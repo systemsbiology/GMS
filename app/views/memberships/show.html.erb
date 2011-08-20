@@ -1,0 +1,25 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Id:</b>
+  <%= @membership.id %>
+</p>
+
+<p>
+  <b>Pedigree:</b>
+  <%= @membership.pedigree_id %>
+</p>
+
+<p>
+  <b>Person:</b>
+  <%= @membership.person_id %>
+</p>
+
+<p>
+  <b>Draw duplicate:</b>
+  <%= @membership.draw_duplicate %>
+</p>
+
+
+<%= link_to 'Edit', edit_membership_path(@membership) %> |
+<%= link_to 'Back', memberships_path %>

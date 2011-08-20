@@ -1,0 +1,40 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Id:</b>
+  <%= @sample.id %>
+</p>
+
+<p>
+  <b>Isb sample:</b>
+  <%= @sample.isb_sample_id %>
+</p>
+
+<p>
+  <b>Sample type:</b>
+  <%= @sample.sample_type_id %>
+</p>
+
+<p>
+  <b>Status:</b>
+  <%= @sample.status %>
+</p>
+
+<p>
+  <b>Date received:</b>
+  <%= @sample.date_received %>
+</p>
+
+<p>
+  <b>Protocol:</b>
+  <%= @sample.protocol %>
+</p>
+
+<p>
+  <b>Comments:</b>
+  <%= @sample.comments %>
+</p>
+
+
+<%= link_to 'Edit', edit_sample_path(@sample) %> |
+<%= link_to 'Back', samples_path %>

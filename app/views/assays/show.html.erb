@@ -1,0 +1,40 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Id:</b>
+  <%= @assay.id %>
+</p>
+
+<p>
+  <b>Sample:</b>
+  <%= @assay.sample_id %>
+</p>
+
+<p>
+  <b>Record:</b>
+  <%= @assay.record_id %>
+</p>
+
+<p>
+  <b>Name:</b>
+  <%= @assay.name %>
+</p>
+
+<p>
+  <b>Type:</b>
+  <%= @assay.type %>
+</p>
+
+<p>
+  <b>Technology:</b>
+  <%= @assay.technology %>
+</p>
+
+<p>
+  <b>Description:</b>
+  <%= @assay.description %>
+</p>
+
+
+<%= link_to 'Edit', edit_assay_path(@assay) %> |
+<%= link_to 'Back', assays_path %>

@@ -1,0 +1,13 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  id: 
+  person_id: 
+  sample_id: 
+  method: 
+
+two:
+  id: 
+  person_id: 
+  sample_id: 
+  method: 

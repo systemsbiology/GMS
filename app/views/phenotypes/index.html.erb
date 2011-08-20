@@ -1,0 +1,29 @@
+<h1>Listing phenotypes</h1>
+
+<table>
+  <tr>
+    <th>Id</th>
+    <th>Diseases</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @phenotypes.each do |phenotype| %>
+  <tr>
+    <td><%= phenotype.id %></td>
+    <td><%= phenotype.diseases_id %></td>
+    <td><%= phenotype.name %></td>
+    <td><%= phenotype.description %></td>
+    <td><%= link_to 'Show', phenotype %></td>
+    <td><%= link_to 'Edit', edit_phenotype_path(phenotype) %></td>
+    <td><%= link_to 'Destroy', phenotype, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Phenotype', new_phenotype_path %>

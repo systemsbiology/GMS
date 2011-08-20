@@ -1,0 +1,30 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Id:</b>
+  <%= @pedigree.id %>
+</p>
+
+<p>
+  <b>Name:</b>
+  <%= @pedigree.name %>
+</p>
+
+<p>
+  <b>Tag:</b>
+  <%= @pedigree.tag %>
+</p>
+
+<p>
+  <b>Study:</b>
+  <%= @pedigree.study_id %>
+</p>
+
+<p>
+  <b>Description:</b>
+  <%= @pedigree.description %>
+</p>
+
+
+<%= link_to 'Edit', edit_pedigree_path(@pedigree) %> |
+<%= link_to 'Back', pedigrees_path %>

@@ -1,0 +1,30 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Id:</b>
+  <%= @trait.id %>
+</p>
+
+<p>
+  <b>Person:</b>
+  <%= @trait.person_id %>
+</p>
+
+<p>
+  <b>Phenotype:</b>
+  <%= @trait.phenotype_id %>
+</p>
+
+<p>
+  <b>Value:</b>
+  <%= @trait.value %>
+</p>
+
+<p>
+  <b>Output order:</b>
+  <%= @trait.output_order %>
+</p>
+
+
+<%= link_to 'Edit', edit_trait_path(@trait) %> |
+<%= link_to 'Back', traits_path %>

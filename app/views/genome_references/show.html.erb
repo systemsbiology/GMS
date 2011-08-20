@@ -1,0 +1,30 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Id:</b>
+  <%= @genome_reference.id %>
+</p>
+
+<p>
+  <b>Name:</b>
+  <%= @genome_reference.name %>
+</p>
+
+<p>
+  <b>Description:</b>
+  <%= @genome_reference.description %>
+</p>
+
+<p>
+  <b>Code:</b>
+  <%= @genome_reference.code %>
+</p>
+
+<p>
+  <b>Location:</b>
+  <%= @genome_reference.location %>
+</p>
+
+
+<%= link_to 'Edit', edit_genome_reference_path(@genome_reference) %> |
+<%= link_to 'Back', genome_references_path %>

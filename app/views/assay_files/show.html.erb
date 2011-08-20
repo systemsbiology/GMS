@@ -1,0 +1,65 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Id:</b>
+  <%= @assay_file.id %>
+</p>
+
+<p>
+  <b>Genome reference:</b>
+  <%= @assay_file.genome_reference_id %>
+</p>
+
+<p>
+  <b>Name:</b>
+  <%= @assay_file.name %>
+</p>
+
+<p>
+  <b>Description:</b>
+  <%= @assay_file.description %>
+</p>
+
+<p>
+  <b>Location:</b>
+  <%= @assay_file.location %>
+</p>
+
+<p>
+  <b>File type:</b>
+  <%= @assay_file.file_type %>
+</p>
+
+<p>
+  <b>Metadata:</b>
+  <%= @assay_file.metadata %>
+</p>
+
+<p>
+  <b>Software:</b>
+  <%= @assay_file.software %>
+</p>
+
+<p>
+  <b>Software version:</b>
+  <%= @assay_file.software_version %>
+</p>
+
+<p>
+  <b>File date:</b>
+  <%= @assay_file.file_date %>
+</p>
+
+<p>
+  <b>Current:</b>
+  <%= @assay_file.current %>
+</p>
+
+<p>
+  <b>Comments:</b>
+  <%= @assay_file.comments %>
+</p>
+
+
+<%= link_to 'Edit', edit_assay_file_path(@assay_file) %> |
+<%= link_to 'Back', assay_files_path %>

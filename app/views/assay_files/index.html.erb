@@ -1,0 +1,45 @@
+<h1>Listing assay_files</h1>
+
+<table>
+  <tr>
+    <th>Id</th>
+    <th>Genome reference</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Location</th>
+    <th>File type</th>
+    <th>Metadata</th>
+    <th>Software</th>
+    <th>Software version</th>
+    <th>File date</th>
+    <th>Current</th>
+    <th>Comments</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @assay_files.each do |assay_file| %>
+  <tr>
+    <td><%= assay_file.id %></td>
+    <td><%= assay_file.genome_reference_id %></td>
+    <td><%= assay_file.name %></td>
+    <td><%= assay_file.description %></td>
+    <td><%= assay_file.location %></td>
+    <td><%= assay_file.file_type %></td>
+    <td><%= assay_file.metadata %></td>
+    <td><%= assay_file.software %></td>
+    <td><%= assay_file.software_version %></td>
+    <td><%= assay_file.file_date %></td>
+    <td><%= assay_file.current %></td>
+    <td><%= assay_file.comments %></td>
+    <td><%= link_to 'Show', assay_file %></td>
+    <td><%= link_to 'Edit', edit_assay_file_path(assay_file) %></td>
+    <td><%= link_to 'Destroy', assay_file, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Assay file', new_assay_file_path %>

@@ -1,0 +1,35 @@
+<h1>Listing assays</h1>
+
+<table>
+  <tr>
+    <th>Id</th>
+    <th>Sample</th>
+    <th>Record</th>
+    <th>Name</th>
+    <th>Type</th>
+    <th>Technology</th>
+    <th>Description</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @assays.each do |assay| %>
+  <tr>
+    <td><%= assay.id %></td>
+    <td><%= assay.sample_id %></td>
+    <td><%= assay.record_id %></td>
+    <td><%= assay.name %></td>
+    <td><%= assay.type %></td>
+    <td><%= assay.technology %></td>
+    <td><%= assay.description %></td>
+    <td><%= link_to 'Show', assay %></td>
+    <td><%= link_to 'Edit', edit_assay_path(assay) %></td>
+    <td><%= link_to 'Destroy', assay, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Assay', new_assay_path %>

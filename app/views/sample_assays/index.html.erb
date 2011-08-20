@@ -1,0 +1,27 @@
+<h1>Listing sample_assays</h1>
+
+<table>
+  <tr>
+    <th>Id</th>
+    <th>Sample</th>
+    <th>Assay</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @sample_assays.each do |sample_assay| %>
+  <tr>
+    <td><%= sample_assay.id %></td>
+    <td><%= sample_assay.sample_id %></td>
+    <td><%= sample_assay.assay_id %></td>
+    <td><%= link_to 'Show', sample_assay %></td>
+    <td><%= link_to 'Edit', edit_sample_assay_path(sample_assay) %></td>
+    <td><%= link_to 'Destroy', sample_assay, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Sample assay', new_sample_assay_path %>

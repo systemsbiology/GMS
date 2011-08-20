@@ -1,0 +1,65 @@
+<%= form_for(@assay_file) do |f| %>
+  <% if @assay_file.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@assay_file.errors.count, "error") %> prohibited this assay_file from being saved:</h2>
+
+      <ul>
+      <% @assay_file.errors.full_messages.each do |msg| %>
+        <li><%= msg %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :id %><br />
+    <%= f.text_field :id %>
+  </div>
+  <div class="field">
+    <%= f.label :genome_reference_id %><br />
+    <%= f.text_field :genome_reference_id %>
+  </div>
+  <div class="field">
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :description %><br />
+    <%= f.text_field :description %>
+  </div>
+  <div class="field">
+    <%= f.label :location %><br />
+    <%= f.text_field :location %>
+  </div>
+  <div class="field">
+    <%= f.label :file_type %><br />
+    <%= f.text_field :file_type %>
+  </div>
+  <div class="field">
+    <%= f.label :metadata %><br />
+    <%= f.text_area :metadata %>
+  </div>
+  <div class="field">
+    <%= f.label :software %><br />
+    <%= f.text_field :software %>
+  </div>
+  <div class="field">
+    <%= f.label :software_version %><br />
+    <%= f.text_field :software_version %>
+  </div>
+  <div class="field">
+    <%= f.label :file_date %><br />
+    <%= f.datetime_select :file_date %>
+  </div>
+  <div class="field">
+    <%= f.label :current %><br />
+    <%= f.check_box :current %>
+  </div>
+  <div class="field">
+    <%= f.label :comments %><br />
+    <%= f.text_area :comments %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

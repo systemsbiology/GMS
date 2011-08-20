@@ -1,0 +1,19 @@
+# Read about fixtures at http://ar.rubyonrails.org/classes/Fixtures.html
+
+one:
+  id: 
+  isb_sample_id: 
+  sample_type_id: 
+  status: MyString
+  date_received: 2011-05-13
+  protocol: MyString
+  comments: MyString
+
+two:
+  id: 
+  isb_sample_id: 
+  sample_type_id: 
+  status: MyString
+  date_received: 2011-05-13
+  protocol: MyString
+  comments: MyString

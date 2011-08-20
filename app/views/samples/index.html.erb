@@ -1,0 +1,35 @@
+<h1>Listing samples</h1>
+
+<table>
+  <tr>
+    <th>Id</th>
+    <th>Isb sample</th>
+    <th>Sample type</th>
+    <th>Status</th>
+    <th>Date received</th>
+    <th>Protocol</th>
+    <th>Comments</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @samples.each do |sample| %>
+  <tr>
+    <td><%= sample.id %></td>
+    <td><%= sample.isb_sample_id %></td>
+    <td><%= sample.sample_type_id %></td>
+    <td><%= sample.status %></td>
+    <td><%= sample.date_received %></td>
+    <td><%= sample.protocol %></td>
+    <td><%= sample.comments %></td>
+    <td><%= link_to 'Show', sample %></td>
+    <td><%= link_to 'Edit', edit_sample_path(sample) %></td>
+    <td><%= link_to 'Destroy', sample, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Sample', new_sample_path %>

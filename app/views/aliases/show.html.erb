@@ -1,0 +1,30 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Id:</b>
+  <%= @alias.id %>
+</p>
+
+<p>
+  <b>Name:</b>
+  <%= @alias.name %>
+</p>
+
+<p>
+  <b>Value:</b>
+  <%= @alias.value %>
+</p>
+
+<p>
+  <b>Type:</b>
+  <%= @alias.type %>
+</p>
+
+<p>
+  <b>Person:</b>
+  <%= @alias.person_id %>
+</p>
+
+
+<%= link_to 'Edit', edit_alias_path(@alias) %> |
+<%= link_to 'Back', aliases_path %>

@@ -1,0 +1,20 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Id:</b>
+  <%= @sample_assay.id %>
+</p>
+
+<p>
+  <b>Sample:</b>
+  <%= @sample_assay.sample_id %>
+</p>
+
+<p>
+  <b>Assay:</b>
+  <%= @sample_assay.assay_id %>
+</p>
+
+
+<%= link_to 'Edit', edit_sample_assay_path(@sample_assay) %> |
+<%= link_to 'Back', sample_assays_path %>

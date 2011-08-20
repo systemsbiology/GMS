@@ -1,0 +1,25 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Id:</b>
+  <%= @acquisition.id %>
+</p>
+
+<p>
+  <b>Person:</b>
+  <%= @acquisition.person_id %>
+</p>
+
+<p>
+  <b>Sample:</b>
+  <%= @acquisition.sample_id %>
+</p>
+
+<p>
+  <b>Method:</b>
+  <%= @acquisition.method %>
+</p>
+
+
+<%= link_to 'Edit', edit_acquisition_path(@acquisition) %> |
+<%= link_to 'Back', acquisitions_path %>

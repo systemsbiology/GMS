@@ -1,0 +1,2 @@
+module SampleAssaysHelper
+end

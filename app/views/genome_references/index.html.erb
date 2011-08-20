@@ -1,0 +1,31 @@
+<h1>Listing genome_references</h1>
+
+<table>
+  <tr>
+    <th>Id</th>
+    <th>Name</th>
+    <th>Description</th>
+    <th>Code</th>
+    <th>Location</th>
+    <th></th>
+    <th></th>
+    <th></th>
+  </tr>
+
+<% @genome_references.each do |genome_reference| %>
+  <tr>
+    <td><%= genome_reference.id %></td>
+    <td><%= genome_reference.name %></td>
+    <td><%= genome_reference.description %></td>
+    <td><%= genome_reference.code %></td>
+    <td><%= genome_reference.location %></td>
+    <td><%= link_to 'Show', genome_reference %></td>
+    <td><%= link_to 'Edit', edit_genome_reference_path(genome_reference) %></td>
+    <td><%= link_to 'Destroy', genome_reference, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New Reference', new_genome_reference_path %>
