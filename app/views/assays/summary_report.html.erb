@@ -1,0 +1,35 @@
+<script>
+  $(document).ready(function() { setupTablesorter() });
+</script>
+<h1>Sequencing Summary</h1>
+<p>Total number of sequencings performed*.</p>
+<%= render "partials/filter_reference" %>
+<table class="tablesorter" style="width: 600px;">
+  <thead>
+  <tr>
+    <th>Pedigree Name</th>
+    <th>Pedigree Description</th>
+    <th>Number of Genomes</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% total = 0 %>
+<% @pedigrees.each do |pedigree| %>
+  <% count = @counts[pedigree.id] || 0 %>
+  <% total = total + count %>
+  <tr>
+  <td><%= pedigree.name %></td>
+  <td><%= pedigree.description %></td>
+  <td><%= count %></td>
+  </tr>
+<% end %>
+</tbody>
+  <tr>
+    <td colspan="2">Total </td>
+    <td><%= total %></td>
+  </tr>
+</table>
+<p> *Multiple assemblies are not counted unless you filter by a specific reference, in which case it counts the number of assemblies of that reference.  For example, there are 46 diversity genomes and each has an hg18 and an hg19 assembly, therefore the count is 46 whether it is unfiltered, hg18 results, or hg19 results.</p>
+
+<br />
+

@@ -1,0 +1,30 @@
+<h1>Listing person_aliases</h1>
+
+<table>
+  <thead>
+  <tr>
+    <th>Id</th>
+    <th>Name</th>
+    <th>Value</th>
+    <th>Person</th>
+    <th colspan="3">Controls</th>
+  </tr>
+  </thead>
+  <tbody>
+<% @person_aliases.each do |person_alias| %>
+  <tr>
+    <td><%= person_alias.id %></td>
+    <td><%= person_alias.name %></td>
+    <td><%= person_alias.value %></td>
+    <td><%= person_alias.person_id %></td>
+    <td><%= link_to 'Show', person_alias %></td>
+    <td><%= link_to 'Edit', edit_person_alias_path(person_alias) %></td>
+    <td><%= link_to 'Destroy', person_alias, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+  </tbody>
+</table>
+
+<br />
+
+<%= link_to 'New Person alias', new_person_alias_path %>

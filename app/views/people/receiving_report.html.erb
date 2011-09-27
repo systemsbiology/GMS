@@ -1,0 +1,102 @@
+<script>
+  $(document).ready(function() { setupTablesorter() });
+</script>
+<h1>Receiving Log for <%= @pedigree.name %></h1>
+<%= render "partials/filter" %>
+<table class="tablesorter">
+  <thead>
+  <tr>
+    <th colspan="2">Sample</th>
+    <th>ISB Person ID&nbsp;&nbsp;&nbsp;</th>
+    <th>Collaborator ID&nbsp;&nbsp;&nbsp;</th>
+    <th>ISB Sample ID</th>
+    <th>Vendor&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+    <th>Status</th>
+    <th>Date Submitted</th>
+    <th>Date Received</th>
+    <th>Date Transferred</th>
+    <th>Dated Backup</th>
+    <th>QC Pass Date</th>
+  </tr>
+  </thead>
+  <tbody>
+<% @people.each do |person| %>
+  <% if person.samples.size == 0 then %>
+        <tr>
+          <td style="background-color: red">&nbsp;</td>
+          <td>No sample information</td>
+          <td>NA</td>
+          <td><nobr><%= person.isb_person_id %></nobr></td>
+          <td><%= person.collaborator_id %></td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+          <td>NA</td>
+        </tr>
+  <% else %>
+    <% person.samples.each do |sample| %>
+      <% if sample.assays.size == 0 then %>
+           <tr>
+            <td style="background-color: 
+	      <% if sample.status == 'sequenced' %>red<%
+	         elsif sample.status == 'submitted' %>yellow<% 
+		 elsif sample.status == 'pending' %>#CC6600<%
+	         elsif sample.status.nil? %>red<% 
+	         end %>">&nbsp;</td>
+            <td><nobr><%= sample.vendor_id %><nobr></td>
+            <td><nobr><%= sample.isb_sample_id %></nobr></td>
+            <td><nobr><%= person.isb_person_id %></nobr></td>
+            <td><%= person.collaborator_id %></td>
+            <td>NA</td>
+            <td><%= sample.status %></td>
+            <td><%= sample.date_submitted %></td>
+            <td>NA</td>
+            <td>NA</td>
+            <td>NA</td>
+            <td>NA</td>
+          </tr>
+       
+      <% else %>
+        <% sample.assays.each do |assay| %>
+          <tr>
+            <td style="background-color: 
+              <% if assay.status then 
+                   if assay.status == 'Received' %>green<% 
+  	           elsif assay.status = 'Pending' %>yellow<% 
+	           end 
+	         else
+	           if sample.status == 'submitted' %>yellow<% 
+	           elsif sample.status.nil? %>#CC6600<% 
+	           end
+	         end %>">&nbsp;</td>
+            <td><nobr><%= sample.vendor_id %><nobr></td>
+            <td><nobr><%= sample.isb_sample_id %></nobr></td>
+            <td><nobr><%= person.isb_person_id %></nobr></td>
+            <td><%= person.collaborator_id %></td>
+            <td><%= assay.vendor %></td>
+            <td><%= sample.status %></td>
+            <td><%= sample.date_submitted %></td>
+            <td><%= assay.date_received %></td>
+            <td><%= assay.date_transferred %></td>
+            <td><%= assay.dated_backup %></td>
+            <td><%= assay.qc_pass_date %></td>
+          </tr>
+        <% end # end assays.each %>
+      <% end # end if sample.assays.size == 0 %>
+    <% end # end samples.each %>
+  <% end # end if person.samples.size == 0 %>
+<% end # end person.each %>
+</tbody>
+</table>
+Legend:
+<table class="tablesorter" style="width: 200px;">
+  <tr><td style="background-color:green">&nbsp;</td><td>Good</td></tr>
+  <tr><td style="background-color:yellow">&nbsp;</td><td>In Process</td></tr>
+  <tr><td style="background-color:#CC6600">&nbsp;</td><td>Pending</td></tr>
+  <tr><td style="background-color:red">&nbsp;</td><td>Error!</td></tr>
+</table>
+<br />
+

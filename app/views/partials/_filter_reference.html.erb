@@ -1,0 +1,6 @@
+
+<%= form_tag("#", :method => "get") do %>
+  <%= select_tag(:reference, options_from_collection_for_select(GenomeReference.all, :id, :name, params[:reference]), {:include_blank => '-Select a reference to filter by', :class => "reference_select"}) %>
+  <%= submit_tag("Filter") %>
+<% end %>
+
