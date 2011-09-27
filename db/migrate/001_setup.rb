@@ -37,7 +37,7 @@ class Setup < ActiveRecord::Migration
       t.string :output_order
     end
 
-    create_table :aliases do |t|
+    create_table :person_aliases do |t|
       t.integer :id
       t.references :person
       t.string :name
@@ -45,7 +45,7 @@ class Setup < ActiveRecord::Migration
       t.string :alias_type
       t.timestamps
     end 
-    add_index :aliases, [:person_id], :name => "alias_person_id"
+    add_index :person_aliases, [:person_id], :name => "alias_person_id"
 
     create_table :pedigrees do |t|
       t.integer :id
@@ -53,6 +53,7 @@ class Setup < ActiveRecord::Migration
       t.string :name
       t.string :tag
       t.references :study
+      t.string :directory
       t.string :description
       t.string :version
       t.timestamps
@@ -75,6 +76,7 @@ class Setup < ActiveRecord::Migration
       t.string :description
       t.string :location
       t.string :file_type
+      t.date :file_date
       t.text :metadata
       t.string :software
       t.string :software_version
@@ -133,10 +135,11 @@ class Setup < ActiveRecord::Migration
       t.integer :id
       t.string :isb_sample_id
       t.references :sample_type
-      t.string :vendor
+      t.string :vendor_id
       t.string :status
       t.string :protocol
       t.date :date_received
+      t.text :description
       t.text :comments
       t.timestamps
     end
@@ -153,8 +156,9 @@ class Setup < ActiveRecord::Migration
     create_table :studies do |t|
       t.integer :id
       t.string :name
-      t.string :principle
+      t.string :principal
       t.string :collaborator
+      t.string :collaborating_institute
       t.string :description
       t.string :contact
       t.timestamps
@@ -166,7 +170,7 @@ class Setup < ActiveRecord::Migration
     drop_table :pedigrees
     drop_table :memberships
     drop_table :people
-    drop_table :aliases
+    drop_table :person_aliases
     drop_table :phenotypes
     drop_table :traits
     drop_table :assay_files

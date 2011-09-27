@@ -1,40 +1,97 @@
-<p id="notice"><%= notice %></p>
+<td id="notice"><%= notice %></p>
 
-<p>
-  <b>Id:</b>
-  <%= @sample.id %>
-</p>
-
-<p>
-  <b>Isb sample:</b>
-  <%= @sample.isb_sample_id %>
-</p>
-
-<p>
+<table class="tablesorter">
+  <tr>
+  <td>
+    <b>ISB sample:</b>
+    <%= @sample.isb_sample_id %>
+ </td>
+ <td >
+   <b>Vendor ID:</b>
+   <%= @sample.vendor_id %>
+ </td>
+<td>
   <b>Sample type:</b>
-  <%= @sample.sample_type_id %>
-</p>
-
-<p>
+  <%= @sample.sample_type.nil? ? 'unknown' : @sample.sample_type.name %>
+</td>
+</tr>
+<tr>
+<td colspan="2">
   <b>Status:</b>
   <%= @sample.status %>
-</p>
+</td>
 
-<p>
-  <b>Date received:</b>
-  <%= @sample.date_received %>
-</p>
-
-<p>
+<td>
+  <b>Date submitted:</b>
+  <%= @sample.date_submitted %>
+</td>
+</tr>
+<tr>
+  <td>
+    <b>Volume:</b>
+    <%= @sample.volume %>
+  </td>
+  <td>
+    <b>Concentration:</b>
+    <%= @sample.concentration %>
+  </td>
+  <td>
+    <b>Quantity:</b>
+    <%= @sample.quantity %>
+  </td>
+</tr>
+<tr>
+<td colspan="3">
   <b>Protocol:</b>
   <%= @sample.protocol %>
-</p>
-
-<p>
+</td>
+</tr>
+<tr>
+<td colspan="3">
   <b>Comments:</b>
   <%= @sample.comments %>
-</p>
-
+</td>
+</tr>
+</table>
 
 <%= link_to 'Edit', edit_sample_path(@sample) %> |
-<%= link_to 'Back', samples_path %>
+<%= link_to 'Back to all samples', samples_path %>
+
+<h1>Listing assays</h1>
+<% if @sample.assays.size > 0 %>
+<script>
+  $(document).ready(function() { setupTablesorter() });
+</script>
+<table class="tablesorter">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Sample</th>
+    <th>ISB Sample ID</th>
+    <th>ISB Person ID&nbsp;&nbsp;&nbsp;</th>
+    <th>Collaborator ID&nbsp;&nbsp;&nbsp;</th>
+    <th>Pedigree</th>
+    <th>Assay type</th>
+    <th>Technology&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+    <th>Status</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @sample.assays.each do |assay| %>
+  <tr>
+    <td><%= link_to assay.name, assay %></td>
+    <td><%= assay.sample.vendor_id %></td>
+    <td><nobr><%= assay.sample.isb_sample_id %></nobr></td>
+    <td><nobr><%= assay.sample.person.isb_person_id %></nobr></td>
+    <td><%= assay.sample.person.collaborator_id %></td>
+    <td><%= assay.sample.person.pedigree.name %></td>
+    <td><%= assay.assay_type %></td>
+    <td><%= assay.technology %></td>
+    <td><%= assay.status %></td>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<% else %>
+<p>No assays for this sample</p>
+<% end %>

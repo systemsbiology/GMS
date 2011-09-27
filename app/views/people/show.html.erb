@@ -7,12 +7,12 @@
 
 <p>
   <b>Sample:</b>
-  <%= @person.sample_id %>
+  <%= @person.isb_person_id %>
 </p>
 
 <p>
   <b>Subject:</b>
-  <%= @person.subject_id %>
+  <%= @person.collaborator_id %>
 </p>
 
 <p>
@@ -30,6 +30,49 @@
   <%= @person.dod %>
 </p>
 
-
+<%= link_to "New Sample for person #{@person.isb_person_id}", new_sample_path(:person_id => @person) %> <br />
 <%= link_to 'Edit', edit_person_path(@person) %> |
 <%= link_to 'Back', people_path %>
+
+<br />
+<h1>Listing samples</h1>
+<% if @person.samples.size > 0 %>
+<script>
+  $(document).ready(function() { setupTablesorter() });
+</script>
+<table class="tablesorter">
+  <thead>
+  <tr>
+    <th>ISB sample</th>
+    <th>ISB Person</th>
+    <th>Peson</th>
+    <th>Pedigree</th>
+    <th>Sample type</th>
+    <th>Status</th>
+    <th>Volume</th>
+    <th>Concentration</th>
+    <th>Quantity</th>
+  </tr>
+  </thead>
+  <tbody>
+<% @person.samples.each do |sample| %>
+  <tr>
+    <td><nobr><%= link_to sample.isb_sample_id, sample %></nobr></td>
+    <td><nobr><%= sample.person.isb_person_id %></nobr></td>
+    <td><%= sample.person.collaborator_id %></td>
+    <td><%= sample.person.pedigree.name %></td>
+    <td><%= sample.sample_type.nil? ? 'unknown' : sample.sample_type.name  %></td>
+    <td><%= sample.status %></td>
+    <td><%= sample.volume %></td>
+    <td><%= sample.concentration %></td>
+    <td><%= sample.quantity %></td>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<% else %>
+<p> No samples for this person.</p>
+<% end %>
+<br />
+
+

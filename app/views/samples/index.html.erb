@@ -1,33 +1,37 @@
+<script>
+  $(document).ready(function() { setupTablesorter() });
+</script>
 <h1>Listing samples</h1>
-
-<table>
+<%= render "partials/filter" %>
+<table class="tablesorter">
+  <thead>
   <tr>
-    <th>Id</th>
-    <th>Isb sample</th>
+    <th>ISB sample</th>
+    <th>ISB Person</th>
+    <th>Peson</th>
+    <th>Pedigree</th>
     <th>Sample type</th>
     <th>Status</th>
-    <th>Date received</th>
-    <th>Protocol</th>
-    <th>Comments</th>
-    <th></th>
-    <th></th>
-    <th></th>
+    <th>Volume</th>
+    <th>Concentration</th>
+    <th>Quantity</th>
   </tr>
-
+  </thead>
+  <tbody>
 <% @samples.each do |sample| %>
   <tr>
-    <td><%= sample.id %></td>
-    <td><%= sample.isb_sample_id %></td>
-    <td><%= sample.sample_type_id %></td>
+    <td><nobr><%= link_to sample.isb_sample_id, sample %></nobr></td>
+    <td><nobr><%= sample.person.isb_person_id %></nobr></td>
+    <td><%= sample.person.collaborator_id %></td>
+    <td><%= sample.person.pedigree.name %></td>
+    <td><%= sample.sample_type.nil? ? 'unknown' : sample.sample_type.name  %></td>
     <td><%= sample.status %></td>
-    <td><%= sample.date_received %></td>
-    <td><%= sample.protocol %></td>
-    <td><%= sample.comments %></td>
-    <td><%= link_to 'Show', sample %></td>
-    <td><%= link_to 'Edit', edit_sample_path(sample) %></td>
-    <td><%= link_to 'Destroy', sample, :confirm => 'Are you sure?', :method => :delete %></td>
+    <td><%= sample.volume %></td>
+    <td><%= sample.concentration %></td>
+    <td><%= sample.quantity %></td>
   </tr>
 <% end %>
+</tbody>
 </table>
 
 <br />

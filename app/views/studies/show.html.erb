@@ -1,23 +1,27 @@
 <p id="notice"><%= notice %></p>
-
-<p>
-  <b>Id:</b>
-  <%= @study.id %>
-</p>
-
 <p>
   <b>Name:</b>
   <%= @study.name %>
 </p>
 
 <p>
+  <b>Tag:</b>
+  <%= @study.tag %>
+</p>
+
+<p>
   <b>Principle:</b>
-  <%= @study.principle %>
+  <%= @study.principal %>
 </p>
 
 <p>
   <b>Collaborator:</b>
   <%= @study.collaborator %>
+</p>
+
+<p>
+  <b>Collaborating Institution:</b>
+  <%= @study.collaborating_institution %>
 </p>
 
 <p>
@@ -30,6 +34,36 @@
   <%= @study.contact %>
 </p>
 
+<p>
+  <b>Pedigrees:</b>
+<% if @pedigrees.nil? or @pedigrees.empty? %>
+  <p>No pedigrees for this study</p>
+<% else %>
+<table class="tablesorter">
+  <tr>
+    <th>Pedigree Name</th>
+    <th>Pedigree Tag</th>
+    <th>Pedigree Description</th>
+    <th style="colspan: 3;">Controls</th>
+  </tr>
+<% @pedigrees.each do |pedigree| %>
+  <tr>
+    <td><%= link_to pedigree.name, pedigree %></td>
+    <td><%= pedigree.tag %></td>
+    <td><%= pedigree.description %></td>
+    <td><%= link_to 'Edit', edit_pedigree_path(pedigree) %></td>
+    <% if false %>
+    <td><%= link_to 'Show', pedigree %></td>
+    <td><%= link_to 'Destroy', pedigree, :confirm => 'Are you sure?', :method => :delete %></td>
+    <% end %>
+  </tr>
+<% end %>
+</table>
+<% end %>
+</p>
 
-<%= link_to 'Edit', edit_study_path(@study) %> |
-<%= link_to 'Back', studies_path %>
+<%= link_to 'Add Pedigree', new_pedigree_path(:study => @study) %>
+<br />
+
+<%= link_to 'Edit Study', edit_study_path(@study) %> |
+<%= link_to 'Back to Study Index', studies_path %>

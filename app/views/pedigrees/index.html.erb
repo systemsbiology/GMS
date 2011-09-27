@@ -1,29 +1,30 @@
+<script>
+  $(document).ready(function() { setupTablesorter() });
+</script>
 <h1>Listing pedigrees</h1>
 
-<table>
+<table class="tablesorter">
+  <thead>
   <tr>
-    <th>Id</th>
     <th>Name</th>
-    <th>Tag</th>
+    <th>Tag&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
     <th>Study</th>
     <th>Description</th>
-    <th></th>
-    <th></th>
-    <th></th>
+    <th colspan="3" class="nosort">Controls</th>
   </tr>
-
-<% @pedigrees.each do |pedigree| %>
-  <tr>
-    <td><%= pedigree.id %></td>
-    <td><%= pedigree.name %></td>
-    <td><%= pedigree.tag %></td>
-    <td><%= pedigree.study_id %></td>
-    <td><%= pedigree.description %></td>
-    <td><%= link_to 'Show', pedigree %></td>
-    <td><%= link_to 'Edit', edit_pedigree_path(pedigree) %></td>
-    <td><%= link_to 'Destroy', pedigree, :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
-<% end %>
+  </thead>
+  <tbody>
+  <% @pedigrees.each do |pedigree| %>
+    <tr>
+      <td><%= link_to pedigree.name, pedigree %></td>
+      <td><%= pedigree.tag %></td>
+      <td><%= pedigree.study.name if pedigree.study %></td>
+      <td><%= pedigree.description %></td>
+      <td><%= link_to 'Edit', edit_pedigree_path(pedigree) %></td>
+      <% if false %><td><%= link_to 'Destroy', pedigree, :confirm => 'Are you sure?', :method => :delete %></td><% end %>
+    </tr>
+  <% end %>
+  </tbody>
 </table>
 
 <br />

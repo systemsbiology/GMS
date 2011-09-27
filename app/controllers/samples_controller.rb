@@ -2,7 +2,7 @@ class SamplesController < ApplicationController
   # GET /samples
   # GET /samples.xml
   def index
-    @samples = Sample.all
+    @samples = Sample.has_pedigree(params[:pedigree]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
 
     respond_to do |format|
       format.html # index.html.erb
@@ -42,8 +42,33 @@ class SamplesController < ApplicationController
   def create
     @sample = Sample.new(params[:sample])
 
+    if params[:check_dates] then
+      if params[:check_dates][:add_date_submitted].to_i != 1 then
+        @sample.date_submitted = nil
+      end
+    end
+
+    if params[:sample_type] then
+      @sample.sample_type_id = params[:sample_type][:id]
+    end
+
+    if params[:status] then
+      @sample.status = params[:status]
+    end
+
+
     respond_to do |format|
       if @sample.save
+         isb_sample_id = "isb_sample: #{@sample.id}"
+         @sample.isb_sample_id = isb_sample_id
+         @sample.save
+
+         #create acquisition
+         acquisition = Acquisition.new
+         acquisition.person_id = params[:person][:id]
+         acquisition.sample_id = @sample.id
+         acquisition.save
+   
         format.html { redirect_to(@sample, :notice => 'Sample was successfully created.') }
         format.xml  { render :xml => @sample, :status => :created, :location => @sample }
       else

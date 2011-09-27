@@ -2,11 +2,17 @@ class AssayFilesController < ApplicationController
   # GET /assay_files
   # GET /assay_files.xml
   def index
-    @assay_files = AssayFile.all
+    #@assay_files = AssayFile.find(:all, :conditions => ['file_type = ?', params[:file_type]]) if (params[:file_type])
+#    @assay_files = @assay_files.find_all_by_file_type(params[:file_type]) if (params[:file_type])
+#    @assay_files = find_all_by_pedigree_id(params[:pedigree][:id]) if (params[:pedigree])
+#    @assay_files = @assay_files.find(:all, :include => { :assay => { :sample => { :person => :pedigree } } },
+#                                        :conditions => [ 'pedigrees.id = ?', params[:pedigree][:id] ]) if (params[:pedigree])
+    @assay_files = AssayFile.has_file_type(params[:file_type]).has_pedigree(params[:pedigree])
 
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @assay_files }
+      format.json  { render :json => @assay_files }
     end
   end
 
@@ -18,6 +24,7 @@ class AssayFilesController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @assay_file }
+      format.json  { render :json => @assay_file }
     end
   end
 
@@ -29,6 +36,7 @@ class AssayFilesController < ApplicationController
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @assay_file }
+      format.json  { render :json => @assay_file }
     end
   end
 
@@ -46,9 +54,11 @@ class AssayFilesController < ApplicationController
       if @assay_file.save
         format.html { redirect_to(@assay_file, :notice => 'Assay file was successfully created.') }
         format.xml  { render :xml => @assay_file, :status => :created, :location => @assay_file }
+        format.json  { render :json => @assay_file, :status => :created, :location => @assay_file }
       else
         format.html { render :action => "new" }
         format.xml  { render :xml => @assay_file.errors, :status => :unprocessable_entity }
+        format.json  { render :json => @assay_file.errors, :status => :unprocessable_entity }
       end
     end
   end
@@ -80,4 +90,13 @@ class AssayFilesController < ApplicationController
       format.xml  { head :ok }
     end
   end
+
+
+  #HELPER METHODS
+
+    def find_all_by_pedigree_id(pedigree_id)
+    @assay_files = AssayFile.find(:all, :include => { :assay => { :sample => { :person => :pedigree } } },
+                                        :conditions => [ 'pedigrees.id = ?', pedigree_id ])
+  end
+
 end

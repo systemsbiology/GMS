@@ -2,13 +2,30 @@
 <html>
 <head>
   <title>Gms</title>
-  <%= stylesheet_link_tag :all %>
-  <%= javascript_include_tag :defaults %>
   <%= csrf_meta_tag %>
+  <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+  <![endif]-->
+  <%= stylesheet_link_tag :all %>
+  <%= stylesheet_link_tag 'tablesorter' %>
+  <%= javascript_include_tag :defaults %>
+  <%= javascript_include_tag 'jquery.tablesorter.min.js' %>
 </head>
 <body>
-
-<%= yield %>
-
+  <div class="container">
+    <div class="header">
+      <%= render 'layouts/header' %>
+    </div>
+    <div class="contents">
+      <div class="menu">
+        <%= render 'layouts/menu' %>
+      </div>
+      <div class="page">
+        <section>
+          <%= yield %>
+        </section>
+      </div>
+    </div>
+  </div>
 </body>
 </html>

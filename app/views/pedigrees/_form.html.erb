@@ -12,10 +12,6 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :id %><br />
-    <%= f.text_field :id %>
-  </div>
-  <div class="field">
     <%= f.label :name %><br />
     <%= f.text_field :name %>
   </div>
@@ -24,8 +20,8 @@
     <%= f.text_field :tag %>
   </div>
   <div class="field">
-    <%= f.label :study_id %><br />
-    <%= f.text_field :study_id %>
+    <%= f.label :study %><br />
+    <%= collection_select(:pedigree, :study_id, Study.all, :id, :name, options = {:prompt => '-Select a study for this pedigree'}, :selected => params[:study_id], :class => "study_select") %>
   </div>
   <div class="field">
     <%= f.label :description %><br />

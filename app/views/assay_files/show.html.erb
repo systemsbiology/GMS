@@ -1,64 +1,39 @@
-<p id="notice"><%= notice %></p>
+<p id="notice"><%= notice %></td>
 
-<p>
-  <b>Id:</b>
-  <%= @assay_file.id %>
-</p>
+<table class="tablesorter">
+  <tr>
+    <td><b>Name:</b> <nobr><%= @assay_file.name %></nobr> </td>
+    <td><b>Genome reference:</b> <%= @assay_file.genome_reference.name %> </td>
+    <td colspan="2"> <b>File type:</b> <%= @assay_file.file_type %> </td>
+  </tr>
+  <tr>
+    <td><b>Software:</b> <%= @assay_file.software %> </td>
+    <td><b>Software version:</b> <%= @assay_file.software_version %> </td>
+    <td><b>File date:</b> <%= @assay_file.file_date %> </td>
+    <td><b>Current:</b> <%= @assay_file.current %> </td>
+  </tr>
+  <tr>
+    <td colspan="4"> <b>Location:</b> <%= @assay_file.location %> </td>
+  </tr>
+  <tr>
+    <td colspan="4"> <b>Metadata:</b> <%= @assay_file.metadata %> </td>
+  </tr>
+  <tr>
+    <td colspan="4"> <b>Description:</b> <%= @assay_file.description %> </td>
+  </tr>
+  <tr>
+    <td colspan="4"> <b>Comments:</b> <%= @assay_file.comments %> </td>
+  </tr>
+</table>
 
-<p>
-  <b>Genome reference:</b>
-  <%= @assay_file.genome_reference_id %>
-</p>
-
-<p>
-  <b>Name:</b>
-  <%= @assay_file.name %>
-</p>
-
-<p>
-  <b>Description:</b>
-  <%= @assay_file.description %>
-</p>
-
-<p>
-  <b>Location:</b>
-  <%= @assay_file.location %>
-</p>
-
-<p>
-  <b>File type:</b>
-  <%= @assay_file.file_type %>
-</p>
-
-<p>
-  <b>Metadata:</b>
-  <%= @assay_file.metadata %>
-</p>
-
-<p>
-  <b>Software:</b>
-  <%= @assay_file.software %>
-</p>
-
-<p>
-  <b>Software version:</b>
-  <%= @assay_file.software_version %>
-</p>
-
-<p>
-  <b>File date:</b>
-  <%= @assay_file.file_date %>
-</p>
-
-<p>
-  <b>Current:</b>
-  <%= @assay_file.current %>
-</p>
-
-<p>
-  <b>Comments:</b>
-  <%= @assay_file.comments %>
-</p>
+<% if @assay_file.file_type == 'SUMMARY' %>
+<div>
+  <div><span style="font-weight:bold; text-decoration: underline;">Summary File Contents</span></div>
+  <div>
+  <%= simple_format(File.read(@assay_file.location)) %>
+  </div>
+</div>
+<% end %>
 
 
 <%= link_to 'Edit', edit_assay_file_path(@assay_file) %> |

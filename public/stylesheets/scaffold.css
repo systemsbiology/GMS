@@ -54,3 +54,26 @@ div.field, div.actions {
   font-size: 12px;
   list-style: square;
 }
+
+div.header {
+  width: 500px;
+}
+
+div.contents {
+  width: 1100px;
+  border: dashed 1px black;
+  position: relative;
+  clear: both;
+}
+
+div.menu {
+  width: 15%;
+  position: relative;
+  float: left;
+}
+
+div.page {
+  width: 84%;
+  position: relative;
+  float: right;
+}

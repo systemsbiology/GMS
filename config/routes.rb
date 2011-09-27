@@ -1,18 +1,21 @@
 Gms::Application.routes.draw do
-  get "welcome/index"
+  resources :reports
 
   root :to => 'welcome#index'
 
   match '/calendar(/:year(/:month))' => 'calendar#index', :as => :calendar, :constraints => {:year => /\d{4}/, :month => /\d{1,2}/}
-
   resources :genome_references
   resources :assay_files
+
+  match "assays/summary_report", :controller => "assays", :action => "summary_report"
   resources :assays
   resources :sample_assays
   resources :samples
   resources :sample_types
   resources :acquisitions
+  match "people/receiving_report/(:id)", :controller => "people", :action => "receiving_report"
   resources :people
+  resources :person_aliases
   resources :traits
   resources :phenotypes
   resources :diseases
@@ -21,6 +24,15 @@ Gms::Application.routes.draw do
   resources :memberships
   resources :pedigrees
   resources :studies
+
+  def self.inherited(child)
+    child.instance_eval do
+      def model_name
+        Report.model_name
+      end
+    end
+    super
+  end
 
   # The priority is based upon order of creation:
   # first created -> highest priority.

@@ -2,7 +2,7 @@ class PeopleController < ApplicationController
   # GET /people
   # GET /people.xml
   def index
-    @people = Person.all
+    @people = Person.has_pedigree(params[:pedigree])
 
     respond_to do |format|
       format.html # index.html.erb
@@ -42,8 +42,33 @@ class PeopleController < ApplicationController
   def create
     @person = Person.new(params[:person])
 
+    if params[:gender] then
+      if params[:gender] != 'unknown' then
+        @person.gender = params[:gender]
+      end
+    end
+
+    if params[:check_dates] then
+      if params[:check_dates][:add_dob].to_i != 1 then
+        @person.dob = nil
+      end
+      if params[:check_dates][:add_dod].to_i != 1 then
+        @person.dod = nil
+      end
+    end
+
     respond_to do |format|
       if @person.save
+        isb_person_id = "isb_ind: #{@person.id}"
+	@person.isb_person_id = isb_person_id
+	@person.save
+
+	# create memberships
+	membership = Membership.new
+	membership.pedigree_id = params[:pedigree][:id]
+        membership.person_id = @person.id
+	membership.save
+
         format.html { redirect_to(@person, :notice => 'Person was successfully created.') }
         format.xml  { render :xml => @person, :status => :created, :location => @person }
       else
@@ -80,4 +105,21 @@ class PeopleController < ApplicationController
       format.xml  { head :ok }
     end
   end
+
+
+  def receiving_report
+    if params[:pedigree] then
+      @pedigree = Pedigree.find(params[:pedigree][:id])
+    else
+      @pedigree = Pedigree.first
+    end
+
+#    @assays = Assay.find(:all, :include => { :sample => { :person => :pedigree }}, :conditions => { 'pedigrees.id' => @pedigree.id })
+    @people = Person.find(:all, :include => [ {:samples =>  :assays }, :pedigree], :conditions => { 'pedigrees.id' => @pedigree.id })
+
+    # this is to make the filter select the proper pedigree on initialize
+    params[:pedigree] = Hash.new
+    params[:pedigree][:id] = @pedigree.id.to_s
+  end
+
 end

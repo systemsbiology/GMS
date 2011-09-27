@@ -31,10 +31,12 @@ gem 'cancan'
 gem 'paperclip'
 
 gem 'ancestry'
+gem 'awesome_nested_set'
 gem 'acts_as_audited', "2.0.0.rc7"
 
 gem 'rspec-rails', '~> 2.6.0'
 
+gem 'madeline', '~> 0.1.4'
 # Bundle the extra gems:
 # gem 'bj'
 # gem 'nokogiri'

@@ -1,9 +1,11 @@
-<p id="notice"><%= notice %></p>
+<script>
+  $(document).ready(function() {
+    $(".tablesorter").tablesorter({widgets: ['zebra']});
+  });
+</script>
 
-<p>
-  <b>Id:</b>
-  <%= @pedigree.id %>
-</p>
+
+<p id="notice"><%= notice %></p>
 
 <p>
   <b>Name:</b>
@@ -17,7 +19,7 @@
 
 <p>
   <b>Study:</b>
-  <%= @pedigree.study_id %>
+  <%= @pedigree.study.name if @pedigree.study %>
 </p>
 
 <p>
@@ -28,3 +30,47 @@
 
 <%= link_to 'Edit', edit_pedigree_path(@pedigree) %> |
 <%= link_to 'Back', pedigrees_path %>
+<br />
+<p><span style="font-weight: bold; text-decoration: underline;">People in this Pedigree</span></p>
+<% if @people.size == 0 %>
+  <p>No people currently entered for this pedigree</p>
+<% else %>
+  <table class="tablesorter" id="PedigreePeople">
+    <thead>
+    <tr>
+      <th>Sample</th>
+      <th>Subject</th>
+      <th>Gender</th>
+      <th>Dob</th>
+      <th>Dod</th>
+    </tr>
+    </thead>
+    <tbody>
+    <% @people.each do |person| %>
+      <tr>
+        <td><%= link_to person.isb_person_id, person %></td>
+        <td><%= person.collaborator_id %></td>
+        <td><%= person.gender %></td>
+        <td><%= person.dob %></td>
+        <td><%= person.dod %></td>
+      </tr>
+    <% end %>
+    <tbody>
+  </table>
+<% end %>
+
+
+<%= link_to 'Add People', new_person_path(:pedigree_id => @pedigree) %>
+<br />
+
+<% if false %>
+<%= @rels.inspect %><br />
+<%= @to_madeline.inspect %><br />
+<%= raw(@filename) %><br />
+<% end %>
+<% if @people.size > 2 %>
+<% unless @pedigree.name.match(/unrelated/) %>
+<%= raw(@madeline) %>
+<% end %>
+<% end %>
+

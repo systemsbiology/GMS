@@ -10,7 +10,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110819233419) do
+ActiveRecord::Schema.define(:version => 20110926182022) do
 
   create_table "acquisitions", :force => true do |t|
     t.integer "sample_id"
@@ -18,16 +18,8 @@ ActiveRecord::Schema.define(:version => 20110819233419) do
     t.string  "method"
   end
 
-  create_table "aliases", :force => true do |t|
-    t.integer  "person_id"
-    t.string   "name"
-    t.string   "value"
-    t.string   "alias_type"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  add_index "aliases", ["person_id"], :name => "alias_person_id"
+  add_index "acquisitions", ["person_id"], :name => "acquisitions_person"
+  add_index "acquisitions", ["sample_id"], :name => "acquisitions_sample"
 
   create_table "assay_files", :force => true do |t|
     t.integer  "genome_reference_id"
@@ -36,7 +28,9 @@ ActiveRecord::Schema.define(:version => 20110819233419) do
     t.string   "description"
     t.string   "location"
     t.string   "file_type"
+    t.date     "file_date"
     t.text     "metadata"
+    t.string   "disk_id",             :limit => 50
     t.string   "software"
     t.string   "software_version"
     t.date     "record_date"
@@ -45,14 +39,23 @@ ActiveRecord::Schema.define(:version => 20110819233419) do
     t.integer  "created_by"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "ancestry"
   end
+
+  add_index "assay_files", ["ancestry"], :name => "index_assay_files_on_ancestry"
+  add_index "assay_files", ["assay_id"], :name => "assay_files_assay"
 
   create_table "assays", :force => true do |t|
     t.string   "name"
+    t.string   "vendor"
     t.string   "assay_type"
     t.string   "technology"
     t.string   "description"
-    t.date     "date"
+    t.date     "date_received"
+    t.date     "date_transferred"
+    t.date     "dated_backup"
+    t.date     "qc_pass_date"
+    t.boolean  "current"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -101,11 +104,15 @@ ActiveRecord::Schema.define(:version => 20110819233419) do
     t.string  "draw_duplicate"
   end
 
+  add_index "memberships", ["pedigree_id"], :name => "membership_pedigree"
+  add_index "memberships", ["person_id"], :name => "membership_person"
+
   create_table "pedigrees", :force => true do |t|
     t.string   "isb_pedigree_id"
     t.string   "name"
     t.string   "tag"
     t.integer  "study_id"
+    t.string   "directory"
     t.string   "description"
     t.string   "version"
     t.datetime "created_at"
@@ -125,9 +132,25 @@ ActiveRecord::Schema.define(:version => 20110819233419) do
     t.text     "comments"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "ancestry"
+    t.integer  "parent_id"
+    t.integer  "lft"
+    t.integer  "rgt"
   end
 
+  add_index "people", ["ancestry"], :name => "index_people_on_ancestry"
   add_index "people", ["isb_person_id"], :name => "index_people_on_isb_person_id", :unique => true
+
+  create_table "person_aliases", :force => true do |t|
+    t.integer  "person_id"
+    t.string   "name"
+    t.string   "value"
+    t.string   "alias_type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  add_index "person_aliases", ["person_id"], :name => "alias_person_id"
 
   create_table "phenotypes", :force => true do |t|
     t.integer  "disease_id"
@@ -147,12 +170,23 @@ ActiveRecord::Schema.define(:version => 20110819233419) do
     t.datetime "updated_at"
   end
 
+  create_table "reports", :force => true do |t|
+    t.string   "name"
+    t.string   "description"
+    t.string   "type"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "sample_assays", :force => true do |t|
     t.integer  "sample_id"
     t.integer  "assay_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  add_index "sample_assays", ["assay_id"], :name => "sample_assays_assay"
+  add_index "sample_assays", ["sample_id"], :name => "sample_assays_sample"
 
   create_table "sample_types", :force => true do |t|
     t.string   "name"
@@ -165,10 +199,14 @@ ActiveRecord::Schema.define(:version => 20110819233419) do
   create_table "samples", :force => true do |t|
     t.string   "isb_sample_id"
     t.integer  "sample_type_id"
-    t.string   "vendor"
+    t.string   "vendor_id"
     t.string   "status"
     t.string   "protocol"
+    t.string   "volume",         :limit => 25
+    t.string   "concentration",  :limit => 25
+    t.string   "quantity",       :limit => 25
     t.date     "date_received"
+    t.text     "description"
     t.text     "comments"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -178,8 +216,10 @@ ActiveRecord::Schema.define(:version => 20110819233419) do
 
   create_table "studies", :force => true do |t|
     t.string   "name"
-    t.string   "principle"
+    t.string   "tag",                       :limit => 50
+    t.string   "principal"
     t.string   "collaborator"
+    t.string   "collaborating_institution"
     t.string   "description"
     t.string   "contact"
     t.datetime "created_at"

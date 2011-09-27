@@ -33,6 +33,10 @@ namespace :pedigree do
 	  cur_ped.description = v
 	when "pedigree_version"
 	  cur_ped.version = v
+	when "pedigree_study"
+	  # don't need to do anything because this is taken care of later
+	when "pedigree_subdir"
+	  cur_ped.directory = v
 	when "individuals"
 	  cur_per = ''
 	  cur_json_id = ''
@@ -210,6 +214,8 @@ namespace :pedigree do
 			  when "assemblies"
 			    # go through the array of assemblies
 			    v4.each do |asm|
+			      # BUG: TODO: need to add a find Assay because things that have multiple
+			      # assemblies shouldn't have multiple assays
 			      puts "assay_info is #{assay_info.inspect}"
 			      cur_assay = Assay.new(:assay_type => 'sequencing')
 			      cur_assay.date = assay_info["date"]
@@ -228,6 +234,12 @@ namespace :pedigree do
 				  cur_asm.software_version = asm_val
 				when "assembly_desc"
 				  cur_asm.description = asm_val
+				when "assembly_deprecated"
+				  if asm_val == "1"
+				    cur_asm.current = 0
+				  else
+				    cur_asm.current = 1
+				  end
 				when "reference"
 				  if asm_val == ""
 				    puts "WARNING: THERE IS NO REFERENCE FOR ASSEMBLY"
@@ -304,7 +316,7 @@ namespace :pedigree do
               cur_per.isb_person_id = "isb_ind: "+cur_per.id.to_s
 	      cur_per.save
 	    end
-	    ped_map[cur_json_id] = cur_per.id
+	    ped_map[cur_json_id.to_s] = cur_per.id
 	    puts "added cur_json_id #{cur_json_id} to ped map with cur_per id #{cur_per.id}\n";
 	    puts cur_per.inspect
 	    puts ped_map.inspect
@@ -341,23 +353,17 @@ namespace :pedigree do
 
             puts "rel_self #{rel_self} rel_mother #{rel_mother} rel_father #{rel_father}\n"
 	    puts "ped_map #{ped_map.inspect}"
-	    puts "find id #{ped_map[rel_self]}\n"
+	    puts "find id #{ped_map[rel_self.to_s]}\n"
 
-            child = Person.find_by_id(ped_map[rel_self])
-	    puts "found child #{child.inspect}\n"
-	    mother = Person.find_by_id(ped_map[rel_mother])
-            puts "found mother #{mother.inspect}\n"
-	    father = Person.find_by_id(ped_map[rel_father])
-            puts "found father #{father.inspect}\n"
+            child = Person.find_by_id(ped_map[rel_self.to_s])
+	    puts "found child #{child.inspect} for rel_self #{rel_self} pedmap #{ped_map[rel_self.to_s]}\n"
+	    mother = Person.find_by_id(ped_map[rel_mother.to_s])
+            puts "found mother #{mother.inspect} for rel_mother #{rel_mother} pedmap #{ped_map[rel_mother.to_s]}\n"
+	    father = Person.find_by_id(ped_map[rel_father.to_s])
+            puts "found father #{father.inspect} for rel_father #{rel_father} pedmap #{ped_map[rel_father.to_s]}\n"
 
             if child.nil? or mother.nil? or father.nil?
 	      puts "ERROR: NO INFORMATION FOR RELATIONSHIP\n"
-#	      child = Person.new(:gender => "male")
-#	      child.id = ped_map[rel_self]
-#	      mother = Person.new
-#	      mother.id = ped_map[rel_mother]
-#	      father = Person.new
-#	      father.id = ped_map[rel_father]
 	    end
 
 	    rel_name = ''
@@ -369,23 +375,27 @@ namespace :pedigree do
 	      rel_name = "child"
             end
 
-	    rel_mom = Relationship.find_by_parent_and_child(mother.id, child.id)
-	    if rel_mom.nil?
-	      rel_mom = Relationship.new(:parent => mother.id, :child => child.id, :name => rel_name, :relationship_type => "directed")
-	      rel_mom.save
+            unless mother.nil? 
+              rel_mom = Relationship.find_by_parent_and_child(mother.id, child.id)
+	      if rel_mom.nil?
+	        rel_mom = Relationship.new(:parent => mother.id, :child => child.id, :name => rel_name, :relationship_type => "directed")
+	        rel_mom.save
+	      end
+              puts "rel mom #{rel_mom.inspect}"
 	    end
-            puts "rel mom #{rel_mom.inspect}"
-	
-	    rel_dad = Relationship.find_by_parent_and_child(father.id, child.id)
-	    if rel_dad.nil?
-	      rel_dad = Relationship.new(:parent => father.id, :child => child.id, :name => rel_name, :relationship_type => "directed")
-	      rel_dad.save
-	    end
-            puts "rel dad #{rel_dad.inspect}"
+	    unless father.nil?
+  	      rel_dad = Relationship.find_by_parent_and_child(father.id, child.id)
+	      if rel_dad.nil?
+	        rel_dad = Relationship.new(:parent => father.id, :child => child.id, :name => rel_name, :relationship_type => "directed")
+	        rel_dad.save
+	      end
+              puts "rel dad #{rel_dad.inspect}"
+            end
 
-	    rel_parents = Relationship.new(:parent => father.id, :child => mother.id, :name => "married", :relationship_type => "undirected")
-	    rel_parents.save
-
+            unless mother.nil? or father.nil?
+  	      rel_parents = Relationship.new(:parent => father.id, :child => mother.id, :name => "married", :relationship_type => "undirected")
+	      rel_parents.save
+            end
 	  end
 	else 
 	  puts "unhandled #{ped_key}"

@@ -12,29 +12,30 @@
   <% end %>
 
   <div class="field">
-    <%= f.label :id %><br />
-    <%= f.text_field :id %>
+    <%= f.label :pedigree_name %><br />
+    <%= collection_select(:pedigree, :id, Pedigree.all(:include=> :study, :order => ['studies.name', 'pedigrees.name']), :id, :name, options = {:include_blank => '-Select the pedigree this person belongs to', :selected => params[:pedigree_id]}, :class => "pedigree_select") %>
   </div>
   <div class="field">
-    <%= f.label :sample_id %><br />
-    <%= f.text_field :sample_id %>
-  </div>
-  <div class="field">
-    <%= f.label :subject_id %><br />
-    <%= f.text_field :subject_id %>
+    <span>Collaborator ID</span><br />
+    <%= f.text_field :collaborator_id %>
   </div>
   <div class="field">
     <%= f.label :gender %><br />
-    <%= f.text_field :gender %>
+    <%= select_tag("gender", "<option>male</option><option>female</option><option>unknown</option>".html_safe) %>
   </div>
   <div class="field">
     <%= f.label :dob %><br />
     <%= f.date_select :dob %>
+    <%= check_box("check_dates", "add_dob") %>
+      Add Date of Birth?
   </div>
   <div class="field">
     <%= f.label :dod %><br />
     <%= f.date_select :dod %>
+    <%= check_box("check_dates", "add_dod") %>
+      Add Date of Death?
   </div>
+
   <div class="actions">
     <%= f.submit %>
   </div>

@@ -1,31 +1,35 @@
+<script>
+  $(document).ready(function() { setupTablesorter() });
+</script>
 <h1>Listing studies</h1>
 
-<table>
+<table class="tablesorter">
+  <thead>
   <tr>
-    <th>Id</th>
     <th>Name</th>
-    <th>Principle</th>
-    <th>Collaborator</th>
-    <th>Description</th>
-    <th>Contact</th>
-    <th></th>
-    <th></th>
-    <th></th>
+    <th>Principle&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+    <th>Collaborator&nbsp;&nbsp;&nbsp;&nbsp;</th>
+    <th>Collaborating Institution&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+    <th>Description&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+    <th>Contact&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+    <th class="nosort" colspan="3">Controls</th>
   </tr>
-
+  </thead>
+  <tbody>
 <% @studies.each do |study| %>
   <tr>
-    <td><%= study.id %></td>
     <td><%= study.name %></td>
-    <td><%= study.principle %></td>
+    <td><%= study.principal %></td>
     <td><%= study.collaborator %></td>
+    <td><%= study.collaborating_institution %></td>
     <td><%= study.description %></td>
     <td><%= study.contact %></td>
     <td><%= link_to 'Show', study %></td>
     <td><%= link_to 'Edit', edit_study_path(study) %></td>
-    <td><%= link_to 'Destroy', study, :confirm => 'Are you sure?', :method => :delete %></td>
+    <% if false %><td><%= link_to 'Destroy', study, :confirm => 'Are you sure?', :method => :delete %></td><% end %>
   </tr>
 <% end %>
+  </tbody>
 </table>
 
 <br />

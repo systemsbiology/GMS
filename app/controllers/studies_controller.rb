@@ -2,7 +2,7 @@ class StudiesController < ApplicationController
   # GET /studies
   # GET /studies.xml
   def index
-    @studies = Study.all
+    @studies = Study.find(:all, :order => :name)
 
     respond_to do |format|
       format.html # index.html.erb
@@ -14,6 +14,7 @@ class StudiesController < ApplicationController
   # GET /studies/1.xml
   def show
     @study = Study.find(params[:id])
+    @pedigrees = Pedigree.find_all_by_study_id(@study)
 
     respond_to do |format|
       format.html # show.html.erb

@@ -2,7 +2,7 @@ class AssaysController < ApplicationController
   # GET /assays
   # GET /assays.xml
   def index
-    @assays = Assay.all
+    @assays = Assay.has_pedigree(params[:pedigree])
 
     respond_to do |format|
       format.html # index.html.erb
@@ -79,5 +79,12 @@ class AssaysController < ApplicationController
       format.html { redirect_to(assays_url) }
       format.xml  { head :ok }
     end
+  end
+
+  def summary_report 
+    @counts = Assay.include_pedigree.group('pedigrees.id').has_reference(params[:reference], 'ASSEMBLY').count
+    @pedigrees = Pedigree.order("name")
+
+
   end
 end
