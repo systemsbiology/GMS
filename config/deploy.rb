@@ -1,7 +1,8 @@
 set :application, "GMS"
 set :repository,  "/proj/famgen/git/gms/"
 
-set :scm, :subversion
+#set :scm, :subversion
+set :scm, :git
 # Or: `accurev`, `bzr`, `cvs`, `darcs`, `git`, `mercurial`, `perforce`, `subversion` or `none`
 
 role :web, "your web-server here"                          # Your HTTP server, Apache/etc
