@@ -35,8 +35,10 @@ class PedigreesController < ApplicationController
     #@to_mad = to_madeline(rels)
     @filename = madeline_file
     if (!File.exists?(madeline_file)) then
-      tmpfile, warnings = Madeline::Interface.new(:embedded => true, :L => "CM").draw(File.open("/u5/www/dev_sites/dmauldin/gms/public/madeline_adamsO_79083.txt","r"))
+      if File.exists?("/u5/www/dev_sites/dmauldin/gms/public/madeline_adamsO_79083.txt") then
+        tmpfile, warnings = Madeline::Interface.new(:embedded => true, :L => "CM").draw(File.open("/u5/www/dev_sites/dmauldin/gms/public/madeline_adamsO_79083.txt","r"))
       FileUtils.copy(tmpfile,madeline_file)
+      end
     end
 
     @madeline = File.read(madeline_file) if @people.size > 0

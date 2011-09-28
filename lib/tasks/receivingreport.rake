@@ -16,7 +16,7 @@ namespace :receiving_report do
     end
 
     # nil is false
-    DEBUG=nil
+    DEBUG=true
 
     default_ref_genome = GenomeReference.find_by_name("hg19").id
     puts "Default reference genome is hg19. Change this default by editing the lib/tasks/receivingreport.rake file if this changes."
@@ -404,7 +404,7 @@ namespace :receiving_report do
     	       else 
 	         raise "error saving assay_file."
               end
-	   else
+	    else
 	      puts "file #{file_loc} not found on disk, not creating entry in database"
 	    end
 	  else 
