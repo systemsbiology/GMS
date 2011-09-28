@@ -43,8 +43,9 @@ class PedigreesController < ApplicationController
       end
     end
 
-    @madeline = File.read(madeline_file) if @people.size > 0 and File.exists?(madeline_file)
-
+    if File.exists?(madeline_file) then
+      @madeline = File.read(madeline_file) if @people.size > 0
+    end 
 
     respond_to do |format|
       format.html # show.html.erb
