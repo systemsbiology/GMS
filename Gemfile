@@ -1,6 +1,7 @@
 source 'http://rubygems.org'
 
-gem 'rails', '3.0.7'
+gem 'rails'
+#, '3.0.7'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -17,6 +18,8 @@ gem 'capistrano'
 # gem 'ruby-debug'
 gem 'ruby-debug19', :require => 'ruby-debug'
 
+gem 'settingslogic'
+
 gem 'will_paginate'
 gem 'jquery-rails'
 gem 'formtastic'
@@ -32,9 +35,11 @@ gem 'paperclip'
 
 gem 'ancestry'
 gem 'awesome_nested_set'
-gem 'acts_as_audited', "2.0.0.rc7"
+gem 'acts_as_audited'
+#, "2.0.0.rc7"
 
-gem 'rspec-rails', '~> 2.6.0'
+gem 'rspec-rails'
+#, '~> 2.6.0'
 
 gem 'madeline', '~> 0.1.4'
 # Bundle the extra gems:

@@ -1,15 +1,5 @@
 <%= form_for(@acquisition) do |f| %>
-  <% if @acquisition.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@acquisition.errors.count, "error") %> prohibited this acquisition from being saved:</h2>
-
-      <ul>
-      <% @acquisition.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "partials/error_messages", :target => @acquisition %>
 
   <div class="field">
     <%= f.label :id %><br />

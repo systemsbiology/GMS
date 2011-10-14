@@ -1,31 +1,17 @@
 <%= form_for(@person_alias) do |f| %>
-  <% if @person_alias.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@person_alias.errors.count, "error") %> prohibited this person_alias from being saved:</h2>
-
-      <ul>
-      <% @person_alias.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "partials/error_messages", :target => @person_alias %>
 
   <div class="field">
-    <%= f.label :id %><br />
-    <%= f.text_field :id %>
+    <%= f.label :person_id %><br />
+    <%= f.collection_select(:person_id, Person.all, :id, :full_identifier, { :include_blank => "-Select Person", :selected => params[:person_id]}) %>
   </div>
   <div class="field">
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
+    <%= f.label :alias_type %><br />
+    <%= f.collection_select(:alias_type, ["collaborator_id"], :downcase, :titleize, { :include_blank => "-Select Alias Type"}) %>
   </div>
   <div class="field">
     <%= f.label :value %><br />
     <%= f.text_field :value %>
-  </div>
-  <div class="field">
-    <%= f.label :person_id %><br />
-    <%= f.text_field :person_id %>
   </div>
   <div class="actions">
     <%= f.submit %>

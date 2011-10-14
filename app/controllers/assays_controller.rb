@@ -2,11 +2,12 @@ class AssaysController < ApplicationController
   # GET /assays
   # GET /assays.xml
   def index
-    @assays = Assay.has_pedigree(params[:pedigree])
+    @assays = Assay.has_pedigree(params[:pedigree_filter])
 
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @assays }
+      format.js
     end
   end
 

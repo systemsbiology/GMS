@@ -1,29 +1,29 @@
 <h1>Listing phenotypes</h1>
 
-<table>
+<%= link_to 'New Phenotype', new_phenotype_path %>
+<table class="tablesorter">
+  <thead>
   <tr>
-    <th>Id</th>
-    <th>Diseases</th>
+    <th>Disease</th>
     <th>Name</th>
     <th>Description</th>
-    <th></th>
-    <th></th>
-    <th></th>
   </tr>
-
+  </thead>
+  <tbody>
 <% @phenotypes.each do |phenotype| %>
   <tr>
-    <td><%= phenotype.id %></td>
-    <td><%= phenotype.disease_id %></td>
-    <td><%= phenotype.name %></td>
+    <td><%= link_to(phenotype.disease.name,phenotype.disease) if phenotype.disease %></td>
+    <td><%= link_to phenotype.name, phenotype %></td>
     <td><%= phenotype.description %></td>
+    <% if false %>
     <td><%= link_to 'Show', phenotype %></td>
     <td><%= link_to 'Edit', edit_phenotype_path(phenotype) %></td>
     <td><%= link_to 'Destroy', phenotype, :confirm => 'Are you sure?', :method => :delete %></td>
+    <% end %>
   </tr>
 <% end %>
+</tbody>
 </table>
 
 <br />
 
-<%= link_to 'New Phenotype', new_phenotype_path %>

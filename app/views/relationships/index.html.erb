@@ -1,31 +1,12 @@
+<script>
+  $(document).ready(function() {
+    $(".tablesorter").tablesorter({widgets: ['zebra']});
+  });
+</script>
 <h1>Listing relationships</h1>
-
-<table>
-  <tr>
-    <th>Id</th>
-    <th>Name</th>
-    <th>Person</th>
-    <th>Parent</th>
-    <th>Child</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
-<% @relationships.each do |relationship| %>
-  <tr>
-    <td><%= relationship.id %></td>
-    <td><%= relationship.name %></td>
-    <td><%= relationship.person_id %></td>
-    <td><%= relationship.parent %></td>
-    <td><%= relationship.child %></td>
-    <td><%= link_to 'Show', relationship %></td>
-    <td><%= link_to 'Edit', edit_relationship_path(relationship) %></td>
-    <td><%= link_to 'Destroy', relationship, :confirm => 'Are you sure?', :method => :delete %></td>
-  </tr>
-<% end %>
-</table>
-
-<br />
+<%= render 'partials/filter' %>
+<div id="filter_table">
+<%= render 'list' %>
+</div>
 
 <%= link_to 'New Relationship', new_relationship_path %>

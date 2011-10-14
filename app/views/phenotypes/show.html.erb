@@ -1,13 +1,8 @@
 <p id="notice"><%= notice %></p>
 
 <p>
-  <b>Id:</b>
-  <%= @phenotype.id %>
-</p>
-
-<p>
-  <b>Diseases:</b>
-  <%= @phenotype.disease_id %>
+  <b>Disease:</b>
+  <%= @phenotype.disease.name if @phenotype.disease %>
 </p>
 
 <p>
@@ -22,4 +17,5 @@
 
 
 <%= link_to 'Edit', edit_phenotype_path(@phenotype) %> |
-<%= link_to 'Back', phenotypes_path %>
+<%= link_to 'Back', phenotypes_path %><br />
+

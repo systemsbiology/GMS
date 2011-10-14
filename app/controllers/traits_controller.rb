@@ -2,11 +2,12 @@ class TraitsController < ApplicationController
   # GET /traits
   # GET /traits.xml
   def index
-    @traits = Trait.all
+    @traits = Trait.has_pedigree(params[:pedigree_filter]).has_person(params[:person])
 
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @traits }
+      format.js
     end
   end
 

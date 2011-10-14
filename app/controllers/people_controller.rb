@@ -2,11 +2,12 @@ class PeopleController < ApplicationController
   # GET /people
   # GET /people.xml
   def index
-    @people = Person.has_pedigree(params[:pedigree])
+    @people = Person.has_pedigree(params[:pedigree_filter])
 
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @people }
+      format.js
     end
   end
 
@@ -55,6 +56,9 @@ class PeopleController < ApplicationController
       if params[:check_dates][:add_dod].to_i != 1 then
         @person.dod = nil
       end
+    else
+      @person.dob = nil
+      @person.dod = nil
     end
 
     respond_to do |format|
@@ -65,6 +69,7 @@ class PeopleController < ApplicationController
 
 	# create memberships
 	membership = Membership.new
+	# this should be params[:pedigree][:id] because that's what the create form passes in
 	membership.pedigree_id = params[:pedigree][:id]
         membership.person_id = @person.id
 	membership.save
@@ -82,6 +87,19 @@ class PeopleController < ApplicationController
   # PUT /people/1.xml
   def update
     @person = Person.find(params[:id])
+
+    @values = params[:person]
+    if params[:check_dates] then
+      if params[:check_dates][:add_dob].to_i != 1 then
+        @values.delete_if{|k,v| k.match(/^dob/)}
+      end
+      if params[:check_dates][:add_dod].to_i != 1 then
+        @values.delete_if{|k,v| k.match(/^dod/)}
+      end 
+    else
+      @values.delete_if{|k,v| k.match(/^dob/)}
+      @values.delete_if{|k,v| k.match(/^dod/)}
+    end
 
     respond_to do |format|
       if @person.update_attributes(params[:person])
@@ -108,18 +126,19 @@ class PeopleController < ApplicationController
 
 
   def receiving_report
-    if params[:pedigree] then
-      @pedigree = Pedigree.find(params[:pedigree][:id])
+    if params[:pedigree_filter] and params[:pedigree_filter][:id] != '' then
+      @pedigree = Pedigree.find(params[:pedigree_filter][:id])
+      @people = Person.find(:all, :include => [ {:samples =>  :assays }, :pedigree], :conditions => { 'pedigrees.id' => @pedigree.id, 'planning_on_sequencing' => 1 })
     else
-      @pedigree = Pedigree.first
+      @pedigree = Pedigree.order(:name)
+      @people = Person.find(:all, :include => [ {:samples =>  :assays }, :pedigree], :conditions => { 'planning_on_sequencing' => 1 }, :order => [ 'pedigrees.name','people.collaborator_id','samples.status'])
     end
 
-#    @assays = Assay.find(:all, :include => { :sample => { :person => :pedigree }}, :conditions => { 'pedigrees.id' => @pedigree.id })
-    @people = Person.find(:all, :include => [ {:samples =>  :assays }, :pedigree], :conditions => { 'pedigrees.id' => @pedigree.id })
-
-    # this is to make the filter select the proper pedigree on initialize
-    params[:pedigree] = Hash.new
-    params[:pedigree][:id] = @pedigree.id.to_s
+    respond_to do |format|
+      format.html 
+      format.xml { render :xml => @people }
+      format.js
+    end
   end
 
 end

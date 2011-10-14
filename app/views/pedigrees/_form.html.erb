@@ -1,15 +1,5 @@
 <%= form_for(@pedigree) do |f| %>
-  <% if @pedigree.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@pedigree.errors.count, "error") %> prohibited this pedigree from being saved:</h2>
-
-      <ul>
-      <% @pedigree.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "partials/error_messages", :target => @pedigree %>
 
   <div class="field">
     <%= f.label :name %><br />
@@ -21,7 +11,7 @@
   </div>
   <div class="field">
     <%= f.label :study %><br />
-    <%= collection_select(:pedigree, :study_id, Study.all, :id, :name, options = {:prompt => '-Select a study for this pedigree'}, :selected => params[:study_id], :class => "study_select") %>
+    <%= collection_select(:pedigree, :study_id, Study.order(:name), :id, :name, options = {:prompt => '-Select a study for this pedigree'}, :selected => params[:study_id], :class => "study_select") %>
   </div>
   <div class="field">
     <%= f.label :description %><br />

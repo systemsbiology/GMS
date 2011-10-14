@@ -1,27 +1,17 @@
 <%= form_for(@assay_file) do |f| %>
-  <% if @assay_file.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@assay_file.errors.count, "error") %> prohibited this assay_file from being saved:</h2>
-
-      <ul>
-      <% @assay_file.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "partials/error_messages", :target => @assay_file %>
 
   <div class="field">
-    <%= f.label :id %><br />
-    <%= f.text_field :id %>
-  </div>
-  <div class="field">
-    <%= f.label :genome_reference_id %><br />
-    <%= f.text_field :genome_reference_id %>
+    <%= f.label :genome_reference %><br />
+    <%= collection_select(:genome_reference, :id, GenomeReference.all, :id, :name, { :prompt => "-Select a Genome Reference"}) %>
   </div>
   <div class="field">
     <%= f.label :name %><br />
     <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :assay %><br />
+    <%= collection_select(:assay, :id, Assay.all, :id, :identifier, { :prompt => "-Select an Assay for this File"}) %>
   </div>
   <div class="field">
     <%= f.label :description %><br />
@@ -33,7 +23,7 @@
   </div>
   <div class="field">
     <%= f.label :file_type %><br />
-    <%= f.text_field :file_type %>
+    <%= f.collection_select(:file_type, AssayFile.select('DISTINCT file_type'), :file_type, :file_type, { :prompt => "-Select an Assay File Type" }) %>
   </div>
   <div class="field">
     <%= f.label :metadata %><br />

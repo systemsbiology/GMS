@@ -2,4 +2,15 @@
 
 <%= render 'form' %>
 
+<% if params[:pedigree_filter] %>
+<%= link_to 'Back to Pedigree', pedigree_path(params[:pedigree_filter]) %> |
+<% end %> 
 <%= link_to 'Back', relationships_path %>
+<br />
+<h1>Listing Relationships</h1>
+<%= render "partials/filter" %>
+<div id="filter_table">
+<%= render 'list' %>
+</div>
+
+<%= link_to 'Remove filtering', new_relationship_path %>

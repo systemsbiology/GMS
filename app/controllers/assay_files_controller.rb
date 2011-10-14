@@ -4,15 +4,16 @@ class AssayFilesController < ApplicationController
   def index
     #@assay_files = AssayFile.find(:all, :conditions => ['file_type = ?', params[:file_type]]) if (params[:file_type])
 #    @assay_files = @assay_files.find_all_by_file_type(params[:file_type]) if (params[:file_type])
-#    @assay_files = find_all_by_pedigree_id(params[:pedigree][:id]) if (params[:pedigree])
+#    @assay_files = find_all_by_pedigree_id(params[:pedigree_filter][:id]) if (params[:pedigree_filter])
 #    @assay_files = @assay_files.find(:all, :include => { :assay => { :sample => { :person => :pedigree } } },
-#                                        :conditions => [ 'pedigrees.id = ?', params[:pedigree][:id] ]) if (params[:pedigree])
-    @assay_files = AssayFile.has_file_type(params[:file_type]).has_pedigree(params[:pedigree])
+#                                        :conditions => [ 'pedigrees.id = ?', params[:pedigree_filter][:id] ]) if (params[:pedigree_filter])
+    @assay_files = AssayFile.has_file_type(params[:file_type]).has_pedigree(params[:pedigree_filter])
 
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @assay_files }
       format.json  { render :json => @assay_files }
+      format.js
     end
   end
 

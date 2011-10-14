@@ -1,40 +1,59 @@
 <p id="notice"><%= notice %></p>
 
-<p>
-  <b>Id:</b>
-  <%= @person.id %>
-</p>
+<table class="tablesorter">
+<tr>
+  <td><b>Sample:</b> <%= @person.isb_person_id %></td>
+  <td><b>Subject:</b> <%= @person.collaborator_id %></td>
+</tr>
+<% if @person.person_aliases.size > 0 %>
+<tr>
+  <td colspan="2"><b>Aliases:</b> <%= @person.person_aliases.map(&:value).join("; ") %></td>
+</tr>
+<% end %>
+<tr>
+  <td><b>Gender:</b> <%= @person.gender %></td>
+  <td><b>Planning on Sequencing this person:</b> <%= @person.planning_on_sequencing %></td>
+</tr>
+<tr>
+  <td><b>Dob:</b> <%= @person.dob %></td>
+  <td><b>Dod:</b> <%= @person.dod %></td>
+</tr>
+<% if @person.diseases.size > 0 %>
+  <tr><td colspan="2"><b>Diagnosed with following Diseases:</b></td></tr>
+  <% @person.diagnoses.each do |pd| %>
+    <tr><td><%= pd.person.full_identifier %></td><td><%= pd.disease.name %><% unless pd.disease_information.nil? %>: <%= pd.disease_information %><% end %></td></tr>
+  <% end %>
+<% end %>
 
-<p>
-  <b>Sample:</b>
-  <%= @person.isb_person_id %>
-</p>
+<% if @person.traits.size > 0 %>
+  <tr> <td colspan="2"><b>Traits:</b></td></tr>
+  <% @person.traits.each do |t| %>
+  <tr><td><%= t.person.full_identifier %></td><td><%= t.phenotype.name %><% unless t.trait_information.nil? %>: <%= t.trait_information %><% end %></td></tr>
+  <% end %>
+<% end %>
+</table>
 
-<p>
-  <b>Subject:</b>
-  <%= @person.collaborator_id %>
-</p>
-
-<p>
-  <b>Gender:</b>
-  <%= @person.gender %>
-</p>
-
-<p>
-  <b>Dob:</b>
-  <%= @person.dob %>
-</p>
-
-<p>
-  <b>Dod:</b>
-  <%= @person.dod %>
-</p>
-
-<%= link_to "New Sample for person #{@person.isb_person_id}", new_sample_path(:person_id => @person) %> <br />
+<%= link_to 'Add Alias for Person', new_person_alias_path(:person_id => @person) %> |
+<%= link_to 'Add Trait for Person', new_trait_path(:person_id => @person) %> |  
 <%= link_to 'Edit', edit_person_path(@person) %> |
-<%= link_to 'Back', people_path %>
-
+<%= link_to 'Back', people_path %> 
 <br />
+<%= link_to "Back to Pedigree #{@person.pedigree.name}", @person.pedigree %>
+<br />
+<h1>Listing Family Memberships</h1>
+<%= render 'memberships/list', :memberships => [@person.membership] %>
+<br />
+<h1>Diagnosed with the following Diseases</h1>
+<%= render 'diagnoses/list', :diagnoses => @person.diagnoses %>
+<br />
+<%= link_to 'Add a new Diagnosis', new_diagnosis_path(:person_id => @person) %>
+<br />
+<h1>Traits for this person</h1>
+<%= render 'traits/list', :traits => @person.traits %>
+<br />
+<%= link_to 'Add a new Trait', new_trait_path(:person_id => @person) %>
+<br />
+<% if @person.planning_on_sequencing then %>
 <h1>Listing samples</h1>
 <% if @person.samples.size > 0 %>
 <script>
@@ -45,7 +64,7 @@
   <tr>
     <th>ISB sample</th>
     <th>ISB Person</th>
-    <th>Peson</th>
+    <th>Person</th>
     <th>Pedigree</th>
     <th>Sample type</th>
     <th>Status</th>
@@ -73,6 +92,37 @@
 <% else %>
 <p> No samples for this person.</p>
 <% end %>
+<%= link_to "New Sample for person #{@person.isb_person_id}", new_sample_path(:person_id => @person) %> <br />
+<br />
+<% end %>
+<h1>Listing Relationships</h1>
+<% if @person.relationships.size > 0 then %>
+<table class="tablesorter">
+  <thead>
+  <tr>
+    <th>Pedigree</th>
+    <th>Relationship Type</th>
+    <th>Person</th>
+    <th>Relationship</th>
+    <th>Relation</th>
+  </tr>
+  </thead>
+  <tbody>
+<% @person.relationships.each do |person_relationship| %>
+  <tr>
+  <td><%= link_to person_relationship.person.pedigree.name, person_relationship.person.pedigree %></td>
+  <td><%= person_relationship.relationship_type %></td>
+  <td><%= link_to person_relationship.person.identifier, person_relationship.person %></td>
+  <td>is the <%= link_to person_relationship.name, person_relationship %> of </td>
+  <td><%= link_to person_relationship.relation.identifier, person_relationship.relation %></td>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<% else %>
+<p> No relationships for this person.</p>
+<% end %>
 <br />
 
-
+<%= link_to "Add Relationship for current person #{@person.identifier}", new_relationship_path(:person => @person, :pedigree_filter => {:id => @person.pedigree}) %>
+<br /><br />

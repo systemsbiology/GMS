@@ -1,35 +1,20 @@
 <%= form_for(@relationship) do |f| %>
-  <% if @relationship.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@relationship.errors.count, "error") %> prohibited this relationship from being saved:</h2>
-
-      <ul>
-      <% @relationship.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
-
+  <%= render "partials/error_messages", :target => @relationship %>
   <div class="field">
-    <%= f.label :id %><br />
-    <%= f.text_field :id %>
+    <%= f.label :person %><br />
+    <% selected_person = params[:person].nil? ? @relationship.person.nil? ? '' : @relationship.person.id : params[:person] %>
+    <% @people_choices = Person.has_pedigree(params[:pedigree_filter]) %>
+    <%= f.collection_select(:person_id, @people_choices, :id, :full_identifier, options = { :include_blank => '-Select person', :selected => selected_person}) %>
   </div>
+  <div> is (the) </div>
   <div class="field">
-    <%= f.label :name %><br />
-    <%= f.text_field :name %>
+    <%= f.collection_select(:name, ["wife","husband","mother","father","son","daughter","monozygotic twin","dizygotic twin"], :downcase, :titleize, { :include_blank => "-Select relationship name" }) %>
+    <%= check_box("status", "divorced") %> divorced?
   </div>
+  <div> (of | to | from) Person</div>
   <div class="field">
-    <%= f.label :person_id %><br />
-    <%= f.text_field :person_id %>
-  </div>
-  <div class="field">
-    <%= f.label :parent %><br />
-    <%= f.text_field :parent %>
-  </div>
-  <div class="field">
-    <%= f.label :child %><br />
-    <%= f.text_field :child %>
+    <% selected_relation = @relationship.relation.nil? ? '' : @relationship.relation.id %>
+    <%= f.collection_select(:relation_id, @people_choices, :id, :full_identifier, options = {:include_blank => '-Select person', :selected => selected_relation}) %>
   </div>
   <div class="actions">
     <%= f.submit %>

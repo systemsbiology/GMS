@@ -1,31 +1,18 @@
 <%= form_for(@trait) do |f| %>
-  <% if @trait.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@trait.errors.count, "error") %> prohibited this trait from being saved:</h2>
+  <%= render "partials/error_messages", :target => @trait %>
 
-      <ul>
-      <% @trait.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="field">
-    <%= f.label :id %><br />
-    <%= f.text_field :id %>
-  </div>
   <div class="field">
     <%= f.label :person_id %><br />
-    <%= f.text_field :person_id %>
+    <%= f.collection_select(:person_id, Person.all(:include => { :membership => :pedigree} , :order => ['pedigrees.name', 'collaborator_id']), :id, :full_identifier, { :prompt => "-Select Person", :selected => params[:person_id]}) %>
   </div>
   <div class="field">
     <%= f.label :phenotype_id %><br />
-    <%= f.text_field :phenotype_id %>
+    <%= f.collection_select(:phenotype_id, Phenotype.order(:name), :id, :name, { :prompt => "-Select Phenotype"}) %>
   </div>
+  <div>If your phenotype is not here, then <%= link_to "Create a new phenotype", new_phenotype_path %></div>
   <div class="field">
-    <%= f.label :value %><br />
-    <%= f.text_field :value %>
+    <%= f.label :trait_information %><span>  (Ex: age of onset)</span><br />
+    <%= f.text_field :trait_information %>
   </div>
   <div class="field">
     <%= f.label :output_order %><br />

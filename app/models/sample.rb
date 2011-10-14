@@ -2,8 +2,10 @@ class Sample < ActiveRecord::Base
   has_many :sample_assays
   has_many :assays, :through => :sample_assays
   belongs_to :sample_type
-  has_many :acquisitions
-  has_one :person, :through => :acquisitions
+  has_one :acquisition
+  has_one :person, :through => :acquisition
+
+  validates_presence_of :sample_type_id, :status, :vendor_id, :volume, :concentration, :quantity
 
     scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?

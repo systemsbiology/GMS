@@ -1,15 +1,5 @@
 <%= form_for(@genome_reference) do |f| %>
-  <% if @genome_reference.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@genome_reference.errors.count, "error") %> prohibited this genome_reference from being saved:</h2>
-
-      <ul>
-      <% @genome_reference.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "partials/error_messages", :target => @genome_reference %>
 
   <div class="field">
     <%= f.label :id %><br />

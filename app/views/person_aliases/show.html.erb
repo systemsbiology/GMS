@@ -1,13 +1,13 @@
 <p id="notice"><%= notice %></p>
 
 <p>
-  <b>Id:</b>
-  <%= @person_alias.id %>
+  <b>Person:</b>
+  <%= @person_alias.person.full_identifier if @person_alias.person %>
 </p>
 
 <p>
-  <b>Name:</b>
-  <%= @person_alias.name %>
+  <b>Alias Type:</b>
+  <%= @person_alias.alias_type %>
 </p>
 
 <p>
@@ -15,11 +15,11 @@
   <%= @person_alias.value %>
 </p>
 
-<p>
-  <b>Person:</b>
-  <%= @person_alias.person_id %>
-</p>
-
-
+<%= link_to "Add another alias for this person", new_person_alias_path(:person_id => @person_alias.person_id) %> | 
 <%= link_to 'Edit', edit_person_alias_path(@person_alias) %> |
 <%= link_to 'Back', person_aliases_path %>
+<br />
+<% if @person_alias.person %>
+<%= link_to "Back to Person #{@person_alias.person.full_identifier}", person_path(@person_alias.person) %> |
+<%= link_to "Back to Pedigree #{@person_alias.person.pedigree.name}", pedigree_path(@person_alias.person.pedigree) %>
+<% end %>

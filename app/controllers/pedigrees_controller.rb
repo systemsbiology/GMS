@@ -17,22 +17,17 @@ class PedigreesController < ApplicationController
   # GET /pedigrees/1.xml
   def show
     @pedigree = Pedigree.find(params[:id])
-    @people = Pedigree.find(params[:id]).people
+    @people = Person.has_pedigree(params[:id]).include_samples
+    @person_relationships = Relationship.order(:person_id).find_all_by_person_id(@people.map(&:id))
+    @relation_relationships = Relationship.find_all_by_relation_id(@people.map(&:id))
+    @relationships = @person_relationships + @relation_relationships
     ped_info = Array.new()
-    rels = Array.new()
-    @people.each do |p|
-      ped_info.push(p.isb_person_id)
-      rels.push(p.relationships)
-    end
-    logger.debug("rels is #{rels.inspect}")
-    logger.debug("ped_info is #{ped_info}")
 
     # the combination of pedigree name and pedigree id should be unique
     madeline_name = "madeline_#{@pedigree.name}_#{@pedigree.id}.xml"
     madeline_file = MADELINE_DIR + "#{madeline_name}"
 
-    @rels = rels
-    #@to_mad = to_madeline(rels)
+    #@to_mad = to_madeline(@relationships)
     @filename = madeline_file
     if (!File.exists?(madeline_file)) then
       if File.exists?("/u5/www/dev_sites/dmauldin/gms/public/madeline_adamsO_79083.txt") then
@@ -81,6 +76,12 @@ class PedigreesController < ApplicationController
 
     respond_to do |format|
       if @pedigree.save
+        isb_ped_id = "isb_ped: #{@pedigree.id}"
+        @pedigree.isb_pedigree_id = isb_ped_id
+
+	@pedigree.version = 1
+	@pedigree.save
+
         format.html { redirect_to(@pedigree, :notice => 'Pedigree was successfully created.') }
         format.xml  { render :xml => @pedigree, :status => :created, :location => @pedigree }
         format.json  { render :json => @pedigree, :status => :created, :location => @pedigree }

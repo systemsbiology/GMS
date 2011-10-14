@@ -1,19 +1,15 @@
 <%= form_for(@person) do |f| %>
-  <% if @person.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@person.errors.count, "error") %> prohibited this person from being saved:</h2>
+  <%= render "partials/error_messages", :target => @person %>
 
-      <ul>
-      <% @person.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
+  <% if params[:pedigree_id] then %>
+  <% cur_pedigree_id = params[:pedigree_id] %>
+  <% else %>
+  <% cur_pedigree_id = @person.pedigree.id if @person.pedigree%>
   <% end %>
 
   <div class="field">
     <%= f.label :pedigree_name %><br />
-    <%= collection_select(:pedigree, :id, Pedigree.all(:include=> :study, :order => ['studies.name', 'pedigrees.name']), :id, :name, options = {:include_blank => '-Select the pedigree this person belongs to', :selected => params[:pedigree_id]}, :class => "pedigree_select") %>
+    <%= collection_select(:pedigree, :id, Pedigree.all(:include=> :study, :order => ['studies.name', 'pedigrees.name']), :id, :name, options = {:include_blank => '-Select the pedigree this person belongs to', :selected => cur_pedigree_id}, :class => "pedigree_select") %>
   </div>
   <div class="field">
     <span>Collaborator ID</span><br />
@@ -21,7 +17,11 @@
   </div>
   <div class="field">
     <%= f.label :gender %><br />
-    <%= select_tag("gender", "<option>male</option><option>female</option><option>unknown</option>".html_safe) %>
+    <%= f.collection_select(:gender, ["male","female","unknown"], :downcase, :titleize, {  :include_blank => "-Select gender", :selected => @person.gender }) %>
+  </div>
+  <div class="field">
+    <%= f.check_box(:planning_on_sequencing, :value => 1, :checked => @person.planning_on_sequencing) %>
+    <%= f.label :planning_on_sequencing %><br />
   </div>
   <div class="field">
     <%= f.label :dob %><br />

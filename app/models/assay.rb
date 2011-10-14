@@ -1,7 +1,9 @@
 class Assay < ActiveRecord::Base
   has_many :assay_files
-  has_many :sample_assay
+  has_one :sample_assay
   has_one :sample, :through => :sample_assay
+
+  validates_presence_of :name, :assay_type, :technology
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
@@ -26,5 +28,7 @@ class Assay < ActiveRecord::Base
     joins( :sample => { :person => :pedigree })
   }
 
-    
+  def identifier 
+    "#{name} - #{vendor} - #{assay_type}"
+  end
 end

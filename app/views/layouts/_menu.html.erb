@@ -7,7 +7,13 @@
             <li><%= link_to "Samples", samples_path  %></li>
             <li><%= link_to "Assays", assays_path  %></li>
             <li><%= link_to "Files", assay_files_path(:file_type => 'ASSEMBLY')  %></li>
+	    <br />
             <li><%= link_to("Receiving Log", url_for(:controller => 'people', :action => 'receiving_report'), :method => "get") %></li>
             <li><%= link_to("Sequencing Summary", url_for(:controller => 'assays', :action => 'summary_report'), :method => "get") %></li>
+	    <br />
+	    <li><%= link_to("Diseases", diseases_path) %></li>
+	    <li><%= link_to("Phenotypes", phenotypes_path) %></li>
+	    <br />
+	    <li><%= link_to("Terminology", terminology_path) %></li>
           </ul>
         </nav>

@@ -1,31 +1,16 @@
 <%= form_for(@membership) do |f| %>
-  <% if @membership.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@membership.errors.count, "error") %> prohibited this membership from being saved:</h2>
-
-      <ul>
-      <% @membership.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
-
-  <div class="field">
-    <%= f.label :id %><br />
-    <%= f.text_field :id %>
-  </div>
+  <%= render "partials/error_messages", :target => @membership %>
   <div class="field">
     <%= f.label :pedigree_id %><br />
-    <%= f.text_field :pedigree_id %>
+    <%= f.collection_select(:pedigree_id, Pedigree.order(:name), :id, :name, { :prompt => "-Select Pedigree"}, :selected => @membership.pedigree_id) %>
   </div>
   <div class="field">
     <%= f.label :person_id %><br />
-    <%= f.text_field :person_id %>
+    <%= f.collection_select(:person_id, Person.all, :id, :full_identifier, { :prompt => "-Select Person"}, :selected => @membership.person_id) %>
   </div>
   <div class="field">
     <%= f.label :draw_duplicate %><br />
-    <%= f.text_field :draw_duplicate %>
+    <%= f.check_box :draw_duplicate %>
   </div>
   <div class="actions">
     <%= f.submit %>

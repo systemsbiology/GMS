@@ -1,5 +1,6 @@
 <td id="notice"><%= notice %></p>
 
+<h1>Sample Information</h1>
 <table class="tablesorter">
   <tr>
   <td>
@@ -10,15 +11,24 @@
    <b>Vendor ID:</b>
    <%= @sample.vendor_id %>
  </td>
-<td>
-  <b>Sample type:</b>
-  <%= @sample.sample_type.nil? ? 'unknown' : @sample.sample_type.name %>
-</td>
+ <td>
+   <b>Person:</b>
+   <%= @sample.person.collaborator_id %>
+ </td>
+ <td>
+   <b>ISB Person:</b>
+   <%= link_to @sample.person.isb_person_id, person_path(@sample.person) %>
+ </td>
 </tr>
 <tr>
+<td>
+  <b>Pedigree:</b>
+  <%= link_to @sample.person.pedigree.name, pedigree_path(@sample.person.pedigree) %>
+</td>
 <td colspan="2">
   <b>Status:</b>
-  <%= @sample.status %>
+  <% rr = Hash.new; rr[:pedigree_filter] = Hash.new; rr[:pedigree_filter][:id] = @sample.person.pedigree.id %>
+  <%= link_to @sample.status, receiving_report_path(rr) %>
 </td>
 
 <td>
@@ -27,6 +37,10 @@
 </td>
 </tr>
 <tr>
+<td>
+  <b>Sample type:</b>
+  <%= @sample.sample_type.nil? ? 'unknown' : @sample.sample_type.name %>
+</td>
   <td>
     <b>Volume:</b>
     <%= @sample.volume %>
@@ -41,13 +55,13 @@
   </td>
 </tr>
 <tr>
-<td colspan="3">
+<td colspan="4">
   <b>Protocol:</b>
   <%= @sample.protocol %>
 </td>
 </tr>
 <tr>
-<td colspan="3">
+<td colspan="4">
   <b>Comments:</b>
   <%= @sample.comments %>
 </td>
@@ -55,7 +69,10 @@
 </table>
 
 <%= link_to 'Edit', edit_sample_path(@sample) %> |
-<%= link_to 'Back to all samples', samples_path %>
+<%= link_to 'Delete this sample', @sample, :confirm => 'Are you sure?', :method => :delete %> | 
+<%= link_to 'Back to all samples', samples_path %> | 
+<%= link_to("Back to Person #{@sample.person.identifier}", person_path(@sample.person)) %> | 
+<%= link_to( "Back to Pedigree #{@sample.person.pedigree.name}", pedigree_path(@sample.person.pedigree.id) )%>
 
 <h1>Listing assays</h1>
 <% if @sample.assays.size > 0 %>

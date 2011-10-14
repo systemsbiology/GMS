@@ -1,30 +1,110 @@
+<script>
+  $(document).ready(function() { setupTablesorter() });
+</script>
+<% 
+   if @relationship.is_undirected? then
+     if @relationship.name.match(/twin/) then
+       person_type = "Person"
+       relation_type = "Sibling"
+     else 
+       person_type = "Person"
+       relation_type = "Spouse"
+     end
+   elsif @relationship.is_parent? then
+     person_type = "Parent"
+     relation_type = "Child"
+   elsif @relationship.is_child? then
+     person_type = "Child"
+     relation_type = "Parent"
+    end
+%>
 <p id="notice"><%= notice %></p>
 
-<p>
-  <b>Id:</b>
-  <%= @relationship.id %>
-</p>
-
-<p>
-  <b>Name:</b>
-  <%= @relationship.name %>
-</p>
-
-<p>
-  <b>Person:</b>
-  <%= @relationship.person_id %>
-</p>
-
-<p>
-  <b>Parent:</b>
-  <%= @relationship.parent %>
-</p>
-
-<p>
-  <b>Child:</b>
-  <%= @relationship.child %>
-</p>
-
+<h1>Relationship</h1>
+<table class="tablesorter">
+    <thead>
+    <tr>
+      <th>Pedigree Name</th>
+      <th><%= person_type %></th>
+      <th>Relationship Name</th>
+      <th><%= relation_type %></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+    <td><%= link_to @relationship.person.pedigree.name, @relationship.person.pedigree %></td>
+    <td><%= link_to @relationship.person.identifier, @relationship.person %></td>
+    <td> is the <%= @relationship.name %> of </td>
+    <td><%= link_to @relationship.relation.identifier, @relationship.relation %></td>
+    </tr>
+    </tbody>
+</table>
 
 <%= link_to 'Edit', edit_relationship_path(@relationship) %> |
-<%= link_to 'Back', relationships_path %>
+<%= link_to 'Delete this relationship', @relationship, :confirm => "Are you sure?", :method => :delete %> |
+<%= link_to 'Back', relationships_path %> | 
+<%= link_to "Back to Pedigree #{@relationship.person.pedigree.name}", @relationship.person.pedigree %>
+<br />
+
+<h1>Other Relationships involving <%= person_type %>: <%= @relationship.person.identifier %></h1>
+<% person_rels = Relationship.find_all_by_person_id(@relationship.person.id) %>
+<% if person_rels.nil? or person_rels.size == 1 then %>
+  <p>No other relationships for <%= @relationship.person.identifier %></p>
+<% else %>
+  <table class="tablesorter">
+    <thead>
+    <tr>
+      <th>Pedigree Name</th>
+      <th>Relationship Name</th>
+      <th><%= person_type %></th>
+      <th><%= relation_type %></th>
+      <th class="nosort">Controls</th>
+    </tr>
+    </thead>
+    <tbody>
+  <% person_rels.each do |prel| %>
+    <% next if prel.id == @relationship.id %>
+    <tr>
+      <td><%= link_to prel.person.pedigree.name, prel.person.pedigree %></td>
+      <td><%= link_to prel.person.identifier, prel.person %></td>
+      <td> is the <%= link_to prel.name, prel %> of </td>
+      <td><%= link_to prel.relation.identifier, prel.relation %></td>
+      <td><%= link_to 'Edit', edit_relationship_path(prel) %></td>
+    </tr>
+  <% end %>
+  </tbody>
+  </table>
+<% end %>
+<%= link_to "Add Relationship to #{person_type} for #{@relationship.person.identifier}", new_relationship_path(:person => @relationship.person, :pedigree_filter => { :id => @relationship.person.pedigree.id } ) %>
+<br />
+<br />
+<h1>Other Relationships involving <%= relation_type %>: <%= @relationship.relation.identifier %></h1>
+<% relation_rels = Relationship.find_all_by_relation_id(@relationship.relation.id) %>
+<% if relation_rels.nil? or relation_rels.size == 1 then %>
+  <p>No other relationships for <%= link_to @relationship.relation.identifier, @relationship.relation %></p>
+<% else %>
+  <table class="tablesorter">
+    <thead>
+    <tr>
+      <th>Pedigree Name</th>
+      <th><%= relation_type %></th>
+      <th>Relationship Name</th>
+      <th><%= person_type %></th>
+    </tr>
+    </thead>
+    <tbody>
+  <% relation_rels.each do |crel| %>
+    <% next if crel.id == @relationship.id %>
+    <tr>
+      <td><%= link_to crel.relation.pedigree.name, crel.relation.pedigree %></td>
+      <td><%= link_to crel.relation.identifier, crel.relation %></td>
+      <td>is the <%= link_to crel.reverse_name, crel %> of </td>
+      <td><%= link_to crel.person.identifier, crel.person %></td>
+    </tr>
+  <% end %>
+  </tbody>
+  </table>
+<% end %>
+<% rr = Hash.new; rr[:id] = @relationship.relation.pedigree.id %>
+<%= link_to "Add Relationship to #{relation_type} for #{@relationship.relation.identifier}", new_relationship_path(:person => @relationship.relation, :pedigree_filter => {:id => @relationship.relation.pedigree.id }) %>
+

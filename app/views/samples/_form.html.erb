@@ -1,15 +1,5 @@
 <%= form_for(@sample) do |f| %>
-  <% if @sample.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(@sample.errors.count, "error") %> prohibited this sample from being saved:</h2>
-
-      <ul>
-      <% @sample.errors.full_messages.each do |msg| %>
-        <li><%= msg %></li>
-      <% end %>
-      </ul>
-    </div>
-  <% end %>
+  <%= render "partials/error_messages", :target => @sample %>
 
   <div class="field">
     <%= f.label :person %><br />
@@ -21,7 +11,7 @@
   </div>
   <div class="field">
     <%= f.label :status %><br />
-    <%= select_tag(:status, "<option>pending</option><option>submitted</option>".html_safe) %>
+    <%= f.collection_select(:status, ["pending", "submitted"], :downcase, :titleize, { :include_blank => "-Select Sample Status" }) %>
   </div>
   <div class="field">
     Vendor Sample ID (ex: GS0001-DNA_A01 or SS6002729) <br />

@@ -15,10 +15,8 @@ describe "person_aliases/edit.html.erb" do
 
     # Run the generator again with the --webrat flag if you want to use webrat matchers
     assert_select "form", :action => person_aliases_path(@person_alias), :method => "post" do
-      assert_select "input#person_alias_id", :name => "person_alias[id]"
-      assert_select "input#person_alias_name", :name => "person_alias[name]"
-      assert_select "input#person_alias_value", :name => "person_alias[value]"
-      assert_select "input#person_alias_person_id", :name => "person_alias[person_id]"
+      #assert_select "input#person_alias_value", :name => "person_alias[value]"
+      #assert_select "input#person_alias_person_id", :name => "person_alias[person_id]"
     end
   end
 end

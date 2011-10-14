@@ -2,11 +2,12 @@ class SamplesController < ApplicationController
   # GET /samples
   # GET /samples.xml
   def index
-    @samples = Sample.has_pedigree(params[:pedigree]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
+    @samples = Sample.has_pedigree(params[:pedigree_filter]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
 
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @samples }
+      format.js
     end
   end
 
@@ -85,6 +86,7 @@ class SamplesController < ApplicationController
 
     respond_to do |format|
       if @sample.update_attributes(params[:sample])
+        logger.debug("sample is #{@sample.inspect} after params #{params[:sample]}")
         format.html { redirect_to(@sample, :notice => 'Sample was successfully updated.') }
         format.xml  { head :ok }
       else

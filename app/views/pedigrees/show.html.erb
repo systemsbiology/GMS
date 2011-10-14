@@ -8,29 +8,37 @@
 
 <h1>Pedigree <%= @pedigree.name %></h1>
 
-<p>
+
+<table class="tablesorter">
+<tr>
+<td>
   <b>Name:</b>
   <%= @pedigree.name %>
-</p>
+</td>
 
-<p>
+<td>
   <b>Tag:</b>
   <%= @pedigree.tag %>
-</p>
-
-<p>
+</td>
+<td>
   <b>Study:</b>
   <%= @pedigree.study.name if @pedigree.study %>
-</p>
+</td>
+</tr>
+<tr>
 
-<p>
+<td colspan="3">
   <b>Description:</b>
   <%= @pedigree.description %>
-</p>
-
+</td>
+</tr>
+</table>
 
 <%= link_to 'Edit', edit_pedigree_path(@pedigree) %> |
 <%= link_to 'Back', pedigrees_path %>
+<br />
+<% par = Hash.new;  par[:pedigree_filter] = Hash.new;  par[:pedigree_filter][:id] = @pedigree.id %>
+<%= link_to "Receiving Log for Pedigree #{@pedigree.name}", receiving_report_path(par) %>
 <br />
 <p><span style="font-weight: bold; text-decoration: underline;">People in this Pedigree</span></p>
 <% if @people.size == 0 %>
@@ -39,39 +47,80 @@
   <table class="tablesorter" id="PedigreePeople">
     <thead>
     <tr>
-      <th>Sample</th>
+      <th>Person</th>
       <th>Subject</th>
       <th>Gender</th>
       <th>Dob</th>
       <th>Dod</th>
+      <th>Number of Samples</th>
+      <th>Number of Phenotypes</th>
+      <th>Number of Diseases Diagnosed</th>
     </tr>
     </thead>
     <tbody>
     <% @people.each do |person| %>
       <tr>
         <td><%= link_to person.isb_person_id, person %></td>
-        <td><%= person.collaborator_id %></td>
+        <td><%= person.full_collaborator %></td>
         <td><%= person.gender %></td>
         <td><%= person.dob %></td>
         <td><%= person.dod %></td>
+	<td><% if person.planning_on_sequencing then %><%= link_to person.samples.count, person unless person.samples.nil? %><% else %>NA<% end %></td>
+	<td><%= person.phenotypes.count > 0 ? link_to(person.phenotypes.count, traits_path(:person => person)) : person.phenotypes.count  %></td>
+	<td><%= person.diseases.count > 0 ? link_to(person.diseases.count, diseases_path(:person => person)) : person.diseases.count %></td>
       </tr>
     <% end %>
     <tbody>
   </table>
 <% end %>
-
-
-<%= link_to 'Add People', new_person_path(:pedigree_id => @pedigree) %>
+<%= link_to 'Add Person', new_person_path(:pedigree_id => @pedigree) %>
 <br />
 
 <% if false %>
-<%= @rels.inspect %><br />
 <%= @to_madeline.inspect %><br />
 <%= raw(@filename) %><br />
 <% end %>
-<% if @people.size > 2 %>
-<% unless @pedigree.name.match(/unrelated/) %>
-<%= raw(@madeline) %>
-<% end %>
-<% end %>
 
+<% if @people.size > 2 %>
+  <% unless @pedigree.name.match(/unrelated/) %>
+    <%= raw(@madeline) %>
+  <% end %>
+<% end %>
+<br /><br />
+<h1>Diseases Diagnosed in this pedigree</h1>
+<%= render 'diseases/list', :diseases => @pedigree.diseases %>
+<br /><br />
+<h1>Phenotypes in this pedigree</h1>
+<%= render 'partials/phenotypes', :phenotypes => @pedigree.phenotypes %>
+<br />
+<h1>Relationships</h1>
+<% if @person_relationships.size > 0 %>
+  <table class="tablesorter" id="PedigreePeople">
+    <thead>
+    <tr>
+    <th>Parent</th>
+    <th>Name</th>
+    <th>Child</th>
+    <th colspan="2" class="nosort">Controls</th>
+    </tr>
+    </thead>
+    <tbody>
+<% @person_relationships.each do |relationship| %>
+  <tr>
+    <td><%= link_to relationship.person.collaborator_id, relationship.person %></td>
+    <td>is the <%= link_to relationship.name, relationship %> of </td>
+    <td><%= link_to relationship.relation.collaborator_id, relationship.relation %></td>
+    <td><%= link_to 'Edit', edit_relationship_path(relationship) %></td>
+  </tr>
+<% end %>
+</tbody></table>
+<% else %>
+  <p>No relationships</p>
+<% end %>
+<br />
+<% par = Hash.new;  par[:pedigree_filter] = Hash.new;  par[:pedigree_filter][:id] = @pedigree.id %>
+<%= link_to 'New Relationship', new_relationship_path(par) %>
+<br />
+<br />
+<br />
+<br />

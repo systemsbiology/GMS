@@ -4,7 +4,7 @@ describe "person_aliases/show.html.erb" do
   before(:each) do
     @person_alias = assign(:person_alias, stub_model(PersonAlias,
       :id => 1,
-      :name => "Name",
+      :name => "Alias Type",
       :value => "Value",
       :person_id => 1
     ))
@@ -15,7 +15,7 @@ describe "person_aliases/show.html.erb" do
     # Run the generator again with the --webrat flag if you want to use webrat matchers
     rendered.should match(/1/)
     # Run the generator again with the --webrat flag if you want to use webrat matchers
-    rendered.should match(/Name/)
+    rendered.should match(/Alias Type/)
     # Run the generator again with the --webrat flag if you want to use webrat matchers
     rendered.should match(/Value/)
     # Run the generator again with the --webrat flag if you want to use webrat matchers

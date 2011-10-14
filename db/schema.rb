@@ -1,3 +1,4 @@
+# encoding: UTF-8
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -49,6 +50,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.string   "name"
     t.string   "vendor"
     t.string   "assay_type"
+    t.string   "status"
     t.string   "technology"
     t.string   "description"
     t.date     "date_received"
@@ -128,17 +130,14 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.string   "gender"
     t.date     "dob"
     t.date     "dod"
-    t.boolean  "deceased",        :default => false, :null => false
+    t.boolean  "deceased",               :default => false, :null => false
+    t.boolean  "planning_on_sequencing", :default => false
+    t.boolean  "root"
     t.text     "comments"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.string   "ancestry"
-    t.integer  "parent_id"
-    t.integer  "lft"
-    t.integer  "rgt"
   end
 
-  add_index "people", ["ancestry"], :name => "index_people_on_ancestry"
   add_index "people", ["isb_person_id"], :name => "index_people_on_isb_person_id", :unique => true
 
   create_table "person_aliases", :force => true do |t|
@@ -161,19 +160,23 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
   end
 
   create_table "relationships", :force => true do |t|
-    t.string   "name"
+    t.string   "name",              :limit => 50
     t.integer  "person_id"
-    t.integer  "parent"
-    t.integer  "child"
+    t.integer  "relation_id"
     t.string   "relationship_type"
+    t.boolean  "divorced",                        :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
+  end
+
+  create_table "report_types", :force => true do |t|
+    t.string "name"
   end
 
   create_table "reports", :force => true do |t|
     t.string   "name"
     t.string   "description"
-    t.string   "type"
+    t.integer  "report_type_id"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -201,6 +204,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.integer  "sample_type_id"
     t.string   "vendor_id"
     t.string   "status"
+    t.date     "date_submitted"
     t.string   "protocol"
     t.string   "volume",         :limit => 25
     t.string   "concentration",  :limit => 25
@@ -217,7 +221,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
   create_table "studies", :force => true do |t|
     t.string   "name"
     t.string   "tag",                       :limit => 50
-    t.string   "principal"
+    t.string   "lead"
     t.string   "collaborator"
     t.string   "collaborating_institution"
     t.string   "description"
