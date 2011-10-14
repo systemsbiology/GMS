@@ -1,0 +1,30 @@
+<% if diagnoses.size > 0 %>
+<table class="tablesorter">
+  <thead>
+  <tr>
+    <th>Person</th>
+    <th>Disease</th>
+    <th>Disease information</th>
+    <th>Output order</th>
+    <th class="nosort">Controls</th>
+  </tr>
+  </thead>
+  <tbody>
+<% diagnoses.each do |diagnosis| %>
+  <tr>
+    <td><%= link_to diagnosis.person.full_identifier, diagnosis.person %></td>
+    <td><%= link_to diagnosis.disease.name, diagnosis.disease %></td>
+    <td><%= diagnosis.disease_information %></td>
+    <td><%= diagnosis.output_order %></td>
+    <td><%= link_to 'Show', diagnosis %></td>
+    <% if false %>
+    <td><%= link_to 'Edit', edit_diagnosis_path(diagnosis) %></td>
+    <td><%= link_to 'Destroy', diagnosis, confirm: 'Are you sure?', method: :delete %></td>
+    <% end %>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<% else %>
+<p>No diseases found for this person</p>
+<% end %>

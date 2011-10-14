@@ -1,0 +1,22 @@
+<table class="tablesorter">
+  <thead>
+  <tr>
+    <th>Pedigree</th>
+    <th>Person</th>
+    <th>Controls</th>
+  </tr>
+  </thead>
+  <tbody>
+<% memberships.each do |membership| %>
+  <tr>
+    <td><%= membership.pedigree.nil? ? '' : link_to(membership.pedigree.name, membership.pedigree) %></td>
+    <td><%= link_to membership.person.identifier, membership.person %></td>
+    <td><%= link_to 'Show', membership %></td>
+    <% if false %>
+    <td><%= link_to 'Edit', edit_membership_path(membership) %></td>
+    <td><%= link_to 'Destroy', membership, :confirm => 'Are you sure?', :method => :delete %></td>
+    <% end %>
+  </tr>
+<% end %>
+</tbody>
+</table>

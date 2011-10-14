@@ -1,0 +1,28 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Person:</b>
+  <%= @diagnosis.person.full_identifier %>
+</p>
+
+<p>
+  <b>Disease:</b>
+  <%= @diagnosis.disease.name %>
+</p>
+
+<p>
+  <b>Disease information:</b>
+  <%= @diagnosis.disease_information %>
+</p>
+
+<p>
+  <b>Output order:</b>
+  <%= @diagnosis.output_order %>
+</p>
+
+
+<%= link_to 'Edit', edit_diagnosis_path(@diagnosis) %> |
+<%= link_to 'Back', diagnoses_path %><br />
+<%= link_to 'Add another diagnosis for this person', new_diagnosis_path(:person_id => @diagnosis.person) %> |
+<%= link_to 'Back to Person', person_path(@diagnosis.person) %> |
+<%= link_to 'Back to Pedigree', pedigree_path(@diagnosis.person.pedigree) %>

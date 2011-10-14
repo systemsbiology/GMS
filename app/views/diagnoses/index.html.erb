@@ -1,0 +1,10 @@
+<script>
+  $(document).ready(function() { setupTablesorter() });
+</script>
+<h1>Listing Diseases for People</h1>
+<%= render "partials/filter" %>
+<%= link_to 'New Person disease', new_diagnosis_path %>
+<div id="filter_table">
+  <%= render 'list', :diagnoses => @diagnoses %>
+</div>
+<br />

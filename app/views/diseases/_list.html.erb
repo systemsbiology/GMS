@@ -1,0 +1,27 @@
+<% if diseases.size > 0 %>
+<table class="tablesorter">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Omim</th>
+    <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+<% diseases.each do |disease| %>
+  <tr>
+    <td><%= link_to disease.name, disease %></td>
+    <td><%= link_to disease.omim_id, "http://omim.org/entry/#{disease.omim_id}" %></td>
+    <td><%= raw disease.description.gsub(/\(\d+\)/) { |digits| digits.sub!("(",""); digits.sub!(")",""); link_to("(#{digits})", "http://omim.org/entry/#{digits}")} %></td>
+    <% if false %>
+    <td><%= link_to 'Show', disease %></td>
+    <td><%= link_to 'Edit', edit_disease_path(disease) %></td>
+    <td><%= link_to 'Destroy', disease, :confirm => 'Are you sure?', :method => :delete %></td>
+    <% end %>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<% else %>
+<p>No diseases found.</p>
+<% end %>

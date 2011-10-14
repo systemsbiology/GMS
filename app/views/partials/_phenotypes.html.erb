@@ -1,0 +1,29 @@
+<% if phenotypes.size > 0 %>
+<table class="tablesorter">
+  <thead>
+  <tr>
+    <th>Phenotype Name</th>
+    <th>Associated with Disease</th>
+    <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+
+<% phenotypes.each do |phenotype| %>
+  <tr>
+    <td><%= link_to phenotype.name, phenotype %></td>
+    <td><%= link_to(phenotype.disease.name,phenotype.disease) if phenotype.disease %></td>
+    <td><%= phenotype.description %></td>
+    <% if false %>
+    <td><%= link_to 'Show', phenotype %></td>
+    <td><%= link_to 'Edit', edit_phenotype_path(phenotype) %></td>
+    <td><%= link_to 'Destroy', phenotype, :confirm => 'Are you sure?', :method => :delete %></td>
+    <% end %>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<% else %>
+<div>No Phenotypes found.</div>
+<% end %>
+<br />

@@ -1,0 +1,48 @@
+<% if @assays.size == 0 then %>
+  <p>No Assays for this pedigree</p>
+<% else %>
+<table class="tablesorter">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Sample</th>
+    <th>ISB Sample ID</th>
+    <th>ISB Person ID&nbsp;&nbsp;&nbsp;</th>
+    <th>Collaborator ID&nbsp;&nbsp;&nbsp;</th>
+    <th>Pedigree</th>
+    <th>Assay type</th>
+    <th>Technology&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+    <th>Status</th>
+  </tr>
+  </thead>
+  <tbody>
+<% @assays.each do |assay| %>
+  <% if assay.sample.nil? then %>
+  <tr>
+    <td><%= link_to assay.name, assay %></td>
+    <td></td>
+    <td></td>
+    <td></nobr></td>
+    <td></td>
+    <td></td>
+    <td><%= assay.assay_type %></td>
+    <td><%= assay.technology %></td>
+    <td><%= assay.status %></td>
+  </tr>
+  <% else %>
+  <tr>
+    <td><%= link_to assay.name, assay %></td>
+    <td><%= assay.sample.vendor_id %></td>
+    <td><nobr><%= assay.sample.isb_sample_id %></nobr></td>
+    <td><nobr><%= assay.sample.person.isb_person_id %></nobr></td>
+    <td><%= assay.sample.person.collaborator_id %></td>
+    <td><%= assay.sample.person.pedigree.name %></td>
+    <td><%= assay.assay_type %></td>
+    <td><%= assay.technology %></td>
+    <td><%= assay.status %></td>
+  </tr>
+  <% end %>
+<% end %>
+</tbody>
+</table>
+<% end %>

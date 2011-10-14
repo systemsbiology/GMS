@@ -1,0 +1,24 @@
+<%= form_for(@diagnosis) do |f| %>
+  <%= render "partials/error_messages", :target => @diagnosis %>
+
+  <div class="field">
+    <%= f.label :person_id %><br />
+    <%= f.collection_select(:person_id, Person.all, :id, :full_identifier, { :include_blank => "-Select Person", :selected => params[:person_id] || @diagnosis.person.id || '' }) %>
+  </div>
+  <div class="field">
+    <%= f.label :disease_id %><br />
+    <%= f.collection_select(:disease_id, Disease.all, :id, :name, { :include_blank => "-Select Disease or leave blank" }) %>
+    <div>If disease is not in this list, then <%= link_to "create a new disease", new_disease_path %></div>
+  </div>
+  <div class="field">
+    <%= f.label :disease_information %> (Ex: age of onset)<br />
+    <%= f.text_field :disease_information %>
+  </div>
+  <div class="field">
+    <%= f.label :output_order %><br />
+    <%= f.number_field :output_order %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

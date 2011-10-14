@@ -1,0 +1,30 @@
+<table class="tablesorter">
+  <thead>
+  <tr>
+    <th>ISB sample</th>
+    <th>ISB Person</th>
+    <th>Peson</th>
+    <th>Pedigree</th>
+    <th>Sample type</th>
+    <th>Status</th>
+    <th>Volume</th>
+    <th>Concentration</th>
+    <th>Quantity</th>
+  </tr>
+  </thead>
+  <tbody>
+<% @samples.each do |sample| %>
+  <tr>
+    <td><nobr><%= link_to sample.isb_sample_id, sample %></nobr></td>
+    <td><nobr><%= sample.person.isb_person_id %></nobr></td>
+    <td><%= sample.person.collaborator_id %></td>
+    <td><%= sample.person.pedigree.name if sample.person.pedigree %></td>
+    <td><%= sample.sample_type.nil? ? 'unknown' : sample.sample_type.name  %></td>
+    <td><%= sample.status %></td>
+    <td><%= sample.volume %></td>
+    <td><%= sample.concentration %></td>
+    <td><%= sample.quantity %></td>
+  </tr>
+<% end %>
+</tbody>
+</table>

@@ -1,0 +1,14 @@
+
+<%= form_tag("#", :method => "get") do %>
+    <% if params[:pedigree_filter] && params[:pedigree_filter][:id] then %>
+    <% cur_pedigree_id = params[:pedigree_filter][:id].to_i %>
+    <% else %>
+    <% cur_pedigree_id = "0" %>
+    <% end %>
+  <%= collection_select(:pedigree_filter, :id, Pedigree.order(:name), :id, :name, options = {:include_blank => '-Select a pedigree to filter by', :selected => cur_pedigree_id}, :class => "pedigree_select") %>
+  <% if params[:controller] == 'assay_files' %>
+    <%= select_tag(:file_type, options_from_collection_for_select(AssayFile.group(:file_type), :file_type, :file_type, params[:file_type]), {:include_blank => '-Select a file_type to filter by', :class => "file_type_select"}) %>
+  <% end %>
+  <%= submit_tag("Filter") %>
+<% end %>
+

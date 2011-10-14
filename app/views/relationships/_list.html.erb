@@ -1,0 +1,37 @@
+<script>
+  $(document).ready(function() { setupTablesorter() });
+</script>
+<% if !@relationships.nil? and @relationships.size > 0 %>
+<table class="tablesorter">
+  <thead>
+  <tr>
+    <th>Pedigree</th>
+    <th>Parent</th>
+    <th>Name</th>
+    <th>Child</th>
+    <th colspan="2" class="nosort">Controls</th>
+  </tr>
+  </thead>
+  <tbody>
+<% @relationships.each do |relationship| %>
+  <% if relationship.person.nil? %>
+    <tr><td colspan="5">Error with relationship <%= relationship.inspect %></td></tr>
+  <% else %>
+  <tr>
+    <td><%= relationship.person.pedigree.nil? ? '' : link_to(relationship.person.pedigree.name, relationship.person.pedigree) %>
+    <td><%= link_to relationship.person.identifier, relationship.person %></td>
+    <td> is the <%= link_to relationship.name, relationship %> of </td>
+    <td><%= link_to relationship.relation.identifier, relationship.relation %></td>
+    <td><%= link_to 'Edit', edit_relationship_path(relationship) %></td>
+    <% if false %>
+    <td><%= link_to 'Show', relationship %> </td>
+    <td><%= link_to 'Destroy', relationship, :confirm => 'Are you sure?', :method => :delete %></td>
+    <% end %>
+  </tr>
+  <% end %>
+<% end %>
+</tbody>
+</table>
+<% else %>
+  <p>No relationships found</p>
+<% end %>
