@@ -3,7 +3,7 @@ class AssayFile < ActiveRecord::Base
   belongs_to :assay
   belongs_to :genome_reference
 
-  validates_presence_of :name, :genome_reference_id, :assay, :location, :file_type, :software, :software_version, :file_date, :current
+  validates_presence_of :name, :genome_reference_id, :assay, :location, :file_type, :software, :software_version, :file_date
 
   scope :has_file_type, lambda { |file_type| 
     unless file_type.blank?
