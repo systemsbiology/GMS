@@ -37,4 +37,5 @@
 
 
 <%= link_to 'Edit', edit_assay_file_path(@assay_file) %> |
-<%= link_to 'Back', assay_files_path %>
+<%= link_to 'Back to all assays', assay_files_path %> | 
+<%= link_to "Back to assay #{@assay_file.assay.name}", assay_path %>

@@ -1,4 +1,4 @@
-<% if @assay_files.size == 0 %>
+<% if assay_files.size == 0 %>
   <p>No files fulfill these conditions.</p>
 <% else %>
 <table class="tablesorter">
@@ -8,7 +8,6 @@
     <th>Pedigree</th>
     <th>Genome reference&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
     <th>Name</th>
-    <th>Description&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
     <th>File type</th>
     <th>Software&nbsp;&nbsp;</th>
     <th>Software version</th>
@@ -16,14 +15,13 @@
   </tr>
   </thead>
   <tbody>
-<% @assay_files.each do |assay_file| %>
+<% assay_files.each do |assay_file| %>
   <% if assay_file.assay.nil? then %>
   <tr>
     <td></td>
     <td></td>
     <td><%= assay_file.genome_reference.name %></td>
     <td><nobr><%= assay_file.name %><nobr></td>
-    <td><%= assay_file.description %></td>
     <td><%= assay_file.file_type %></td>
     <td><%= assay_file.software %></td>
     <td><%= assay_file.software_version %></td>
@@ -31,20 +29,32 @@
 
   <% else %>
   <tr>
-    <td><nobr><%= assay_file.assay.sample.nil? ? '' : assay_file.assay.sample.vendor_id %></nobr></td>
+    <td><nobr><%= image_tag('file_location.png', :size => "20x20", :onmouseover => "$('#assay_file_loc_#{assay_file.id}').poshytip('show')", :onmouseout => "$('#assay_file_loc_#{assay_file.id}').poshytip('hide')", :id => "assay_file_loc_#{assay_file.id}") %><%= assay_file.assay.sample.nil? ? '' : assay_file.assay.sample.vendor_id %></nobr></td>
     <td><%= assay_file.assay.sample.nil? ? '' : assay_file.assay.sample.person.nil? ? '' : assay_file.assay.sample.person.pedigree.name %></td>
     <td><%= assay_file.genome_reference.name %></td>
     <td><nobr><%= assay_file.name %><nobr></td>
-    <td><%= assay_file.description %></td>
     <td><%= assay_file.file_type %></td>
     <td><%= assay_file.software %></td>
     <td><%= assay_file.software_version %></td>
     <td><%= link_to 'Show', assay_file %></td>
   </tr>
+  <script>
+  $("#assay_file_loc_<%= assay_file.id %>").poshytip({
+      content: '<%= assay_file.location if assay_file.location %>', 
+      className: 'tip-yellow',
+      showOn: 'none',
+      alignTo: 'target',
+      alignX: 'inner-left'
+  });
+  </script>
+
   <% end %>
 <% end %>
   </tbody>
 </table>
 
-<%= @assay_files.size %> files
+<%= assay_files.size %> files
+
 <% end %>
+
+

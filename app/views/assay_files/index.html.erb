@@ -8,7 +8,7 @@
   <p><b>Files for Pedigree <u><%= Pedigree.find(params[:pedigree_filter][:id]).name %></u></b></p>
 <% end %>
 <div id="filter_table">
-  <%= render 'list' %>
+  <%= render 'list', :assay_files => @assay_files %>
 </div>
 <br />
 

@@ -1,25 +1,33 @@
-<p id="notice"><%= notice %></p>
+<p id="notice"><%= notice %></td>
 
-<p>
+<table class="tablesorter">
+<tr>
+<td>
   <b>Name:</b>
   <%= @assay.name %>
-</p>
-
-<p>
+</td>
+<td>
   <b>Assay type:</b>
   <%= @assay.assay_type %>
-</p>
-
-<p>
+</td>
+<td>
   <b>Technology:</b>
   <%= @assay.technology %>
-</p>
-
-<p>
+</td>
+</tr>
+<tr>
+<td colspan="3">
   <b>Description:</b>
   <%= @assay.description %>
-</p>
-
-
+</td>
+</tr>
+</table>
 <%= link_to 'Edit', edit_assay_path(@assay) %> |
 <%= link_to 'Back', assays_path %>
+<br /><br />
+<h1>Listing Assay Files</h1>
+<% if @assay.assay_files.size > 0 %>
+<%= render 'assay_files/list', :assay_files => @assay.assay_files %>
+<% else %>
+<p>No assay files for this assay.</p>
+<% end %>

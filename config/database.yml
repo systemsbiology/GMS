@@ -3,13 +3,13 @@
 development:
   adapter: mysql
   database: gms_development
+  reconnect: true
   pool: 5
   timeout: 5000
   username: pedigree
   password: p3d4b0
   host: localhost
   socket: /u5/mysql/mysql.sock
-  reconnect: true
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
