@@ -7,7 +7,7 @@ class AssembliesController < ApplicationController
 #    @assembly = find_all_by_pedigree_id(params[:pedigree_filter][:id]) if (params[:pedigree_filter])
 #    @assembly = @assembly.find(:all, :include => { :assay => { :sample => { :person => :pedigree } } },
 #                                        :conditions => [ 'pedigrees.id = ?', params[:pedigree_filter][:id] ]) if (params[:pedigree_filter])
-    @assembly = Assembly.has_file_type(params[:file_type]).has_pedigree(params[:pedigree_filter])
+    @assemblies = Assembly.has_pedigree(params[:pedigree_filter])
 
     respond_to do |format|
       format.html # index.html.erb

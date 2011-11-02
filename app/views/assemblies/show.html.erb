@@ -28,6 +28,7 @@
 
 <%= render 'assembly_files/list', :assembly_files => @assembly.assembly_files %>
 
+<br /><br />
 <%= link_to 'Edit', edit_assembly_path(@assembly) %> |
 <%= link_to 'Back to all assemblies', assemblies_path %> | 
 <%= link_to "Back to assay #{@assembly.assay.name}", assay_path %>
