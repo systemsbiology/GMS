@@ -1,3 +1,5 @@
+require 'pedigree_info'
+
 class Pedigree < ActiveRecord::Base
   has_many :people, :through => :memberships
   has_many :memberships
@@ -11,6 +13,16 @@ class Pedigree < ActiveRecord::Base
 
   def diseases
     self.people.map(&:diseases).flatten.uniq
+  end
+
+  def write_pedigrees
+    data_store = pedigree_info
+    json_data_store = ActiveSupport::JSON.encode(data_store)
+    File.open("isb-pedigrees.dat", 'w') do |f|
+      f.puts json_data_store
+    end
+
+    
   end
 
 end

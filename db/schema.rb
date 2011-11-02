@@ -22,7 +22,23 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
   add_index "acquisitions", ["person_id"], :name => "acquisitions_person"
   add_index "acquisitions", ["sample_id"], :name => "acquisitions_sample"
 
-  create_table "assay_files", :force => true do |t|
+  create_table "assays", :force => true do |t|
+    t.string   "name"
+    t.string   "vendor"
+    t.string   "assay_type"
+    t.string   "status"
+    t.string   "technology"
+    t.string   "description"
+    t.date     "date_received"
+    t.date     "date_transferred"
+    t.date     "dated_backup"
+    t.date     "qc_pass_date"
+    t.boolean  "current"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "assemblies", :force => true do |t|
     t.integer  "genome_reference_id"
     t.integer  "assay_id"
     t.string   "name"
@@ -43,23 +59,26 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.string   "ancestry"
   end
 
-  add_index "assay_files", ["ancestry"], :name => "index_assay_files_on_ancestry"
-  add_index "assay_files", ["assay_id"], :name => "assay_files_assay"
-
-  create_table "assays", :force => true do |t|
+  create_table "assembly_files", :force => true do |t|
+    t.integer  "genome_reference_id"
+    t.integer  "assembly_id"
+    t.integer  "file_types_id"
     t.string   "name"
-    t.string   "vendor"
-    t.string   "assay_type"
-    t.string   "status"
-    t.string   "technology"
     t.string   "description"
-    t.date     "date_received"
-    t.date     "date_transferred"
-    t.date     "dated_backup"
-    t.date     "qc_pass_date"
+    t.string   "location"
+    t.string   "file_type"
+    t.date     "file_date"
+    t.text     "metadata"
+    t.string   "disk_id",             :limit => 50
+    t.string   "software"
+    t.string   "software_version"
+    t.date     "record_date"
     t.boolean  "current"
+    t.text     "comments"
+    t.integer  "created_by"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.string   "ancestry"
   end
 
   create_table "audits", :force => true do |t|
@@ -83,10 +102,26 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
   add_index "audits", ["created_at"], :name => "index_audits_on_created_at"
   add_index "audits", ["user_id", "user_type"], :name => "user_index"
 
+  create_table "diagnoses", :force => true do |t|
+    t.integer "person_id"
+    t.integer "disease_id"
+    t.string  "disease_information"
+    t.integer "output_order"
+    t.date    "created_at"
+    t.date    "updated_at"
+  end
+
   create_table "diseases", :force => true do |t|
     t.string   "name"
     t.string   "omim_id"
     t.text     "description"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
+  create_table "file_types", :force => true do |t|
+    t.string   "type_name",  :limit => 50
+    t.integer  "created_by"
     t.datetime "created_at"
     t.datetime "updated_at"
   end
@@ -154,6 +189,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
   create_table "phenotypes", :force => true do |t|
     t.integer  "disease_id"
     t.string   "name"
+    t.string   "phenotype_type"
     t.text     "description"
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -233,7 +269,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
   create_table "traits", :force => true do |t|
     t.integer "person_id"
     t.integer "phenotype_id"
-    t.string  "value"
+    t.string  "trait_information"
     t.string  "output_order"
   end
 

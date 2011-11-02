@@ -1,0 +1,33 @@
+<p id="notice"><%= notice %></td>
+
+<table class="tablesorter">
+  <tr>
+    <td><b>Name:</b> <nobr><%= @assembly.name %></nobr> </td>
+    <td><b>Genome reference:</b> <%= @assembly.genome_reference.name %> </td>
+    <td colspan="2"> <b>File type:</b> <%= @assembly.file_type %> </td>
+  </tr>
+  <tr>
+    <td><b>Software:</b> <%= @assembly.software %> </td>
+    <td><b>Software version:</b> <%= @assembly.software_version %> </td>
+    <td><b>File date:</b> <%= @assembly.file_date %> </td>
+    <td><b>Current:</b> <%= @assembly.current %> </td>
+  </tr>
+  <tr>
+    <td colspan="4"> <b>Location:</b> <%= @assembly.location %> </td>
+  </tr>
+  <tr>
+    <td colspan="4"> <b>Metadata:</b> <%= @assembly.metadata %> </td>
+  </tr>
+  <tr>
+    <td colspan="4"> <b>Description:</b> <%= @assembly.description %> </td>
+  </tr>
+  <tr>
+    <td colspan="4"> <b>Comments:</b> <%= @assembly.comments %> </td>
+  </tr>
+</table>
+
+<%= render 'assembly_files/list', :assembly_files => @assembly.assembly_files %>
+
+<%= link_to 'Edit', edit_assembly_path(@assembly) %> |
+<%= link_to 'Back to all assemblies', assemblies_path %> | 
+<%= link_to "Back to assay #{@assembly.assay.name}", assay_path %>

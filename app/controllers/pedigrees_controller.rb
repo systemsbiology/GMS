@@ -1,3 +1,5 @@
+require 'download_zip'
+
 class PedigreesController < ApplicationController
   unloadable
 
@@ -26,6 +28,7 @@ class PedigreesController < ApplicationController
     # the combination of pedigree name and pedigree id should be unique
     madeline_name = "madeline_#{@pedigree.name}_#{@pedigree.id}.xml"
     madeline_file = MADELINE_DIR + "#{madeline_name}"
+    #logger.debug("looking for madeline file #{madeline_file}")
 
     #@to_mad = to_madeline(@relationships)
     @filename = madeline_file
@@ -122,5 +125,54 @@ class PedigreesController < ApplicationController
       format.xml  { head :ok }
       format.json  { head :ok }
     end
+  end
+
+  # this prints out the JSON pedigree file
+  def pedigree_file
+    @pedigree = Pedigree.find(params[:id])
+    output_file = PEDFILES_DIR + pedigree_output_filename(@pedigree)
+    ped_hash = pedfile(params[:id])
+    parent_rels = pedigree_relationships(params[:id])
+    ped_hash["relationships"] = parent_rels
+    json_pedigree = JSON.pretty_generate(ped_hash)
+    File.open(output_file, 'w') do |f|
+      f.puts json_pedigree
+    end
+
+    respond_to do |format|
+      format.html { send_data(File.read(output_file), :filename => "#{@pedigree.tag}.ped", :type => 'application/json') }
+      format.json { end_data(File.read(output_file), :filename => output_file, :type => 'application/json') }
+    end
+  end
+
+  def all_pedigree_files
+    @pedigrees = Pedigree.all
+    ped_file_list = Hash.new
+    @pedigrees.each do |ped|
+      file_name = pedigree_output_filename(ped)
+      output_file = PEDFILES_DIR + file_name
+      ped_file_list[file_name] = output_file
+      ped_hash = pedfile(ped.id)
+      parent_rels = pedigree_relationships(ped.id)
+      ped_hash["relationships"] = parent_rels
+      json_pedigree = JSON.pretty_generate(ped_hash)
+      File.open(output_file, 'w') do |f|
+        f.puts json_pedigree
+      end
+    end
+
+    data_store = pedindex
+    data_store_name = PEDIGREE_DATA_STORE # from config/environment.rb
+    data_store_loc = PEDFILES_DIR + data_store_name
+    ped_file_list[data_store_name] = data_store_loc
+    json_index = JSON.pretty_generate(data_store)
+    File.open(data_store_loc, 'w') do |f|
+      f.puts json_index
+    end
+
+    respond_to do |format|
+      format.html { download_zip("pedigrees.zip",ped_file_list) }
+    end
+
   end
 end

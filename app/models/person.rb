@@ -17,6 +17,26 @@ class Person < ActiveRecord::Base
 
   validates_presence_of :collaborator_id, :gender
 
+  def father
+    parent_relationships = self.parents
+    father = Array.new
+    parent_relationships.each do |rel|
+      father.push(rel.relation) if rel.relation.gender == 'male'
+    end
+    return father
+  end
+
+  def mother
+    parent_relationships = self.parents
+    mother = Array.new
+    parent_relationships.each do |rel|
+      mother.push(rel.relation) if rel.relation.gender == 'female'
+    end
+    return mother
+  end
+
+
+
   def relationships
     spouses = self.spouses
     offspring = self.offspring

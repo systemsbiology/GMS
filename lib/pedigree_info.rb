@@ -47,7 +47,7 @@ def pedfile(pedigree_id)
     samples_list = Array.new
     ind.samples.each do |sample|
       ind_sample = Hash.new
-#     puts "sample is #{sample.inspect}"
+      #puts "sample is #{sample.inspect}"
       ind_sample["sample_id"] = sample.isb_sample_id
       if sample.sample_type.nil?
         ind_sample["sample_type"] = 'unknown'
@@ -58,47 +58,67 @@ def pedfile(pedigree_id)
       ind_sample["sample_protocol"] = sample.protocol
       ind_sample["sample_date"] = sample.date_received
       #ind_sample["assays"] = Array.new
-      assay_hash = Hash.new
+      #assay_hash = Hash.new
       assays = sample.assays
+      next if assays.size == 0
+      assay_holder = Array.new
       assays.group_by { |t| t.assay_type }.each do |assay_type_group, assay_array|
-        assay_hash[assay_type_group] = Array.new
-
+        #assay_hash[assay_type_group] = Array.new
+        #puts "assay_array is #{assay_array}"
         assay_array.each do |assay|
+	  #puts "assay is #{assay.inspect}"
           assay_info = Hash.new
           assay_info["assay_name"] = assay.name
           assay_info["assay_type"] = assay.assay_type
           assay_info["assay_technology"] = assay.technology
           assay_info["assay_desc"] = assay.description
+	  assay_info["assemblies"] = Array.new
 
-          asm_list = Array.new
-          af_list = assay.assay_files
-          af_list.group_by {|t| t.file_type }.each do |assay_key, assay_file_array|
-            #puts "assay_key is #{assay_key.inspect} asasy_file_array is #{assay_file_array.inspect}"
-            next unless assay_key == "VAR-ANNOTATION" # this skips all files except for the varfile - may want to add other files eventually but will need different keys
-            assay_file_array.each do |assay_file|
-              file_info = Hash.new
-              file_info["assembly_id"] = assay_file.name
-              file_info["assembly_date"] = assay_file.file_date
-              file_info["assember_swversion"] = assay_file.software_version
-              file_info["assembly_desc"] = assay_file.description
-              file_info["reference"] = assay_file.genome_reference.name
-              file_info["variation_file"] = assay_file.location
+	  assay.assemblies.each do |assembly|
+    	      #puts "assembly #{assembly.inspect}"
+              asm_list = Hash.new
+              asm_list["assembly_id"] = assembly.name
+	      asm_list["assembly_date"] = assembly.file_date
+	      asm_list["assembler_swversion"] = assembly.software_version
+	      asm_list["assembly_desc"] = assembly.description
+	      asm_list["reference"] = assembly.genome_reference.name
+ 
+              af_list = assembly.assembly_files
+              file_list = Array.new
+              af_list.group_by {|t| t.file_type }.each do |assay_key, assembly_file_array|
+                #puts "assay_key is #{assay_key.inspect} asasy_file_array is #{assembly_file_array.inspect}"
+                next if assay_key == "ASSEMBLY" 
+                assembly_file_array.each do |assembly_file|
+                  file_info = Hash.new
+	          file_info["file_type"] = assay_key
+                  file_info["assembly_id"] = assembly_file.name
+                  file_info["assembly_date"] = assembly_file.file_date
+                  file_info["assember_swversion"] = assembly_file.software_version
+                  file_info["assembly_desc"] = assembly_file.description
+                  file_info["reference"] = assembly_file.genome_reference.name
+                  file_info["file"] = assembly_file.location
 
-              asm_list.push(file_info)
-            end
-          end # end assay.assay_files.all
+                  file_list.push(file_info)
+                end
+              end # end assay.assembly_files.all
+          
+              asm_list["files"] = file_list unless file_list.size == 0
+              assay_info["assemblies"].push(asm_list) unless asm_list.size == 0
+          end
 
-          assay_info["assemblies"] = asm_list
-          assay_hash[assay_type_group].push(assay_info)
+	  assay_info.delete("assemblies") if assay_info["assemblies"].size == 0
+          #assay_hash[assay_type_group].push(assay_info)
+	  #puts "adding assay_info to assay_array #{assay_info.inspect}"
+	  assay_holder.push(assay_info)
         end # end assay_array.each
       end # end assays.group_by.each
 
       #ind_sample["assays"].push(assay_hash)
-      ind_sample["assays"] = assay_hash
+      ind_sample["assays"] = assay_holder
       samples_list.push(ind_sample)
     end # end ind.samples.each
 
-    person["samples"] = samples_list
+    person["samples"] = samples_list unless samples_list.size == 0 
     individuals.push(person)
   end # end ped.people.each
 

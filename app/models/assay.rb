@@ -1,5 +1,5 @@
 class Assay < ActiveRecord::Base
-  has_many :assay_files
+  has_many :assemblies
   has_one :sample_assay
   has_one :sample, :through => :sample_assay
 
@@ -18,9 +18,9 @@ class Assay < ActiveRecord::Base
 
   scope :has_reference, lambda { |reference, file_type|
     unless reference.blank?
-      joins(:assay_files ).
-      where('assay_files.genome_reference_id = ?', reference).
-      where('assay_files.file_type = ?', file_type)
+      joins(:assemblies).
+      where('assemblies.genome_reference_id = ?', reference).
+      where('assemblies.file_type = ?', file_type)
     end
   }
 

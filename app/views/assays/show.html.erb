@@ -25,9 +25,9 @@
 <%= link_to 'Edit', edit_assay_path(@assay) %> |
 <%= link_to 'Back', assays_path %>
 <br /><br />
-<h1>Listing Assay Files</h1>
-<% if @assay.assay_files.size > 0 %>
-<%= render 'assay_files/list', :assay_files => @assay.assay_files %>
+<h1>Listing Assemblies</h1>
+<% if @assay.assemblies.size > 0 %>
+<%= render 'assemblies/list', :assemblies => @assay.assemblies %>
 <% else %>
-<p>No assay files for this assay.</p>
+<p>No assemblies for this assay.</p>
 <% end %>

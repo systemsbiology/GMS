@@ -1,4 +1,6 @@
 Gms::Application.routes.draw do
+  resources :file_types
+
   resources :diagnoses
 
   resources :reports
@@ -6,7 +8,8 @@ Gms::Application.routes.draw do
   root :to => 'welcome#index'
   match '/calendar(/:year(/:month))' => 'calendar#index', :as => :calendar, :constraints => {:year => /\d{4}/, :month => /\d{1,2}/}
   resources :genome_references
-  resources :assay_files
+  resources :assemblies
+  resources :assembly_files
 
   match "assays/summary_report/(:id)", :to =>  "assays#summary_report", :as => "summary_report"
   resources :assays
@@ -23,6 +26,8 @@ Gms::Application.routes.draw do
   resources :relationships
   resources :aliases
   resources :memberships
+  match "pedigrees/pedigree_file/(:id)", :to => "pedigrees#pedigree_file", :as => "pedigree_file"
+  match "pedigrees/all_pedigree_files", :to => "pedigrees#all_pedigree_files", :as => "all_pedigree_files"
   resources :pedigrees
   resources :studies
 

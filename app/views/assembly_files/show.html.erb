@@ -1,0 +1,42 @@
+<p id="notice"><%= notice %></td>
+
+<table class="tablesorter">
+  <tr>
+    <td><b>Name:</b> <nobr><%= @assembly_file.name %></nobr> </td>
+    <td><b>Genome reference:</b> <%= @assembly_file.genome_reference.name %> </td>
+    <td colspan="2"> <b>File type:</b> <%= @assembly_file.file_type %> </td>
+  </tr>
+  <tr>
+    <td><b>Software:</b> <%= @assembly_file.software %> </td>
+    <td><b>Software version:</b> <%= @assembly_file.software_version %> </td>
+    <td><b>File date:</b> <%= @assembly_file.file_date %> </td>
+    <td><b>Current:</b> <%= @assembly_file.current %> </td>
+  </tr>
+  <tr>
+    <td colspan="4"> <b>Location:</b> <%= @assembly_file.location %> </td>
+  </tr>
+  <tr>
+    <td colspan="4"> <b>Metadata:</b> <%= @assembly_file.metadata %> </td>
+  </tr>
+  <tr>
+    <td colspan="4"> <b>Description:</b> <%= @assembly_file.description %> </td>
+  </tr>
+  <tr>
+    <td colspan="4"> <b>Comments:</b> <%= @assembly_file.comments %> </td>
+  </tr>
+</table>
+
+<% if @assembly_file.file_type == 'SUMMARY' %>
+<div>
+  <div><span style="font-weight:bold; text-decoration: underline;">Summary File Contents</span></div>
+  <div>
+  <%= simple_format(File.read(@assembly_file.location)) %>
+  </div>
+</div>
+<% end %>
+
+
+<%= link_to 'Edit', edit_assembly_file_path(@assembly_file) %> |
+<%= link_to 'Back to all assemblies', assembly_files_path %> | 
+<%= link_to "Back to assembly #{@assembly_file.assembly.name}", assembly_path %> |
+<%= link_to "Back to assay #{@assembly_file.assembly.assay.name}", assay_path %>

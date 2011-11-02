@@ -1,0 +1,51 @@
+<%= form_for(@assemblies) do |f| %>
+  <%= render "partials/error_messages", :target => @assemblies %>
+
+  <div class="field">
+    <%= f.label :genome_reference %><br />
+    <%= collection_select(:genome_reference, :id, GenomeReference.all, :id, :name, { :prompt => "-Select a Genome Reference"}) %>
+  </div>
+  <div class="field">
+    <%= f.label :name %><br />
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :assay %><br />
+    <%= collection_select(:assay, :id, Assay.all, :id, :identifier, { :prompt => "-Select an Assay for this File"}) %>
+  </div>
+  <div class="field">
+    <%= f.label :description %><br />
+    <%= f.text_field :description %>
+  </div>
+  <div class="field">
+    <%= f.label :location %><br />
+    <%= f.text_field :location, :size => 100 %>
+  </div>
+  <div class="field">
+    <%= f.label :metadata %><br />
+    <%= f.text_area :metadata %>
+  </div>
+  <div class="field">
+    <%= f.label :software %><br />
+    <%= f.text_field :software %>
+  </div>
+  <div class="field">
+    <%= f.label :software_version %><br />
+    <%= f.text_field :software_version %>
+  </div>
+  <div class="field">
+    <%= f.label :file_date %><br />
+    <%= f.datetime_select :file_date %>
+  </div>
+  <div class="field">
+    <%= f.label :current %><br />
+    <%= f.check_box :current %>
+  </div>
+  <div class="field">
+    <%= f.label :comments %><br />
+    <%= f.text_area :comments %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

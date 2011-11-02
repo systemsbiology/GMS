@@ -100,7 +100,6 @@ class Relationship < ActiveRecord::Base
 
   def correct_gender?
     relationship_gender = Settings.relationship_gender
-    logger.debug("in correct_gender?")
 
     if relationship_gender[self.name].nil? then
       logger.debug("Error: relationship_gender does not contain #{self.name}.  Please add to config/application.yml before adding this relationship.")

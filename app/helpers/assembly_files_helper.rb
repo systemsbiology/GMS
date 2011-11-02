@@ -1,0 +1,3 @@
+module AssemblyFilesHelper
+
+end

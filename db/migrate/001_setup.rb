@@ -68,7 +68,26 @@ class Setup < ActiveRecord::Migration
       t.string :draw_duplicate
     end
 
-    create_table :assay_files do |t|
+    create_table :assembly_files do |t|
+      t.integer :id
+      t.references :genome_reference
+      t.references :assay
+      t.string :name
+      t.string :description
+      t.string :location
+      t.string :file_type
+      t.date :file_date
+      t.text :metadata
+      t.string :software
+      t.string :software_version
+      t.date :record_date
+      t.boolean :current
+      t.text :comments
+      t.integer :created_by
+      t.timestamps
+    end
+
+    create table :assemblies do |t|
       t.integer :id
       t.references :genome_reference
       t.references :assay
@@ -173,7 +192,8 @@ class Setup < ActiveRecord::Migration
     drop_table :person_aliases
     drop_table :phenotypes
     drop_table :traits
-    drop_table :assay_files
+    drop_table :assembly_files
+    drop_table :assemblies
     drop_table :genome_references
     drop_table :relationships
     drop_table :samples

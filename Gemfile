@@ -42,6 +42,9 @@ gem 'rspec-rails'
 #, '~> 2.6.0'
 
 gem 'madeline', '~> 0.1.4'
+
+gem 'rubyzip'
+
 # Bundle the extra gems:
 # gem 'bj'
 # gem 'nokogiri'

@@ -1,0 +1,15 @@
+<script>
+  $(document).ready(function() { setupTablesorter() });
+</script>
+<h1>Listing Files</h1>
+<%= render "partials/filter" %>
+
+<% unless params[:pedigree_filter].nil? or params[:pedigree_filter][:id].blank? %>
+  <p><b>Files for Pedigree <u><%= Pedigree.find(params[:pedigree_filter][:id]).name %></u></b></p>
+<% end %>
+<div id="filter_table">
+  <%= render 'list', :assemblies => @assemblies %>
+</div>
+<br />
+
+<%= link_to 'New Assembly', new_assembly_path %>
