@@ -6,6 +6,7 @@ class Sample < ActiveRecord::Base
   has_one :person, :through => :acquisition
 
   validates_presence_of :sample_type_id, :status, :vendor_id, :volume, :concentration, :quantity
+  validates_uniqueness_of :vendor_id
 
     scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?

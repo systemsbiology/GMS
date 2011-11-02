@@ -4,6 +4,7 @@ class AssemblyFile < ActiveRecord::Base
   belongs_to :genome_reference
 
   validates_presence_of :name, :genome_reference_id, :assembly, :location, :file_type, :software, :software_version, :file_date
+  validates_uniqueness_of :name, :location
 
   scope :has_file_type, lambda { |file_type| 
     unless file_type.blank?

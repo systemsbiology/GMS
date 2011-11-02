@@ -4,6 +4,7 @@ class Assembly < ActiveRecord::Base
   has_many :assembly_files
 
   validates_presence_of :name, :genome_reference_id, :assay, :location, :software, :software_version, :file_date
+  validates_uniqueness_of :name, :location
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?

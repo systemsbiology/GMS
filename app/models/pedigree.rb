@@ -6,6 +6,7 @@ class Pedigree < ActiveRecord::Base
   belongs_to :study
 
   validates_presence_of :name, :tag, :study_id
+  validates_uniqueness_of :name, :tag
 
   def phenotypes 
     self.people.map(&:phenotypes).flatten.uniq

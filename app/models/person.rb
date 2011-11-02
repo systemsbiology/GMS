@@ -16,6 +16,7 @@ class Person < ActiveRecord::Base
   has_many :diseases, :through => :diagnoses
 
   validates_presence_of :collaborator_id, :gender
+  validates_uniqueness_of :collaborator_id, :isb_person_id
 
   def father
     parent_relationships = self.parents

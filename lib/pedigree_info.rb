@@ -36,7 +36,7 @@ def pedfile(pedigree_id)
   ped.people.each do |ind|
     person = Hash.new
     person["id"] = ind.isb_person_id
-    person["subject_id"] = ind.collaborator_id
+    person["collaborator_id"] = ind.collaborator_id
     person["gender"] = ind.gender
     person["DOB"] = ind.dob
     person["DOD"] = ind.dod

@@ -4,6 +4,7 @@ class Assay < ActiveRecord::Base
   has_one :sample, :through => :sample_assay
 
   validates_presence_of :name, :assay_type, :technology
+  validates_uniqueness_of :name
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
