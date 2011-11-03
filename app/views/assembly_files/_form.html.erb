@@ -3,7 +3,7 @@
 
   <div class="field">
     <%= f.label :genome_reference %><br />
-    <%= collection_select(:genome_reference, :id, GenomeReference.all, :id, :name, { :prompt => "-Select a Genome Reference"}) %>
+    <%= collection_select(:genome_reference, :id, GenomeReference.all, :id, :name, { :prompt => "-Select a Genome Reference", :selected => @assembly_file.genome_reference_id}) %>
   </div>
   <div class="field">
     <%= f.label :name %><br />
@@ -11,7 +11,7 @@
   </div>
   <div class="field">
     <%= f.label :assembly %><br />
-    <%= collection_select(:assembly, :id, Assembly.all, :id, :identifier, { :prompt => "-Select an Assembly for this File"}) %>
+    <%= collection_select(:assembly, :id, Assembly.all, :id, :identifier, { :prompt => "-Select an Assembly for this File", :selected => @assembly_file.assembly.id || '' }) %>
   </div>
   <div class="field">
     <%= f.label :description %><br />
@@ -23,7 +23,7 @@
   </div>
   <div class="field">
     <%= f.label :file_type %><br />
-    <%= f.collection_select(:file_type, FileTypes.all, :file_type, :file_type, { :prompt => "-Select a File Type" }) %>
+    <%= f.collection_select(:file_types_id, FileType.all, :id, :type_name, { :prompt => "-Select a File Type" }, :selected => @assembly_file.file_types_id || '') %>
   </div>
   <div class="field">
     <%= f.label :metadata %><br />

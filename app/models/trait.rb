@@ -2,6 +2,7 @@ class Trait < ActiveRecord::Base
   belongs_to :person
   belongs_to :phenotype
 
+  auto_strip_attributes :trait_information, :output_order
   validates_presence_of :person_id, :phenotype_id
 
   scope :has_pedigree, lambda { |pedigree|

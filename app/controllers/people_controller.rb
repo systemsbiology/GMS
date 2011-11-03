@@ -95,7 +95,7 @@ class PeopleController < ApplicationController
       end
       if params[:check_dates][:add_dod].to_i != 1 then
         @values.delete_if{|k,v| k.match(/^dod/)}
-      end 
+      end
     else
       @values.delete_if{|k,v| k.match(/^dob/)}
       @values.delete_if{|k,v| k.match(/^dod/)}
@@ -135,7 +135,7 @@ class PeopleController < ApplicationController
     end
 
     respond_to do |format|
-      format.html 
+      format.html
       format.xml { render :xml => @people }
       format.js
     end

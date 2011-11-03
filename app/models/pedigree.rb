@@ -5,10 +5,11 @@ class Pedigree < ActiveRecord::Base
   has_many :memberships
   belongs_to :study
 
+  auto_strip_attributes :name, :tag, :description
   validates_presence_of :name, :tag, :study_id
   validates_uniqueness_of :name, :tag
 
-  def phenotypes 
+  def phenotypes
     self.people.map(&:phenotypes).flatten.uniq
   end
 
@@ -23,7 +24,7 @@ class Pedigree < ActiveRecord::Base
       f.puts json_data_store
     end
 
-    
+
   end
 
 end

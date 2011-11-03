@@ -3,15 +3,15 @@
 
   <div class="field">
     <%= f.label :person %><br />
-    <%= collection_select(:person, :id, Person.all, :id, :full_identifier, options = {:selected => params[:person_id]}) %>
+    <%= collection_select(:person, :id, Person.all, :id, :full_identifier, options = {:selected => params[:person_id] || ''}) %>
   </div>
   <div class="field">
     <%= f.label :sample_type_id %><br />
-    <%= collection_select(:sample_type, :id, SampleType.all, :id, :name, {:prompt => "Select a sample type for this person"}) %>
+    <%= collection_select(:sample_type, :id, SampleType.all, :id, :name, {:prompt => "Select a sample type for this person", :selected => @sample.sample_type_id || ''}) %>
   </div>
   <div class="field">
     <%= f.label :status %><br />
-    <%= f.collection_select(:status, ["pending", "submitted"], :downcase, :titleize, { :include_blank => "-Select Sample Status" }) %>
+    <%= f.collection_select(:status, ["pending", "submitted", "sequenced"], :downcase, :titleize, { :include_blank => "-Select Sample Status", :selected => @sample.status || '' }) %>
   </div>
   <div class="field">
     Vendor Sample ID (ex: GS0001-DNA_A01 or SS6002729) <br />

@@ -1,9 +1,9 @@
-<%= form_for(@assemblies) do |f| %>
-  <%= render "partials/error_messages", :target => @assemblies %>
+<%= form_for(@assembly) do |f| %>
+  <%= render "partials/error_messages", :target => @assembly %>
 
   <div class="field">
     <%= f.label :genome_reference %><br />
-    <%= collection_select(:genome_reference, :id, GenomeReference.all, :id, :name, { :prompt => "-Select a Genome Reference"}) %>
+    <%= collection_select(:genome_reference, :id, GenomeReference.all, :id, :name, { :prompt => "-Select a Genome Reference", :selected => @assembly.genome_reference_id || ''}) %>
   </div>
   <div class="field">
     <%= f.label :name %><br />
@@ -11,7 +11,7 @@
   </div>
   <div class="field">
     <%= f.label :assay %><br />
-    <%= collection_select(:assay, :id, Assay.all, :id, :identifier, { :prompt => "-Select an Assay for this File"}) %>
+    <%= collection_select(:assay, :id, Assay.all, :id, :identifier, { :prompt => "-Select an Assay for this File", :selected => @assembly.assay_id || ''}) %>
   </div>
   <div class="field">
     <%= f.label :description %><br />

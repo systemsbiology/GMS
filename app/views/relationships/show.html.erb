@@ -1,12 +1,12 @@
 <script>
   $(document).ready(function() { setupTablesorter() });
 </script>
-<% 
+<%
    if @relationship.is_undirected? then
      if @relationship.name.match(/twin/) then
        person_type = "Person"
        relation_type = "Sibling"
-     else 
+     else
        person_type = "Person"
        relation_type = "Spouse"
      end
@@ -42,7 +42,7 @@
 
 <%= link_to 'Edit', edit_relationship_path(@relationship) %> |
 <%= link_to 'Delete this relationship', @relationship, :confirm => "Are you sure?", :method => :delete %> |
-<%= link_to 'Back', relationships_path %> | 
+<%= link_to 'Back', relationships_path %> |
 <%= link_to "Back to Pedigree #{@relationship.person.pedigree.name}", @relationship.person.pedigree %>
 <br />
 

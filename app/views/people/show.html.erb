@@ -34,9 +34,9 @@
 </table>
 
 <%= link_to 'Add Alias for Person', new_person_alias_path(:person_id => @person) %> |
-<%= link_to 'Add Trait for Person', new_trait_path(:person_id => @person) %> |  
+<%= link_to 'Add Trait for Person', new_trait_path(:person_id => @person) %> |
 <%= link_to 'Edit', edit_person_path(@person) %> |
-<%= link_to 'Back', people_path %> 
+<%= link_to 'Back', people_path %>
 <br />
 <%= link_to "Back to Pedigree #{@person.pedigree.name}", @person.pedigree %>
 <br />

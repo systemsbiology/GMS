@@ -22,7 +22,7 @@
 
 
 <%= link_to 'Edit', edit_membership_path(@membership) %> |
-<%= link_to 'Delete this membership', @membership, :confirm => "Are you sure?", :method => :delete %> | 
+<%= link_to 'Delete this membership', @membership, :confirm => "Are you sure?", :method => :delete %> |
 <%= link_to 'Back', memberships_path %><br />
 <%= link_to 'Back to Pedigree', pedigree_path(@membership.pedigree) %>
 <%= link_to 'Back to Person', person_path(@membership.person) %>

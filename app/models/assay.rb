@@ -5,6 +5,7 @@ class Assay < ActiveRecord::Base
 
   validates_presence_of :name, :assay_type, :technology
   validates_uniqueness_of :name
+  auto_strip_attributes :name, :assay_type, :technology, :description
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
@@ -29,7 +30,7 @@ class Assay < ActiveRecord::Base
     joins( :sample => { :person => :pedigree })
   }
 
-  def identifier 
+  def identifier
     "#{name} - #{vendor} - #{assay_type}"
   end
 end

@@ -1,5 +1,6 @@
 class Study < ActiveRecord::Base
   has_many :pedigrees
+  auto_strip_attributes :name, :tag, :collaborator, :collaborating_institution, :lead, :description, :contact
   validates_presence_of :name, :tag, :collaborator, :collaborating_institution
   validates_uniqueness_of :name, :tag
 end

@@ -42,11 +42,11 @@
     <% person.samples.each do |sample| %>
       <% if sample.assays.size == 0 then %>
            <tr>
-            <td style="background-color: 
+            <td style="background-color:
 	      <% if sample.status == 'sequenced' %>red<%
-	         elsif sample.status == 'submitted' %>yellow<% 
+	         elsif sample.status == 'submitted' %>yellow<%
 		 elsif sample.status == 'pending' %>#CC6600<%
-	         elsif sample.status.nil? %>red<% 
+	         elsif sample.status.nil? %>red<%
 	         end %>">&nbsp;</td>
             <td><nobr><%= sample.vendor_id %><nobr></td>
             <td><nobr><%= link_to sample.isb_sample_id, sample_path(sample) %></nobr></td>
@@ -61,18 +61,18 @@
             <td>NA</td>
             <td>NA</td>
           </tr>
-       
+
       <% else %>
         <% sample.assays.each do |assay| %>
           <tr>
-            <td style="background-color: 
-              <% if assay.status then 
-                   if assay.status == 'Received' %>green<% 
-  	           elsif assay.status = 'Pending' %>yellow<% 
-	           end 
+            <td style="background-color:
+              <% if assay.status then
+                   if assay.status == 'Received' %>green<%
+  	           elsif assay.status = 'Pending' %>yellow<%
+	           end
 	         else
-	           if sample.status == 'submitted' %>yellow<% 
-	           elsif sample.status.nil? %>#CC6600<% 
+	           if sample.status == 'submitted' %>yellow<%
+	           elsif sample.status.nil? %>#CC6600<%
 	           end
 	         end %>">&nbsp;</td>
             <td><nobr><%= sample.vendor_id %><nobr></td>

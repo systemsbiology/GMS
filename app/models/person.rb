@@ -15,6 +15,7 @@ class Person < ActiveRecord::Base
   has_many :diagnoses
   has_many :diseases, :through => :diagnoses
 
+  auto_strip_attributes :collaborator_id
   validates_presence_of :collaborator_id, :gender
   validates_uniqueness_of :collaborator_id, :isb_person_id
 
@@ -80,25 +81,25 @@ class Person < ActiveRecord::Base
   def full_identifier
     if self.pedigree and self.person_aliases.size > 0 then
       return "#{self.pedigree.name} - #{isb_person_id} - #{collaborator_id}; #{self.person_aliases.map(&:value).join("; ")}"
-    elsif self.pedigree then 
+    elsif self.pedigree then
       return "#{self.pedigree.name} - #{isb_person_id} - #{collaborator_id}"
-    else 
+    else
       return "Missing Pedigree - #{isb_person_id} - #{collaborator_id}"
     end
   end
 
-  def ped_identifier 
-    if self.pedigree then 
+  def ped_identifier
+    if self.pedigree then
       return "#{self.pedigree.name} - #{isb_person_id} - #{collaborator_id}"
-    else 
+    else
       return "Missing Pedigree - #{isb_person_id} - #{collaborator_id}"
     end
   end
 
   def identifier
-    if self.person_aliases.size > 0 then 
+    if self.person_aliases.size > 0 then
       return "#{isb_person_id} - #{collaborator_id}; #{self.person_aliases.map(&:value).join("; ")}"
-    else 
+    else
       return "#{isb_person_id} - #{collaborator_id}"
     end
   end

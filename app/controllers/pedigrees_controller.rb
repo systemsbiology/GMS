@@ -36,14 +36,14 @@ class PedigreesController < ApplicationController
       if File.exists?("/u5/www/dev_sites/dmauldin/gms/public/madeline_adamsO_79083.txt") then
         tmpfile, warnings = Madeline::Interface.new(:embedded => true, :L => "CM").draw(File.open("/u5/www/dev_sites/dmauldin/gms/public/madeline_adamsO_79083.txt","r"))
       FileUtils.copy(tmpfile,madeline_file)
-      else 
+      else
         File
       end
     end
 
     if File.exists?(madeline_file) then
       @madeline = File.read(madeline_file) if @people.size > 0
-    end 
+    end
 
     respond_to do |format|
       format.html # show.html.erb
@@ -56,7 +56,7 @@ class PedigreesController < ApplicationController
   # GET /pedigrees/new.xml
   def new
     @pedigree = Pedigree.new
-    if (params[:study]) 
+    if (params[:study])
       @pedigree.study_id = params[:study]
     end
 

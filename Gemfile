@@ -44,6 +44,7 @@ gem 'rspec-rails'
 gem 'madeline', '~> 0.1.4'
 
 gem 'rubyzip'
+gem 'auto_strip_attributes', "~> 1.0"
 
 # Bundle the extra gems:
 # gem 'bj'

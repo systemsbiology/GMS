@@ -14,9 +14,9 @@ class Relationship < ActiveRecord::Base
         where('pedigrees.id = ?', pedigree_id)
       end
     end
-  } 
+  }
 
-  scope :order_by_pedigree, lambda { 
+  scope :order_by_pedigree, lambda {
     joins(:person => { :membership => :pedigree}).
     order('pedigrees.id', 'people.id')
   }
@@ -83,7 +83,7 @@ class Relationship < ActiveRecord::Base
   # return the reverse name of a relationship father -> son, wife -> husband, defined in app/config/application.yml
   def reverse_name
     reverse_lookup = Settings.relationship_reverse
-    
+
     reverse_name =  reverse_lookup[self.name]
     if reverse_name.kind_of?(Hash) then
       return reverse_name[self.relation.gender]
@@ -95,7 +95,7 @@ class Relationship < ActiveRecord::Base
   # returns the type for a relationship father -> directed, husband -> undirected, defined in app/config/application.yml
   def lookup_relationship_type
     relationship_types = Settings.relationship_types
-    return relationship_types[self.name] 
+    return relationship_types[self.name]
   end
 
   def correct_gender?
@@ -105,8 +105,8 @@ class Relationship < ActiveRecord::Base
       logger.debug("Error: relationship_gender does not contain #{self.name}.  Please add to config/application.yml before adding this relationship.")
       return false
     end
-   
-    if self.relationship_type.nil? then 
+
+    if self.relationship_type.nil? then
       logger.debug("Error: relationship provided to relationship_gender does not contain a relationship_type.")
       return false
     end
@@ -130,9 +130,9 @@ class Relationship < ActiveRecord::Base
     else
       return false
     end
-  end      
+  end
 
-#    if self.relationship_type == 'undirected' then 
+#    if self.relationship_type == 'undirected' then
 #      if self.name == 'husband' or self.name == 'wife' then
 #        if self.person.gender == relationship_gender[self.name] and self.relation.gender == relationship_gender[self.reverse_name] then
 #          return true
@@ -155,7 +155,7 @@ class Relationship < ActiveRecord::Base
 ##      end
 ##    end
 ##
-##    if self.relationship_type == 'child' then 
+##    if self.relationship_type == 'child' then
 #      logger.debug("in relatinship_type child for #{self.inspect} self.person.gender #{self.person.gender} raltionship_gender[self.name] #{relationship_gender[self.name]} self.relation.gender #{self.relation.gender} relationship_gender[self.reverse_name] #{relationship_gender[self.reverse_name]}" )
 #      if self.person.gender == relationship_gender[self.name] and self.relation.gender == relationship_gender[self.reverse_name] then
 #        return true

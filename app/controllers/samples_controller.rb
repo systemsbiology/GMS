@@ -69,7 +69,7 @@ class SamplesController < ApplicationController
          acquisition.person_id = params[:person][:id]
          acquisition.sample_id = @sample.id
          acquisition.save
-   
+
         format.html { redirect_to(@sample, :notice => 'Sample was successfully created.') }
         format.xml  { render :xml => @sample, :status => :created, :location => @sample }
       else

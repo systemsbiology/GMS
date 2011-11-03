@@ -20,7 +20,7 @@
   <%= @trait.output_order %>
 </p>
 
-<%= link_to 'Add another trait for this person', new_trait_path(:person_id => @trait.person) %> | 
+<%= link_to 'Add another trait for this person', new_trait_path(:person_id => @trait.person) %> |
 <%= link_to 'Edit', edit_trait_path(@trait) %> |
 <%= link_to 'Back', traits_path %><br />
 <%= link_to 'Back to Person', person_path(@trait.person) %> |

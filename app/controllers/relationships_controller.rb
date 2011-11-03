@@ -55,7 +55,7 @@ class RelationshipsController < ApplicationController
     if @relationship.person.pedigree != @relationship.relation.pedigree then
       @relationship.errors[:base] << "Cannot create a relationship link between two pedigrees."
     end
-    
+
     @relationship.relationship_type = @relationship.lookup_relationship_type
 
     if !@relationship.correct_gender? then
@@ -117,7 +117,7 @@ class RelationshipsController < ApplicationController
           if check_recip.nil? then
             @reciprocal.save
             format.html { redirect_to(@relationship, :notice => 'Relationship and reciprocal successfully created.') }
-	  else 
+	  else
             format.html { redirect_to(@relationship, :notice => 'Relationship was successfully created.') }
           end
 

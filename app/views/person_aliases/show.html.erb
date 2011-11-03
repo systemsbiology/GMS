@@ -15,7 +15,7 @@
   <%= @person_alias.value %>
 </p>
 
-<%= link_to "Add another alias for this person", new_person_alias_path(:person_id => @person_alias.person_id) %> | 
+<%= link_to "Add another alias for this person", new_person_alias_path(:person_id => @person_alias.person_id) %> |
 <%= link_to 'Edit', edit_person_alias_path(@person_alias) %> |
 <%= link_to 'Back', person_aliases_path %>
 <br />
