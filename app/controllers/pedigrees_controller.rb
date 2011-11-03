@@ -130,6 +130,9 @@ class PedigreesController < ApplicationController
   # this prints out the JSON pedigree file
   def pedigree_file
     @pedigree = Pedigree.find(params[:id])
+    if !File.exist?(PEDFILES_DIR) then
+      Dir.mkdir(PEDFILES_DIR)
+    end
     output_file = PEDFILES_DIR + pedigree_output_filename(@pedigree)
     ped_hash = pedfile(params[:id])
     parent_rels = pedigree_relationships(params[:id])
@@ -146,6 +149,9 @@ class PedigreesController < ApplicationController
   end
 
   def all_pedigree_files
+    if !File.exist?(PEDFILES_DIR) then
+      Dir.mkdir(PEDFILES_DIR)
+    end
     @pedigrees = Pedigree.all
     ped_file_list = Hash.new
     @pedigrees.each do |ped|
