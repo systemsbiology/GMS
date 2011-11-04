@@ -1,4 +1,10 @@
 
+def peddir_exists
+  if !File.exists?(PEDFILES_DIR) then
+    Dir.mkdir(PEDFILES_DIR)
+  end
+end
+
 def pedindex
   data_store = Hash.new
   data_store["pedigree_databases_name"] = "ISB Locally Stored Pedigrees"
@@ -57,6 +63,7 @@ def pedfile(pedigree_id)
       ind_sample["sample_desc"] = sample.comments
       ind_sample["sample_protocol"] = sample.protocol
       ind_sample["sample_date"] = sample.date_received
+      ind_sample["sample_vendor_id"] = sample.vendor_id
       #ind_sample["assays"] = Array.new
       #assay_hash = Hash.new
       assays = sample.assays
@@ -82,6 +89,7 @@ def pedfile(pedigree_id)
 	      asm_list["assembler_swversion"] = assembly.software_version
 	      asm_list["assembly_desc"] = assembly.description
 	      asm_list["reference"] = assembly.genome_reference.name
+	      asm_list["assembly_location"] = assembly.location
  
               af_list = assembly.assembly_files
               file_list = Array.new
