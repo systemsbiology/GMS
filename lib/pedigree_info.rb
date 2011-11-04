@@ -89,7 +89,7 @@ def pedfile(pedigree_id)
 	      asm_list["assembler_swversion"] = assembly.software_version
 	      asm_list["assembly_desc"] = assembly.description
 	      asm_list["reference"] = assembly.genome_reference.name
-	      asm_list["assembly_location"] = assembly.location
+	      asm_list["assembly_directory"] = assembly.location
  
               af_list = assembly.assembly_files
               file_list = Array.new
