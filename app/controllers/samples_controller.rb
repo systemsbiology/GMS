@@ -4,7 +4,11 @@ class SamplesController < ApplicationController
   def index
     @samples = Sample.has_pedigree(params[:pedigree_filter]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
     if params[:vendor_id] then
-    @samples = Sample.has_pedigree(params[:pedigree_filter]).where("vendor_id = ?", params[:vendor_id]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
+      if params[:vendor_id].match(/%/) then
+        @samples = Sample.has_pedigree(params[:pedigree_filter]).where("vendor_id like ?", params[:vendor_id]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
+      else
+        @samples = Sample.has_pedigree(params[:pedigree_filter]).where("vendor_id = ?", params[:vendor_id]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
+      end
     end
 
     respond_to do |format|
