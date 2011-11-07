@@ -5,10 +5,10 @@
 </script>
 
 <h1>Listing traits</h1>
-<%= render "partials/filter", :traits => @traits %>
+<%= render "partials/filter" %>
 <%= link_to 'New Trait', new_trait_path %>
 <div id="filter_table">
-  <%= render 'list' %>
+  <%= render 'list', :traits => @traits %>
 </div>
 
 <br />
