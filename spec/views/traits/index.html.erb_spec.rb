@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe "traits/index.html.erb" do
   before(:each) do
-    assign(:traits, [
+    @traits = assign(:traits, [
       stub_model(Trait),
       stub_model(Trait)
     ])

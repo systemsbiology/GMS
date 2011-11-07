@@ -1,6 +1,6 @@
 require "spec_helper"
 
-describe AssemblyController do
+describe AssembliesController do
   describe "routing" do
 
     it "routes to #index" do

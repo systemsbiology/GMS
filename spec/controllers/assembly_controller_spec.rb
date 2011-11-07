@@ -18,7 +18,7 @@ require 'spec_helper'
 # Message expectations are only used when there is no simpler way to specify
 # that an instance is receiving a specific message.
 
-describe AssemblyController do
+describe AssembliesController do
 
   # This should return the minimal set of attributes required to create a valid
   # Assembly. As you add validations to Assembly, be sure to
