@@ -5,10 +5,13 @@ class Relationship < ActiveRecord::Base
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
-      unless pedigree.kind_of?(Hash) then
-        raise "Malformed pedigree_filter.  Must be in the format pedigree_filter[:id] = #"
-      end
+      if pedigree.kind_of?(Array) then
+        pedigree_id = pedigree[0]
+      elsif pedigree.kind_of?(Hash) then
       pedigree_id = pedigree[:id]
+      else
+      pedigree_id = pedigree.to_i
+      end
       unless pedigree_id.blank?
         joins(:person => {:membership => :pedigree} ).
         where('pedigrees.id = ?', pedigree_id)

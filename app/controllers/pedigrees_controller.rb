@@ -1,4 +1,5 @@
 require 'download_zip'
+require 'madeline'
 
 class PedigreesController < ApplicationController
   unloadable
@@ -19,14 +20,9 @@ class PedigreesController < ApplicationController
   # GET /pedigrees/1.xml
   def show
     @pedigree = Pedigree.find(params[:id])
-    @people = Person.has_pedigree(params[:id]).include_samples
-    @person_relationships = Relationship.order(:person_id).find_all_by_person_id(@people.map(&:id))
-    @relation_relationships = Relationship.find_all_by_relation_id(@people.map(&:id))
-    @relationships = @person_relationships + @relation_relationships
-    ped_info = Array.new()
 
     # the combination of pedigree name and pedigree id should be unique
-    madeline_name = "madeline_#{@pedigree.name}_#{@pedigree.id}.xml"
+    madeline_name = madeline_file(@pedigree)
     madeline_file = MADELINE_DIR + "#{madeline_name}"
     #logger.debug("looking for madeline file #{madeline_file}")
 
@@ -37,7 +33,7 @@ class PedigreesController < ApplicationController
         tmpfile, warnings = Madeline::Interface.new(:embedded => true, :L => "CM").draw(File.open("/u5/www/dev_sites/dmauldin/gms/public/madeline_adamsO_79083.txt","r"))
       FileUtils.copy(tmpfile,madeline_file)
       else
-        File
+
       end
     end
 
@@ -130,9 +126,7 @@ class PedigreesController < ApplicationController
   # this prints out the JSON pedigree file
   def pedigree_file
     @pedigree = Pedigree.find(params[:id])
-    if !File.exist?(PEDFILES_DIR) then
-      Dir.mkdir(PEDFILES_DIR)
-    end
+    peddir_exists
     output_file = PEDFILES_DIR + pedigree_output_filename(@pedigree)
     ped_hash = pedfile(params[:id])
     parent_rels = pedigree_relationships(params[:id])
@@ -149,9 +143,7 @@ class PedigreesController < ApplicationController
   end
 
   def all_pedigree_files
-    if !File.exist?(PEDFILES_DIR) then
-      Dir.mkdir(PEDFILES_DIR)
-    end
+    peddir_exists
     @pedigrees = Pedigree.all
     ped_file_list = Hash.new
     @pedigrees.each do |ped|
