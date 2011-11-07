@@ -3,6 +3,9 @@ class SamplesController < ApplicationController
   # GET /samples.xml
   def index
     @samples = Sample.has_pedigree(params[:pedigree_filter]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
+    if params[:vendor_id] then
+    @samples = Sample.has_pedigree(params[:pedigree_filter]).where("vendor_id = ?", params[:vendor_id]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
+    end
 
     respond_to do |format|
       format.html # index.html.erb

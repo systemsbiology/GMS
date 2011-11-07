@@ -1,10 +1,12 @@
+<% if @samples.size > 0 %>
 <table class="tablesorter">
   <thead>
   <tr>
     <th>ISB sample</th>
     <th>ISB Person</th>
-    <th>Peson</th>
+    <th>Person</th>
     <th>Pedigree</th>
+    <th>Vendor ID</th>
     <th>Sample type</th>
     <th>Status</th>
     <th>Volume</th>
@@ -19,6 +21,7 @@
     <td><nobr><%= sample.person.isb_person_id %></nobr></td>
     <td><%= sample.person.collaborator_id %></td>
     <td><%= sample.person.pedigree.name if sample.person.pedigree %></td>
+    <td><nobr><%= sample.vendor_id if sample.vendor_id %></nobr></td>
     <td><%= sample.sample_type.nil? ? 'unknown' : sample.sample_type.name  %></td>
     <td><%= sample.status %></td>
     <td><%= sample.volume %></td>
@@ -28,3 +31,8 @@
 <% end %>
 </tbody>
 </table>
+<% else %>
+<table class="tablesorter">
+  <tr><td>No samples found for this query</td></tr>
+</table>
+<% end %>

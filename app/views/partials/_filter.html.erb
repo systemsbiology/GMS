@@ -5,7 +5,7 @@
     <% else %>
     <% cur_pedigree_id = "0" %>
     <% end %>
-  <%= collection_select(:pedigree_filter, :id, Pedigree.order(:name), :id, :name, options = {:include_blank => '-Select a pedigree to filter by', :selected => cur_pedigree_id}, :class => "pedigree_select") %>
+  Filter By Pedigree: <%= collection_select(:pedigree_filter, :id, Pedigree.order(:name), :id, :name, options = {:include_blank => '-Select a pedigree to filter by', :selected => cur_pedigree_id}, :class => "pedigree_select") %>
   <% if params[:controller] == 'assembly_files' %>
     <%= select_tag(:file_type, options_from_collection_for_select(FileType.all, :id, :type_name, params[:file_type]), {:include_blank => '-Select a file_type to filter by', :class => "file_type_select"}) %>
   <% end %>
