@@ -1,4 +1,5 @@
 require 'pedigree_info'
+require 'madeline_utils'
 
 class Pedigree < ActiveRecord::Base
   has_many :people, :through => :memberships
