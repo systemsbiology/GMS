@@ -1,5 +1,5 @@
 require 'download_zip'
-require 'madeline'
+require 'madeline_utils'
 
 class PedigreesController < ApplicationController
   unloadable
@@ -20,6 +20,9 @@ class PedigreesController < ApplicationController
   # GET /pedigrees/1.xml
   def show
     @pedigree = Pedigree.find(params[:id])
+    @person_relationships = Relationship.order(:person_id).find_all_by_person_id(@pedigree.people.map(&:id))
+    @relation_relationships = Relationship.find_all_by_relation_id(@pedigree.people.map(&:id))
+    @relationships = @person_relationships + @relation_relationships
 
     # the combination of pedigree name and pedigree id should be unique
     madeline_name = madeline_file(@pedigree)
@@ -38,7 +41,7 @@ class PedigreesController < ApplicationController
     end
 
     if File.exists?(madeline_file) then
-      @madeline = File.read(madeline_file) if @people.size > 0
+      @madeline = File.read(madeline_file) if @pedigree.people.size > 0
     end
 
     respond_to do |format|
