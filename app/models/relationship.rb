@@ -19,6 +19,10 @@ class Relationship < ActiveRecord::Base
     end
   }
 
+  scope :display_filter, lambda { 
+    {:conditions => ["relationship_type = 'parent' or relationship_type = 'undirected'"]}
+  }
+
   scope :order_by_pedigree, lambda {
     joins(:person => { :membership => :pedigree}).
     order('pedigrees.id', 'people.id')

@@ -20,9 +20,11 @@ class PedigreesController < ApplicationController
   # GET /pedigrees/1.xml
   def show
     @pedigree = Pedigree.find(params[:id])
-    @person_relationships = Relationship.order(:person_id).find_all_by_person_id(@pedigree.people.map(&:id))
-    @relation_relationships = Relationship.find_all_by_relation_id(@pedigree.people.map(&:id))
-    @relationships = @person_relationships + @relation_relationships
+    @person_relationships = Relationship.order(:person_id).display_filter.find_all_by_person_id(@pedigree.people.map(&:id))
+
+#    @person_relationships = Relationship.order(:person_id).find_all_by_person_id(@pedigree.people.map(&:id))
+#    @relation_relationships = Relationship.find_all_by_relation_id(@pedigree.people.map(&:id))
+#    @relationships = @person_relationships + @relation_relationships
 
     # the combination of pedigree name and pedigree id should be unique
     madeline_name = madeline_file(@pedigree)
