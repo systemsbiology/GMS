@@ -34,6 +34,7 @@ def pedfile(pedigree_id)
   output_pedigree = Hash.new
   output_pedigree["pedigree_name"] = ped.tag
   output_pedigree["pedigree_study"] = ped.study.name
+  output_pedigree["pedigree_study_tag"] = ped.study.tag
   output_pedigree["pedigree_desc"] = ped.description
   output_pedigree["pedigree_version"] = ped.version
   output_pedigree["pedigree_subDir"] = ped.directory
@@ -170,4 +171,38 @@ end
 
 def pedigree_output_filename(ped)
     "#{ped.tag}.ped"
+end
+
+
+
+def ordered_pedigree(pedigree_id)
+  # go through each person in the pedigree and find the relationships
+
+  madeline_people = Array.new # an ordered array of people to draw
+  # people who are not children of anyone else
+  root_people = Person.has_pedigree(1).joins(:offspring).where("relationships.person_id not in (?)",Relationship.has_pedigree(1).where(:relationship_type => "child").map(&:person_id))
+  # go through the root people and figure out if their child is a male or female.
+  # if child is male and person gender is male, then draw this first
+  puts "root_people before remove #{root_people.inspect}"
+  root_people.each do |person|
+    if person.gender == "male" and person.child.gender == "male"
+      madeline_people.push(person)
+      root_people.delete(person)
+    end
+  end
+
+  puts "root_people after first remove #{root_people.inspect}"
+  puts "madeline_people after first remove #{madeline_people.inspect}"
+
+  return madeline_people
+end
+
+
+def find_root(pedigree_id)
+   root_candidates = Person.has_pedigree(pedigree_id).joins(:offspring).where("relationships.person_id not in (?)", Relationship.has_pedigree(pedigree_id).where(:relationship_type => "child").map(&:person_id))
+   # find the person that is male and has a male child
+   root_candidates.each do |person|
+     if person.gender == "male"
+     end
+   end
 end
