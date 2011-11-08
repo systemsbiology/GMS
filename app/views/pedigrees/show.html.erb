@@ -44,7 +44,7 @@
 <%= link_to "Receiving Log for Pedigree #{@pedigree.name}", receiving_report_path(par) %>
 <br />
 <p><span style="font-weight: bold; text-decoration: underline;">People in this Pedigree</span></p>
-<% if @people.size == 0 %>
+<% if @pedigree.people.size == 0 %>
   <p>No people currently entered for this pedigree</p>
 <% else %>
   <table class="tablesorter" id="PedigreePeople">
@@ -61,7 +61,7 @@
     </tr>
     </thead>
     <tbody>
-    <% @people.each do |person| %>
+    <% @pedigree.people.each do |person| %>
       <tr>
         <td><%= link_to person.isb_person_id, person %></td>
         <td><%= person.full_collaborator %></td>
@@ -84,7 +84,7 @@
 <%= raw(@filename) %><br />
 <% end %>
 
-<% if @people.size > 2 %>
+<% if @pedigree.people.size > 2 %>
   <% unless @pedigree.name.match(/unrelated/) %>
     <%= raw(@madeline) %>
   <% end %>
