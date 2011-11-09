@@ -187,7 +187,7 @@ def ordered_pedigree(pedigree_id)
 
     puts "ERROR: no root person!" if root_person.nil?
 
-    people = traverse(root_person)
+    madeline_people = traverse(root_person)
     #madeline_people.push(root_person)
     #root_person.spouses.each do |spouse_rels|
     #  spouse = spouse_rels.relation
@@ -198,7 +198,7 @@ def ordered_pedigree(pedigree_id)
     #end 
   end
 
-  puts "madeline_people #{madeline_people.inspect}"
+  puts "madeline_people #{madeline_people.map(&:id)}"
   return madeline_people
 end
 
@@ -206,6 +206,7 @@ end
 def traverse(person)
   puts "traversing person #{person.inspect}"
   people = Array.new
+  people.push(person)
   people = side_branch(person, people)
   people = up_branch(person, people)
   people = down_branch(person, people)
@@ -213,7 +214,8 @@ def traverse(person)
 end
 
 def side_branch(person, previous)
-  return 0 if person.spouses.size == 0
+  puts "side_branch previous #{previous.map(&:id)}"
+  return previous if person.spouses.size == 0
   person.spouses.each do |spouse_rel|
     puts "sidebranch for person #{person.inspect}"
     puts "found #{spouse_rel.relation.inspect}"
@@ -221,15 +223,20 @@ def side_branch(person, previous)
     spouse = spouse_rel.relation
     if !previous.include?(spouse) then
       previous.push(spouse)
-      up_branch(spouse, person)
-      down_branch(spouse, person)
+  puts "side_branch previous with spouse #{previous.map(&:id)}"
+      previous = up_branch(spouse, previous)
+      previous = down_branch(spouse, previous)
     end
   end
+
+  return previous
+
 end
 
 def up_branch(person, previous)
   # go up parents until you don't find any
-  return 0 if person.parents.size == 0
+  puts "up_branch previous #{previous.map(&:id)}"
+  return previous if person.parents.size == 0
   person.parents.each do |parent_rel|
     puts "upbranch for person #{person.inspect}"
     puts "found #{parent_rel.relation.inspect}"
@@ -237,15 +244,17 @@ def up_branch(person, previous)
     parent = parent_rel.relation
     if !previous.include?(parent) then
       previous.push(parent)
-      up_branch(parent, person)
-      side_branch(parent, person)
+      previous = side_branch(parent, previous)
+      previous = up_branch(parent, previous)
     end 
   end
+
+  return previous
 end
 
 def down_branch(person, previous)
-  return 0 if person.offspring.size == 0
-  puts person.id
+  puts "down_branch previous #{previous.map(&:id)}"
+  return previous if person.offspring.size == 0
   person.offspring.each do |offspring_rel|
     puts "downbranch person #{person.inspect}"
     puts "found #{offspring_rel.relation.inspect}"
@@ -253,11 +262,13 @@ def down_branch(person, previous)
     child = offspring_rel.relation
     if !previous.include?(child) then
       previous.push(child)
-      side_branch(child, person)
-      down_branch(child, previous)
-      up_branch(child, person)
+      previous = side_branch(child, previous)
+      previous = up_branch(child, previous)
+      previous = down_branch(child, previous)
     end
   end
+
+  return previous
 end
 
 def find_root(pedigree_id)
