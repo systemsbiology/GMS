@@ -1,4 +1,4 @@
-
+#
 def peddir_exists
   if !File.exists?(PEDFILES_DIR) then
     Dir.mkdir(PEDFILES_DIR)
@@ -91,6 +91,7 @@ def pedfile(pedigree_id)
 	      asm_list["assembly_desc"] = assembly.description
 	      asm_list["reference"] = assembly.genome_reference.name
 	      asm_list["assembly_directory"] = assembly.location
+	      asm_list["assembly_current"] = assembly.current
  
               af_list = assembly.assembly_files
               file_list = Array.new
@@ -179,30 +180,191 @@ def ordered_pedigree(pedigree_id)
   # go through each person in the pedigree and find the relationships
 
   madeline_people = Array.new # an ordered array of people to draw
-  # people who are not children of anyone else
-  root_people = Person.has_pedigree(1).joins(:offspring).where("relationships.person_id not in (?)",Relationship.has_pedigree(1).where(:relationship_type => "child").map(&:person_id))
-  # go through the root people and figure out if their child is a male or female.
-  # if child is male and person gender is male, then draw this first
-  puts "root_people before remove #{root_people.inspect}"
-  root_people.each do |person|
-    if person.gender == "male" and person.child.gender == "male"
-      madeline_people.push(person)
-      root_people.delete(person)
-    end
+  if Pedigree.find(pedigree_id).tag.downcase.match("unrelateds") then
+    madeline_people = Pedigree.find(pedigree_id).people
+  else
+    root_person = find_root(pedigree_id)
+
+    puts "ERROR: no root person!" if root_person.nil?
+
+    people = traverse(root_person)
+    #madeline_people.push(root_person)
+    #root_person.spouses.each do |spouse_rels|
+    #  spouse = spouse_rels.relation
+    #  madeline_people.push(spouse)
+    #  spouse.parents.each do |spouse_parent_rels|
+    #    madeline_people.push(spouse_parent_rels.relation)
+    #  end
+    #end 
   end
 
-  puts "root_people after first remove #{root_people.inspect}"
-  puts "madeline_people after first remove #{madeline_people.inspect}"
-
+  puts "madeline_people #{madeline_people.inspect}"
   return madeline_people
 end
 
+# call up_branch and down_branch
+def traverse(person)
+  puts "traversing person #{person.inspect}"
+  people = Array.new
+  people = side_branch(person, people)
+  people = up_branch(person, people)
+  people = down_branch(person, people)
+  return people
+end
+
+def side_branch(person, previous)
+  return 0 if person.spouses.size == 0
+  person.spouses.each do |spouse_rel|
+    puts "sidebranch for person #{person.inspect}"
+    puts "found #{spouse_rel.relation.inspect}"
+    puts "sidebranch #{person.id} -> #{spouse_rel.relation.id}"
+    spouse = spouse_rel.relation
+    if !previous.include?(spouse) then
+      previous.push(spouse)
+      up_branch(spouse, person)
+      down_branch(spouse, person)
+    end
+  end
+end
+
+def up_branch(person, previous)
+  # go up parents until you don't find any
+  return 0 if person.parents.size == 0
+  person.parents.each do |parent_rel|
+    puts "upbranch for person #{person.inspect}"
+    puts "found #{parent_rel.relation.inspect}"
+    puts "upbranch #{person.id} -> #{parent_rel.relation.id}"
+    parent = parent_rel.relation
+    if !previous.include?(parent) then
+      previous.push(parent)
+      up_branch(parent, person)
+      side_branch(parent, person)
+    end 
+  end
+end
+
+def down_branch(person, previous)
+  return 0 if person.offspring.size == 0
+  puts person.id
+  person.offspring.each do |offspring_rel|
+    puts "downbranch person #{person.inspect}"
+    puts "found #{offspring_rel.relation.inspect}"
+    puts "downbranch #{person.id} -> #{offspring_rel.relation.id}"
+    child = offspring_rel.relation
+    if !previous.include?(child) then
+      previous.push(child)
+      side_branch(child, person)
+      down_branch(child, previous)
+      up_branch(child, person)
+    end
+  end
+end
 
 def find_root(pedigree_id)
-   root_candidates = Person.has_pedigree(pedigree_id).joins(:offspring).where("relationships.person_id not in (?)", Relationship.has_pedigree(pedigree_id).where(:relationship_type => "child").map(&:person_id))
-   # find the person that is male and has a male child
-   root_candidates.each do |person|
-     if person.gender == "male"
-     end
+
+   if Pedigree.find(pedigree_id).tag.downcase.match("unrelateds") then
+     first = Pedigree.find(pedigree_id).people.first
+     puts "Returned one root for unrelated pedigree #{pedigree_id}"
+     return first
    end
+
+   if Pedigree.find(pedigree_id).tag.downcase.match("diversity") then
+     # diversity shoudl be split into multiple pedigrees, but for now just return the first
+     first = Pedigree.find(pedigree_id).people.first
+     puts "Returned one root for diversity pedigree #{pedigree_id}"
+     return first
+   end
+
+   root_candidates = Person.has_pedigree(pedigree_id).joins(:offspring).where("relationships.person_id not in (?)", Relationship.has_pedigree(pedigree_id).where(:relationship_type => "child").map(&:person_id))
+
+   #puts "root candidates #{root_candidates.inspect}"
+   if root_candidates.empty?
+     # this means that this pedigree has a single person (probably)
+     root_candidates = Person.has_pedigree(pedigree_id)
+     #puts "new root cands is #{root_candidates.inspect}"
+   end
+
+   roots = winnow_candidates(root_candidates)
+   roots = prefer_male(roots)
+   roots = prefer_male_children(roots)
+
+
+   if roots.size > 1
+     puts "Error: Found multiple roots for pedigree #{pedigree_id}."
+   elsif roots.size == 1
+     puts "Found one root for pedigree #{pedigree_id}"
+   else
+     puts "Found no root for pedigree #{pedigree_id}"
+   end
+
+   root_array = roots.values
+   return root_array.first
 end
+
+def winnow_candidates(root_candidates)
+
+   roots = Hash.new
+   root_candidates.each do |person|
+     #puts "person #{person.inspect}"
+     # check to see that this person isn't a child of someone else
+     parent_relationships = person.parents
+     #puts "parent_rels #{parent_relationships.inspect}"
+     next if parent_relationships.size > 0
+
+     # check marriages to see if spouse has parents
+     spouse_relationships = person.spouses
+     #puts "spouse_rels #{spouse_relationships.inspect}"
+     flag = false
+     spouse_relationships.each do |spouse_rels|
+       spouse = spouse_rels.relation
+       spouse_parents = spouse.parents
+       #puts "spouse parents #{spouse_parents.inspect} #{spouse_parents.size}"
+       if spouse_parents.size > 0 then
+         flag = true
+       end
+     end
+     next if flag
+     #puts "adding person to root list"
+     roots[person.id] = person
+
+     #puts "________________"
+   end
+
+  return roots
+end
+
+def prefer_male(roots)
+  new_roots = Hash.new
+  roots.each do |id, root|
+    if root.gender == "male"
+      new_roots[id] = root
+    end
+  end
+
+  if new_roots.size > 0
+    return new_roots
+  else
+    return roots
+  end
+end
+
+def prefer_male_children(roots)
+     # find if one of the roots has a male child and use that one
+     new_roots = Hash.new
+     roots.each do |id, person|
+       children_relationships = person.offspring
+       children_relationships.each do |child_rel|
+         child = child_rel.relation
+	 if child.gender == "male"
+	   new_roots[id] = person
+	 end
+       end
+     end
+     if new_roots.size > 0
+       return new_roots
+     else
+       return roots
+     end
+end
+
+
