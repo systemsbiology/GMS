@@ -101,7 +101,7 @@ def pedfile(pedigree_id)
                 assembly_file_array.each do |assembly_file|
                   file_info = Hash.new
 	          file_info["file_type"] = assay_key
-                  file_info["assembly_id"] = assembly_file.name
+                  file_info["file_id"] = assembly_file.name
                   file_info["assembly_date"] = assembly_file.file_date
                   file_info["assember_swversion"] = assembly_file.software_version
                   file_info["assembly_desc"] = assembly_file.description
@@ -187,12 +187,12 @@ def ordered_pedigree(pedigree_id)
 
     puts "ERROR: no root person!" if root_person.nil?
 
-    madeline_people = traverse(root_person)
+    madeline_people = breadth_traverse(root_person)
     #madeline_people.push(root_person)
     #root_person.spouses.each do |spouse_rels|
     #  spouse = spouse_rels.relation
     #  madeline_people.push(spouse)
-    #  spouse.parents.each do |spouse_parent_rels|
+    #  spouse.ordered_parents.each do |spouse_parent_rels|
     #    madeline_people.push(spouse_parent_rels.relation)
     #  end
     #end 
@@ -202,18 +202,106 @@ def ordered_pedigree(pedigree_id)
   return madeline_people
 end
 
-# call up_branch and down_branch
-def traverse(person)
+def breadth_traverse(person)
+  puts "traversing person #{person.inspect}"
+  people = Array.new
+  people.push(person)
+  people = side_branch(person, people)
+  puts "people before loop #{people.map(&:id)}"
+  current_gen = Array.new
+  madeline_people = Array.new
+  madeline_people = people.dup
+  loop {
+    puts "********************************** START"
+    puts "people starting loop #{people.map(&:id)}"
+    puts "current_gen starting loop #{current_gen.map(&:id)}"
+
+    unless current_gen.empty? then
+      people, current_gen = up_breadth_branch(people, current_gen)
+      puts "people in loop after up_breadth_branch #{people.map(&:id)}"
+      puts "current_gen in loop after up_breadth_branch #{current_gen.map(&:id)}"
+    end
+
+    people, current_gen = down_breadth_branch(people, current_gen)
+    puts "current_gen ending loop #{current_gen.map(&:id)}"
+    puts "people in loop #{people.map(&:id)}"
+    break if current_gen.empty?
+    madeline_people = madeline_people | current_gen
+    people = current_gen.dup
+    current_gen = Array.new
+    puts "********************************** END"
+  }
+
+  puts "people main #{people.map(&:id)}"
+  return madeline_people
+end
+
+def down_breadth_branch(people, current_gen)
+  puts "**down_breadth_branch start"
+  puts "down_breadth_branch people #{people.map(&:id)}"
+  puts "down_breadth_branch current_gen #{current_gen.map(&:id)}"
+  new_gen = Array.new
+  people.each do |person|
+    person.offspring.each do |offspring_rel|
+      puts "person #{person.inspect}"
+      puts "found #{offspring_rel.relation.inspect}"
+      puts "downbranch #{person.id} -> #{offspring_rel.relation.id}"
+      child = offspring_rel.relation
+      if !current_gen.include?(child) and !people.include?(child) then
+        new_gen.push(child)
+	current_gen.push(child) unless current_gen.include?(child)
+	puts "new gen before side #{new_gen.map(&:id)}"
+	new_gen = side_branch(child, current_gen)
+	puts "new gen after side #{new_gen.map(&:id)}"
+      end
+    end
+  end
+  puts "**ending down_breadth_branch"
+ 
+  return people, new_gen
+end
+
+def up_breadth_branch(people, current_gen)
+  puts "**up_breadth_branch start"
+  puts "up_breadth_branch people #{people.map(&:id)}"
+  puts "up_breadth_branch current_gen #{current_gen.map(&:id)}"
+  new_gen = Array.new
+  people.each do |person|
+    puts "up_breadth_branch person #{person.inspect}"
+    puts "up_breadth_branch parents are #{person.parents.inspect}"
+    person.ordered_parents.each do |parent_rel|
+      parent = parent_rel.relation
+      puts "up_breadth_branch parent is #{parent.inspect}"
+      if !current_gen.include?(parent) and !people.include?(parent) and !new_gen.include?(parent) then
+	puts "new gen before push in up_breadth_branch #{new_gen.map(&:id)}"
+        new_gen.push(parent)
+	puts "new gen before current_gen push in up_breadth_branch #{new_gen.map(&:id)}"
+	current_gen.push(parent) unless current_gen.include?(parent)
+	puts "new gen before side in up_breadth_branch #{new_gen.map(&:id)}"
+	new_gen = side_branch(parent, current_gen)
+	puts "new gen after side in up_breadth_branch #{new_gen.map(&:id)}"
+      end
+    end
+  end
+  puts "**up_breadth_branch end"
+  return people, new_gen
+end
+
+
+# DEPTH TRAVERSE
+def depth_traverse(person)
   puts "traversing person #{person.inspect}"
   people = Array.new
   people.push(person)
   people = side_branch(person, people)
   people = up_branch(person, people)
-  people = down_branch(person, people)
+  people = down_depth_branch(person, people)
   return people
 end
 
 def side_branch(person, previous)
+  puts "start side_branch"
+  puts "side_branch person #{person.inspect}"
   puts "side_branch previous #{previous.map(&:id)}"
   return previous if person.spouses.size == 0
   person.spouses.each do |spouse_rel|
@@ -223,12 +311,12 @@ def side_branch(person, previous)
     spouse = spouse_rel.relation
     if !previous.include?(spouse) then
       previous.push(spouse)
-  puts "side_branch previous with spouse #{previous.map(&:id)}"
-      previous = up_branch(spouse, previous)
-      previous = down_branch(spouse, previous)
+      puts "side_branch previous with spouse #{previous.map(&:id)}"
+      #previous = up_branch(spouse, previous)
+      #previous = down_depth_branch(spouse, previous)
     end
   end
-
+  puts "end side_branch"
   return previous
 
 end
@@ -237,7 +325,7 @@ def up_branch(person, previous)
   # go up parents until you don't find any
   puts "up_branch previous #{previous.map(&:id)}"
   return previous if person.parents.size == 0
-  person.parents.each do |parent_rel|
+  person.ordered_parents.each do |parent_rel|
     puts "upbranch for person #{person.inspect}"
     puts "found #{parent_rel.relation.inspect}"
     puts "upbranch #{person.id} -> #{parent_rel.relation.id}"
@@ -252,8 +340,8 @@ def up_branch(person, previous)
   return previous
 end
 
-def down_branch(person, previous)
-  puts "down_branch previous #{previous.map(&:id)}"
+def down_depth_branch(person, previous)
+  puts "down_depth_branch previous #{previous.map(&:id)}"
   return previous if person.offspring.size == 0
   person.offspring.each do |offspring_rel|
     puts "downbranch person #{person.inspect}"
@@ -264,12 +352,14 @@ def down_branch(person, previous)
       previous.push(child)
       previous = side_branch(child, previous)
       previous = up_branch(child, previous)
-      previous = down_branch(child, previous)
+      previous = down_depth_branch(child, previous)
     end
   end
 
   return previous
 end
+
+# END DEPTH TRAVERSE
 
 def find_root(pedigree_id)
 
