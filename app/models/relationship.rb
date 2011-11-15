@@ -108,18 +108,9 @@ class Relationship < ActiveRecord::Base
   def correct_gender?
     relationship_gender = Settings.relationship_gender
 
-    if relationship_gender[self.name].nil? then
-      logger.debug("Error: relationship_gender does not contain #{self.name}.  Please add to config/application.yml before adding this relationship.")
-      return false
-    end
-
-    if self.relationship_type.nil? then
-      logger.debug("Error: relationship provided to relationship_gender does not contain a relationship_type.")
-      return false
-    end
-
     if self.name == 'monozygotic twin' then
       # monozygotic twins are always the same sex (unless they have a disease, which may mean this check should be removed if we get any cases of this)
+      logger.debug("monozygotic twins test #{self.person.gender} to #{self.relation.gender}")
       if self.person.gender == self.relation.gender then
         return true
       else
@@ -130,6 +121,16 @@ class Relationship < ActiveRecord::Base
     if self.name == 'dizygotic twin' then
       # dizygotic twins can be any sex combination
       return true
+    end
+
+    if relationship_gender[self.name].nil? then
+      logger.debug("Error: relationship_gender does not contain #{self.name}.  Please add to config/application.yml before adding this relationship.")
+      return false
+    end
+
+    if self.relationship_type.nil? then
+      logger.debug("Error: relationship provided to relationship_gender does not contain a relationship_type.")
+      return false
     end
 
     if self.person.gender == relationship_gender[self.name] and self.relation.gender == relationship_gender[self.reverse_name] then
