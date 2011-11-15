@@ -5,6 +5,7 @@ namespace :pedigree do
   desc "Write PedigreeDB datastore"
   task :write_pedigree_datastore => :environment do
     data_store = pedindex
+    peddir_exists
     #json_data_store = ActiveSupport::JSON.encode(data_store)
     json_data_store = JSON.pretty_generate(data_store)
     data_store_filename = PEDFILES_DIR+PEDIGREE_DATA_STORE
@@ -18,6 +19,7 @@ namespace :pedigree do
   desc "Write all PedigreeDB data JSON files."
   task :write_pedigrees => :environment do
 
+    peddir_exists
     peds = Array.new
     puts "adding all pedigrees to list"
     Pedigree.all.each do |ped|
@@ -64,6 +66,7 @@ namespace :pedigree do
   desc "Write one PedigreeDB JSON file, must specify pedigree id"
   task :write_one_pedigree, [:pedigree_id] => :environment do |t, args|
     raise "No pedigree id provided" unless args[:pedigree_id]
+    peddir_exists
     ped_id = args[:pedigree_id]
     ped_hash = pedfile(ped_id)
     parent_rels = pedigree_relationships(ped_id)
