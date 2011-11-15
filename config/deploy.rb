@@ -49,8 +49,8 @@ server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
 
  namespace :data do
     require 'yaml'
-    set :prod_dump_file, "prod-#{application}_#{Time.now.strftime("%Y%m%d")}.dmp"
-    set :dev_dump_file, "dev-#{application}_#{Time.now.strftime("%Y%m%d")}.dmp"
+    set :prod_dump_file, "prod-#{application}_#{Time.now.strftime("%Y%m%d%H%M%S%L")}.dmp"
+    set :dev_dump_file, "dev-#{application}_#{Time.now.strftime("%Y%m%d%H%M%S%L")}.dmp"
 
     desc <<-DESC
       Dump development data, push it to production and load it.
