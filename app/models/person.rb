@@ -6,6 +6,7 @@ class Person < ActiveRecord::Base
   # either check the relationship_type parent for the relation_id, OR check for relationship_type child for person_id
 #  has_many :parents, :class_name => "Relationship", :foreign_key => "relation_id", :conditions => { :relationship_type => 'parent' }
   has_many :parents, :class_name => "Relationship", :foreign_key => "person_id", :conditions => { :relationship_type => 'child'}
+#  has_many :parents, :class_name => "Relationship", :foreign_key => "relation_id", :conditions => { :relationship_type => 'parent'}, :include => :person, :order => "people.gender desc"
   has_many :spouses, :class_name => "Relationship", :foreign_key => "person_id", :conditions => { :relationship_type => "undirected" }
   has_many :person_aliases, :class_name => "PersonAlias"
   has_many :traits
@@ -18,6 +19,20 @@ class Person < ActiveRecord::Base
   auto_strip_attributes :collaborator_id
   validates_presence_of :collaborator_id, :gender
   validates_uniqueness_of :collaborator_id, :isb_person_id
+
+  def ordered_parents
+    parent_relationships = self.parents
+    male = Array.new
+    female = Array.new
+    parent_relationships.each do |rel|
+      parent = rel.relation
+      male.push(rel) if parent.gender == "male"
+      female.push(rel) if parent.gender == "female"
+    end
+
+    parents = male | female
+    return parents
+  end
 
   def father
     parent_relationships = self.parents
