@@ -67,7 +67,7 @@ class SamplesController < ApplicationController
 
     respond_to do |format|
       if @sample.save
-         isb_sample_id = "isb_sample: #{@sample.id}"
+         isb_sample_id = "isb_sample_#{@sample.id}"
          @sample.isb_sample_id = isb_sample_id
          @sample.save
 
