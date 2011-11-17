@@ -8,6 +8,7 @@ class Person < ActiveRecord::Base
   has_many :parents, :class_name => "Relationship", :foreign_key => "person_id", :conditions => { :relationship_type => 'child'}
 #  has_many :parents, :class_name => "Relationship", :foreign_key => "relation_id", :conditions => { :relationship_type => 'parent'}, :include => :person, :order => "people.gender desc"
   has_many :spouses, :class_name => "Relationship", :foreign_key => "person_id", :conditions => { :relationship_type => "undirected" }
+  has_many :twins, :class_name => "Relationship", :foreign_key => "person_id", :conditions => ["name like ?","%twin%"]
   has_many :person_aliases, :class_name => "PersonAlias"
   has_many :traits
   has_many :phenotypes, :through => :traits
@@ -15,6 +16,7 @@ class Person < ActiveRecord::Base
   has_many :samples, :through => :acquisitions
   has_many :diagnoses
   has_many :diseases, :through => :diagnoses
+
 
   auto_strip_attributes :collaborator_id
   validates_presence_of :collaborator_id, :gender
@@ -52,8 +54,6 @@ class Person < ActiveRecord::Base
     return mother
   end
 
-
-
   def relationships
     spouses = self.spouses
     offspring = self.offspring
@@ -84,6 +84,10 @@ class Person < ActiveRecord::Base
   scope :include_samples, lambda {
     joins("LEFT OUTER JOIN acquisitions aq on aq.person_id = people.id left outer join samples s on aq.sample_id = s.id")
   }
+
+  def sequenced
+    return "#{planning_on_sequencing}"
+  end
 
   def full_collaborator
     if self.person_aliases.size > 0 then
