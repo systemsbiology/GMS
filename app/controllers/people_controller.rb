@@ -63,7 +63,7 @@ class PeopleController < ApplicationController
 
     respond_to do |format|
       if @person.save
-        isb_person_id = "isb_ind: #{@person.id}"
+        isb_person_id = "isb_ind_#{@person.id}"
 	@person.isb_person_id = isb_person_id
 	@person.save
 
