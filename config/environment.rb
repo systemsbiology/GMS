@@ -6,6 +6,7 @@ MADELINE_DIR = Rails.root.join('public/pedigrees/madeline')
 PEDIGREE_ROOT = "/proj/famgen/studies"
 PEDFILES_DIR = Rails.root.join('public/pedigrees/pedFiles')
 PEDIGREE_DATA_STORE = "isb-pedigrees.dat"
+CSVDIR = Rails.root.join('tmp/csv')
 
 Dir[File.dirname(__FILE__) + "/../vendor/*"].each do |path|
   gem_name = File.basename(path.gsub(/-\d+.\d+.\d+$/, ''))

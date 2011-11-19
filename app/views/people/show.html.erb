@@ -3,20 +3,21 @@
 <table class="tablesorter">
 <tr>
   <td><b>Sample:</b> <%= @person.isb_person_id %></td>
-  <td><b>Subject:</b> <%= @person.collaborator_id %></td>
+  <td colspan="2"><b>Subject:</b> <%= @person.collaborator_id %></td>
 </tr>
 <% if @person.person_aliases.size > 0 %>
 <tr>
-  <td colspan="2"><b>Aliases:</b> <%= @person.person_aliases.map(&:value).join("; ") %></td>
+  <td colspan="3"><b>Aliases:</b> <%= @person.person_aliases.map(&:value).join("; ") %></td>
 </tr>
 <% end %>
 <tr>
   <td><b>Gender:</b> <%= @person.gender %></td>
-  <td><b>Planning on Sequencing this person:</b> <%= @person.planning_on_sequencing %></td>
+  <td colspan="2"><b>Planning on Sequencing this person:</b> <%= @person.planning_on_sequencing %></td>
 </tr>
 <tr>
   <td><b>Dob:</b> <%= @person.dob %></td>
   <td><b>Dod:</b> <%= @person.dod %></td>
+  <td><b>Deceased:</b> <%= @person.deceased %></td>
 </tr>
 <% if @person.diseases.size > 0 %>
   <tr><td colspan="2"><b>Diagnosed with following Diseases:</b></td></tr>

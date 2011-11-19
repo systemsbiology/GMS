@@ -331,6 +331,14 @@ def find_root(pedigree_id)
    roots = prefer_male(roots)
    roots = prefer_male_children(roots)
 
+   # to make logger.debug work with the rake task
+   if (!defined?(logger)) then
+     logger = Logger.new(STDOUT)
+   end
+   # to make logger.debug work in the console - can't combine and not sure why
+   if (logger.nil?) then
+     logger = Logger.new(STDOUT)
+   end
 
    if roots.size > 1
      logger.debug("Error: Found multiple roots for pedigree #{pedigree_id}.")

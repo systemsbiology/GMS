@@ -7,7 +7,7 @@ class Person < ActiveRecord::Base
 #  has_many :parents, :class_name => "Relationship", :foreign_key => "relation_id", :conditions => { :relationship_type => 'parent' }
   has_many :parents, :class_name => "Relationship", :foreign_key => "person_id", :conditions => { :relationship_type => 'child'}
 #  has_many :parents, :class_name => "Relationship", :foreign_key => "relation_id", :conditions => { :relationship_type => 'parent'}, :include => :person, :order => "people.gender desc"
-  has_many :spouses, :class_name => "Relationship", :foreign_key => "person_id", :conditions => { :relationship_type => "undirected" }
+  has_many :spouses, :class_name => "Relationship", :foreign_key => "person_id", :conditions => ["relationship_type = ? and name not like ?", "undirected", "%twin%"] 
   has_many :twins, :class_name => "Relationship", :foreign_key => "person_id", :conditions => ["name like ?","%twin%"]
   has_many :person_aliases, :class_name => "PersonAlias"
   has_many :traits
@@ -85,8 +85,13 @@ class Person < ActiveRecord::Base
     joins("LEFT OUTER JOIN acquisitions aq on aq.person_id = people.id left outer join samples s on aq.sample_id = s.id")
   }
 
-  def sequenced
-    return "#{planning_on_sequencing}"
+  def sequenced?
+    logger.debug("self.planning_on_seuqencing #{self.planning_on_sequencing}")
+    if (self.planning_on_sequencing) then
+      return true
+    else
+      return false
+    end
   end
 
   def full_collaborator
@@ -122,4 +127,13 @@ class Person < ActiveRecord::Base
       return "#{isb_person_id} - #{collaborator_id}"
     end
   end
+
+  def madeline_identifier
+    if self.person_aliases.size > 0 then
+      return "#{collaborator_id};#{self.person_aliases.map(&:value).join(";")}"
+    else
+      return "#{collaborator_id}"
+    end
+  end
+
 end

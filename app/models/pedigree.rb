@@ -24,8 +24,22 @@ class Pedigree < ActiveRecord::Base
     File.open("isb-pedigrees.dat", 'w') do |f|
       f.puts json_data_store
     end
+  end
 
-
+  def find_childless_marriages
+    ordered_people = ordered_pedigree(self.id)
+    cm = Array.new
+    cmhash = Hash.new
+    ordered_people.each do |person|
+      if (person.spouses.size > 0 and person.offspring.empty?) then
+        unless (cm.include?(person.id)) then
+          cm.push(person.id)
+          cm.push(person.spouses.first.relation.id)
+          cmhash[person.id] = person.spouses.first.relation.id
+        end
+      end
+    end
+    return cmhash
   end
 
 end

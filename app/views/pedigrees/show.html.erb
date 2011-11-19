@@ -68,24 +68,23 @@
         <td><%= person.gender %></td>
         <td><%= person.dob %></td>
         <td><%= person.dod %></td>
-	<td><% if person.planning_on_sequencing then %><%= link_to person.samples.count, person unless person.samples.nil? %><% else %>NA<% end %></td>
+	<td><% if person.sequenced? then %><%= link_to person.samples.count, person unless person.samples.nil? %><% else %>NA<% end %></td>
 	<td><%= person.phenotypes.count > 0 ? link_to(person.phenotypes.count, traits_path(:person => person)) : person.phenotypes.count  %></td>
-	<td><%= person.diseases.count > 0 ? link_to(person.diseases.count, diseases_path(:person => person)) : person.diseases.count %></td>
+	<td><%= person.diseases.count > 0 ? link_to(person.diseases.count, person_path(person)) : person.diseases.count %></td>
       </tr>
     <% end %>
     <tbody>
   </table>
 <% end %>
 <%= link_to 'Add Person', new_person_path(:pedigree_id => @pedigree) %>
-<br />
+<br /><br />
 
-<% if false %>
-<%= @to_madeline.inspect %><br />
-<%= raw(@filename) %><br />
-<% end %>
 
 <% if @pedigree.people.size > 2 %>
   <% unless @pedigree.name.match(/unrelated/) %>
+    <%= link_to "Download madeline table", export_madeline_table_path(@pedigree) %>
+    <% if false %><%= raw @madeline_table %><br /><% end %>
+
     <%= raw(@madeline) %>
   <% end %>
 <% end %>

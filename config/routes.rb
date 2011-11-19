@@ -28,6 +28,7 @@ Gms::Application.routes.draw do
   resources :memberships
   match "pedigrees/pedigree_file/(:id)", :to => "pedigrees#pedigree_file", :as => "pedigree_file"
   match "pedigrees/all_pedigree_files", :to => "pedigrees#all_pedigree_files", :as => "all_pedigree_files"
+  match "pedigrees/export_madeline_table/(:id)", :to => "pedigrees#export_madeline_table", :as => "export_madeline_table"
   resources :pedigrees
   resources :studies
 

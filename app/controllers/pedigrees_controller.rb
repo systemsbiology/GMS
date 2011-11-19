@@ -1,5 +1,7 @@
 require 'download_zip'
 require 'madeline_utils'
+require 'utils'
+require 'csv'
 
 class PedigreesController < ApplicationController
   unloadable
@@ -26,24 +28,43 @@ class PedigreesController < ApplicationController
 #    @relation_relationships = Relationship.find_all_by_relation_id(@pedigree.people.map(&:id))
 #    @relationships = @person_relationships + @relation_relationships
 
-    # the combination of pedigree name and pedigree id should be unique
-    madeline_name = madeline_file(@pedigree)
-    madeline_file = MADELINE_DIR + "#{madeline_name}"
-    #logger.debug("looking for madeline file #{madeline_file}")
+    unless @pedigree.tag.match(/unrelateds/) or @pedigree.tag == 'diversity_P1' or @pedigree.people.size <= 2 then
+      # the combination of pedigree name and pedigree id should be unique
+      madeline_name = madeline_file(@pedigree)
+      madeline_file = MADELINE_DIR + "#{madeline_name}"
 
-    #@to_mad = to_madeline(@relationships)
-    @filename = madeline_file
-    if (!File.exists?(madeline_file)) then
-      if File.exists?("/u5/www/dev_sites/dmauldin/gms/public/madeline_adamsO_79083.txt") then
-        tmpfile, warnings = Madeline::Interface.new(:embedded => true, :L => "CM").draw(File.open("/u5/www/dev_sites/dmauldin/gms/public/madeline_adamsO_79083.txt","r"))
-      FileUtils.copy(tmpfile,madeline_file)
-      else
+      ordered_ped = ordered_pedigree(@pedigree.id)
+      madeline_array = to_madeline(@pedigree,ordered_ped)
+      @filename = madeline_file
 
+      labels = Array.new
+      labels.push("IndividualID")
+      labels << @pedigree.diseases.map{|d| d.name.gsub!(/ /, '_')}
+      labels << @pedigree.phenotypes.map{|p| p.name.gsub!(/ /,'_')}
+
+      madeline_info = Array.new
+      madeline_array.each do |line|
+        line = line.join("\t")
+        madeline_info.push(line)
       end
-    end
 
-    if File.exists?(madeline_file) then
-      @madeline = File.read(madeline_file) if @pedigree.people.size > 0
+      infile = Tempfile.new('madeline_input')
+      header = madeline_header(@pedigree)
+      infile.print(header)
+      infile.print("\n")
+      infile.print(madeline_info.join("\n"))
+      infile.flush
+      infile.close
+
+      @madeline_table = array_to_html_table(header.split(/\t/), madeline_array)
+      @madeline_table.gsub!(/table/, "table border=\"1\" cellspacing=\"0\"") #dunno how to get XMLBuilder to return a border
+      # we want to regenerate the file every time because something may have changed.
+      tmpfile, warnings = Madeline::Interface.new(:embedded => true, :L => labels, "font-size"=> "10", "nolabeltruncation" => true).draw(File.open(infile,'r'))
+      FileUtils.copy(tmpfile,madeline_file)
+
+      if File.exists?(madeline_file) then
+        @madeline = File.read(madeline_file) if @pedigree.people.size > 0
+      end
     end
 
     respond_to do |format|
@@ -80,7 +101,7 @@ class PedigreesController < ApplicationController
 
     respond_to do |format|
       if @pedigree.save
-        isb_ped_id = "isb_ped: #{@pedigree.id}"
+        isb_ped_id = "isb_ped_#{@pedigree.id}"
         @pedigree.isb_pedigree_id = isb_ped_id
 
 	@pedigree.version = 1
@@ -177,5 +198,25 @@ class PedigreesController < ApplicationController
       format.html { download_zip("pedigrees.zip",ped_file_list) }
     end
 
+  end
+
+  def export_madeline_table
+    @pedigree = Pedigree.find(params[:id])
+    ordered_ped = ordered_pedigree(@pedigree.id)
+    madeline_array = to_madeline(@pedigree,ordered_ped)
+    header = madeline_header(@pedigree).split(/\t/)
+
+    csvdir_exists
+    csv_file_name = "#{CSVDIR}/#{@pedigree.tag}_madeline_table_#{Date.today.to_s}.csv"
+    CSV.open(csv_file_name, "wb") do |csv|
+      csv << header
+      madeline_array.each do |row|
+        csv << row
+      end
+    end
+    
+    respond_to do |format|
+      format.html { download_zip("#{@pedigree.tag}_madline_table.zip",{ "#{@pedigree.tag}_madeline_table.csv" => csv_file_name}) }
+    end
   end
 end

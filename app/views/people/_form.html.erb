@@ -24,6 +24,10 @@
     <%= f.label :planning_on_sequencing %><br />
   </div>
   <div class="field">
+    <%= f.check_box(:deceased, :value => 0, :checked => @person.deceased) %>
+    <%= f.label :deceased %><br />
+  </div>
+  <div class="field">
     <%= f.label :dob %><br />
     <%= f.date_select :dob %>
     <%= check_box("check_dates", "add_dob") %>

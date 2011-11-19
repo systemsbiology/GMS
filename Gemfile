@@ -1,7 +1,9 @@
 source 'http://rubygems.org'
 
 gem 'rails'
+gem 'rake' , '~> 0.9.2.2'
 #, '3.0.7'
+gem 'builder'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
@@ -41,7 +43,7 @@ gem 'acts_as_audited'
 gem 'rspec-rails'
 #, '~> 2.6.0'
 
-gem 'madeline', '~> 0.1.4'
+gem 'madeline', '~> 0.1.8'
 
 gem 'rubyzip'
 gem 'auto_strip_attributes', "~> 1.0"
