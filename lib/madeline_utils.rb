@@ -5,7 +5,7 @@ def maddir_exists
 end
 
 def madeline_file(pedigree)
- "madeline_#{pedigree.name}_#{pedigree.id}.xml"
+ "madeline_#{pedigree.tag}_#{pedigree.id}.xml"
 end
 
 def madeline_header(pedigree)
