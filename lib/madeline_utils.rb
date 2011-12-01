@@ -1,3 +1,9 @@
+def maddir_exists
+  if !File.exists?(MADELINE_DIR) then
+    Dir.mkdir(MADELINE_DIR)
+  end
+end
+
 def madeline_file(pedigree)
  "madeline_#{pedigree.name}_#{pedigree.id}.xml"
 end
