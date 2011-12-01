@@ -31,6 +31,7 @@ class PedigreesController < ApplicationController
 
     unless @pedigree.tag.match(/unrelateds/) or @pedigree.tag == 'diversity_P1' or @pedigree.people.size <= 2 then
       peddir_exists
+      maddir_exists
       # the combination of pedigree name and pedigree id should be unique
       madeline_name = madeline_file(@pedigree)
       madeline_file = MADELINE_DIR + "#{madeline_name}"
