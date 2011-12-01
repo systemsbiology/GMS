@@ -65,6 +65,23 @@ class Person < ActiveRecord::Base
     return results
   end
 
+  # if any spouse relationship for this person has a divorced flag, then return truea
+  def divorced?
+    spouses = self.spouses
+    flag = 0
+    spouses.each do |spouse|
+      if spouse.divorced == true
+        flag =1
+      end
+    end
+
+    if flag == 1 then
+      return true
+    else
+      return false
+    end
+  end
+
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
       if pedigree.kind_of?(Array) then

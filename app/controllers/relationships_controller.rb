@@ -135,8 +135,32 @@ class RelationshipsController < ApplicationController
   def update
     @relationship = Relationship.find(params[:id])
 
+    recip = Relationship.find_by_person_id_and_relation_id_and_relationship_type_and_name(@relationship.relation_id, @relationship.person_id, @relationship.lookup_relationship_type, @relationship.reverse_name)
+    if params[:status] then
+      logger.debug("foudn status #{params[:status]}")
+      if (params[:status][:divorced]) then
+        logger.debug("found status divorced #{params[:status][:divorced]}")
+        @relationship.divorced = 1
+	recip.divorced = 1
+      else
+        @relationship.divorced = 0
+	recip.divorced = 0
+      end
+    else
+      @relationship.divorced = 0
+      recip.divorced = 0
+    end
+
     respond_to do |format|
       if @relationship.update_attributes(params[:relationship])
+
+        # update recip to the new values
+	recip.person_id = @relationship.relation_id
+	recip.relation_id = @relationship.person_id
+	recip.name = @relationship.reverse_name
+        recip.relationship_type = @relationship.lookup_relationship_type
+	recip.save
+
         format.html { redirect_to(@relationship, :notice => 'Relationship was successfully updated.') }
         format.xml  { head :ok }
       else

@@ -1,13 +1,18 @@
-#
+# test the pedfile directory exists
 def peddir_exists
   if !File.exists?(PEDFILES_DIR) then
     Dir.mkdir(PEDFILES_DIR)
   end
 end
 
-def pedindex
+def pedindex(protocol,id_type)
   data_store = Hash.new
-  data_store["pedigree_databases_name"] = "ISB Locally Stored Pedigrees"
+  if protocol.match('REST') then
+    data_store["pedigree_databases_name"] = "ISB GMS Pedigrees"
+  else 
+    data_store["pedigree_databases_name"] = "ISB Locally Stored Pedigrees"
+  end
+
   data_store["pedigree_databases_version"] = Time.now
   data_store["pedigree_databases_last_updated"] = Time.now
   data_store["pedigree_studies_root"] = PEDIGREE_ROOT
@@ -15,8 +20,15 @@ def pedindex
 
   Pedigree.all.each do |ped|
       local_hash = Hash.new
-      local_hash["pedigree_id"] = ped.tag
-      local_hash["database_file"] = pedigree_output_filename(ped)
+      if id_type == ('TAG') then
+        local_hash["pedigree_id"] = ped.tag
+        local_hash["database_file"] = pedigree_output_filename(ped)
+      elsif id_type == ('ID') then
+        local_hash["pedigree_id"] = ped.id
+	local_hash["pedigree_tag"] = ped.tag
+      else
+        raise ArgumentError "Did not provide a correct value for protocol to pedindex"
+      end
 
       data_store["pedigree_databases"].push(local_hash)
   end

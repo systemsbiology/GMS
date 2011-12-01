@@ -1,5 +1,6 @@
 require 'download_zip'
 require 'madeline_utils'
+require 'pedigree_info'
 require 'utils'
 require 'csv'
 
@@ -29,6 +30,7 @@ class PedigreesController < ApplicationController
 #    @relationships = @person_relationships + @relation_relationships
 
     unless @pedigree.tag.match(/unrelateds/) or @pedigree.tag == 'diversity_P1' or @pedigree.people.size <= 2 then
+      peddir_exists
       # the combination of pedigree name and pedigree id should be unique
       madeline_name = madeline_file(@pedigree)
       madeline_file = MADELINE_DIR + "#{madeline_name}"
@@ -164,7 +166,7 @@ class PedigreesController < ApplicationController
 
     respond_to do |format|
       format.html { send_data(File.read(output_file), :filename => "#{@pedigree.tag}.ped", :type => 'application/json') }
-      format.json { end_data(File.read(output_file), :filename => output_file, :type => 'application/json') }
+      format.json { send_data(File.read(output_file), :filename => pedigree_output_filename(@pedigree), :type => 'application/json') }
     end
   end
 
@@ -185,19 +187,49 @@ class PedigreesController < ApplicationController
       end
     end
 
-    data_store = pedindex
-    data_store_name = PEDIGREE_DATA_STORE # from config/environment.rb
-    data_store_loc = PEDFILES_DIR + data_store_name
-    ped_file_list[data_store_name] = data_store_loc
-    json_index = JSON.pretty_generate(data_store)
-    File.open(data_store_loc, 'w') do |f|
-      f.puts json_index
-    end
-
     respond_to do |format|
-      format.html { download_zip("pedigrees.zip",ped_file_list) }
+      format.html { 
+        # add the data_store to the zip file
+        data_store = pedindex('FILE','TAG')
+        data_store_name = PEDIGREE_DATA_STORE # from config/environment.rb
+        data_store_loc = PEDFILES_DIR + data_store_name
+        ped_file_list[data_store_name] = data_store_loc
+        json_index = JSON.pretty_generate(data_store)
+        File.open(data_store_loc, 'w') do |f|
+          f.puts json_index
+        end
+
+        download_zip("pedigrees.zip",ped_file_list) 
+      }
+      format.json { 
+        contents = Array.new
+	ped_file_list.each do |file, file_loc|
+	  contents.push(File.read(file_loc))
+	end
+	send_data(contents.join(","), :filename => "all_peds", :type => 'application/json') 
+      }
     end
 
+  end
+  
+  def pedigree_datastore
+    peddir_exists
+
+    if params[:type] and params[:type].match('REST') then
+      data_store = pedindex('REST','ID')
+    else
+      data_store = pedindex('FILE','TAG')
+    end
+
+    json_index = JSON.pretty_generate(data_store)
+    respond_to do |format|
+      format.html {
+        send_data(json_index, :filename => "index", :type => "applicaton/json")
+      }
+      format.json {
+        send_data(json_index, :filename => "index", :type => "applicaton/json")
+      }
+    end
   end
 
   def export_madeline_table

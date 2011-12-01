@@ -4,7 +4,7 @@ namespace :pedigree do
 
   desc "Write PedigreeDB datastore"
   task :write_pedigree_datastore => :environment do
-    data_store = pedindex
+    data_store = pedindex('FILE','TAG')
     peddir_exists
     #json_data_store = ActiveSupport::JSON.encode(data_store)
     json_data_store = JSON.pretty_generate(data_store)

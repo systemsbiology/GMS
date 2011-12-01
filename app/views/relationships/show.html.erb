@@ -34,7 +34,7 @@
     <tr>
     <td><%= link_to @relationship.person.pedigree.name, @relationship.person.pedigree %></td>
     <td><%= link_to @relationship.person.identifier, @relationship.person %></td>
-    <td> is the <%= @relationship.name %> of </td>
+    <td> is the <% if (@relationship.divorced) then %>divorced <% end %><%= @relationship.name %> of </td>
     <td><%= link_to @relationship.relation.identifier, @relationship.relation %></td>
     </tr>
     </tbody>

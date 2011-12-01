@@ -5,7 +5,7 @@ end
 def madeline_header(pedigree)
   diseases = pedigree.diseases
 
-  header = "FamilyID\tIndividualID\tGender\tFather\tMother\tMZTwin\tDZTwin\tAffected\tSampled\tDeceased\tDOB"
+  header = "FamilyID\tIndividualID\tGender\tFather\tMother\tMZTwin\tDZTwin\tAffected\tSampled\tDeceased\tDOB\tRelationshipEnded"
   header << "\t" + diseases.map(&:name).join("\t")
 
   phenotypes = pedigree.phenotypes
@@ -109,6 +109,16 @@ def create_row(person, familyID, diseases, phenotypes, twin_letter)
       current_person.push('.')
     end
 
+    #RelationshipEnded
+    # if we run into one person that is divorced multiple times then we'll need
+    # to recode ordered_pedigree and this to go by relationships instead of by people
+    if (person.divorced?) then
+      logger.debug("#{person.divorced?} is true? for person #{person.inspect}")
+      current_person.push('D')
+    else
+      current_person.push('.')
+    end
+
     diseases.each do |disease|
       diagnoses = disease.diagnoses.where(:person_id => person.id)
       if diagnoses.nil? or diagnoses.empty? then
@@ -155,6 +165,7 @@ def create_fake(person, familyID, diseases, phenotypes, father_id, mother_id)
     current_person.push('.') #Sampled
     current_person.push('.') # Deceased
     current_person.push('.') # DOB
+    current_person.push('.') # RelationshipEnded
 
     diseases.each do |disease|
       current_person.push('.')

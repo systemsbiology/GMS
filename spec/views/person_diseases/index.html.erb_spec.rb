@@ -2,20 +2,25 @@ require 'spec_helper'
 
 describe "diagnoses/index.html.erb" do
   before(:each) do
+    pedigree = stub_model(Pedigree, :name => "Test1")
+    person = stub_model(Person, :pedigree => pedigree, :isb_person_id => "isb_ind_1", :collaborator_id => "474-A01")
+    disease = stub_model(Disease, :name => "Pains")
     assign(:diagnoses, [
       stub_model(Diagnosis,
         :id => 1,
-        :person_id => 1,
         :disease_id => 1,
         :disease_information => "Disease Information",
-        :output_order => 1
+        :output_order => 1,
+	:person => person,
+	:disease => disease
       ),
       stub_model(Diagnosis,
         :id => 1,
-        :person_id => 1,
         :disease_id => 1,
         :disease_information => "Disease Information",
-        :output_order => 1
+        :output_order => 1,
+	:person => person,
+	:disease => disease
       )
     ])
   end
