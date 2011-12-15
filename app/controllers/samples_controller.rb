@@ -3,18 +3,18 @@ class SamplesController < ApplicationController
   # GET /samples.xml
   def index
     @samples = Sample.has_pedigree(params[:pedigree_filter]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
-    if params[:vendor_id] then
-      if params[:vendor_id].match(/%/) then
-        @samples = Sample.has_pedigree(params[:pedigree_filter]).where("vendor_id like ?", params[:vendor_id]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
+    if params[:sample_vendor_id] then
+      if params[:sample_vendor_id].match(/%/) then
+        @samples = Sample.has_pedigree(params[:pedigree_filter]).where("sample_vendor_id like ?", params[:sample_vendor_id]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
       else
-        @samples = Sample.has_pedigree(params[:pedigree_filter]).where("vendor_id = ?", params[:vendor_id]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
+        @samples = Sample.has_pedigree(params[:pedigree_filter]).where("sample_vendor_id = ?", params[:sample_vendor_id]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
       end
     end
 
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @samples }
-      format.js
+      format.json { render :json => @samples }
     end
   end
 
