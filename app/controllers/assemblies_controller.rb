@@ -1,3 +1,5 @@
+require 'utils'
+
 class AssembliesController < ApplicationController
   # GET /assembly
   # GET /assembly.xml
@@ -50,17 +52,22 @@ class AssembliesController < ApplicationController
   # POST /assembly.xml
   def create
     @assembly = Assembly.new(params[:assembly])
+    @assembly.current = 1  # new assemblies should automatically be current
+    dir = params[:assembly][:location]
+    if File.exists?(dir) then
+      @assembly.file_date = creation_time(dir)
+    end
 
     respond_to do |format|
-      if @assembly.save
-        format.html { redirect_to(@assembly, :notice => 'Assay file was successfully created.') }
-        format.xml  { render :xml => @assembly, :status => :created, :location => @assembly }
-        format.json  { render :json => @assembly, :status => :created, :location => @assembly }
-      else
-        format.html { render :action => "new" }
-        format.xml  { render :xml => @assembly.errors, :status => :unprocessable_entity }
-        format.json  { render :json => @assembly.errors, :status => :unprocessable_entity }
-      end
+        if @assembly.save
+          format.html { redirect_to(@assembly, :notice => 'Assay file was successfully created.') }
+          format.xml  { render :xml => @assembly, :status => :created, :location => @assembly }
+          format.json  { render :json => @assembly, :status => :created, :location => @assembly }
+        else
+          format.html { render :action => "new" }
+          format.xml  { render :xml => @assembly.errors, :status => :unprocessable_entity }
+          format.json  { render :json => @assembly.errors, :status => :unprocessable_entity }
+        end
     end
   end
 
