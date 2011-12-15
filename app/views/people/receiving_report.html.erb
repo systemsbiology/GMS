@@ -48,7 +48,7 @@
 		 elsif sample.status == 'pending' %>#CC6600<%
 	         elsif sample.status.nil? %>red<%
 	         end %>">&nbsp;</td>
-            <td><nobr><%= sample.vendor_id %><nobr></td>
+            <td><nobr><%= sample.sample_vendor_id %><nobr></td>
             <td><nobr><%= link_to sample.isb_sample_id, sample_path(sample) %></nobr></td>
             <td><nobr><%= link_to person.isb_person_id, person_path(person) %></nobr></td>
             <td><%= person.full_collaborator %></td>
@@ -75,7 +75,7 @@
 	           elsif sample.status.nil? %>#CC6600<%
 	           end
 	         end %>">&nbsp;</td>
-            <td><nobr><%= sample.vendor_id %><nobr></td>
+            <td><nobr><%= sample.sample_vendor_id %><nobr></td>
             <td><nobr><%= link_to sample.isb_sample_id, sample_path(sample) %></nobr></td>
             <td><nobr><%= link_to person.isb_person_id, person_path(person) %></nobr></td>
             <td><%= person.full_collaborator %></td>
