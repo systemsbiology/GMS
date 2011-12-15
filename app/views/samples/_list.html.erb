@@ -21,7 +21,7 @@
     <td><nobr><%= sample.person.isb_person_id %></nobr></td>
     <td><%= sample.person.collaborator_id %></td>
     <td><%= sample.person.pedigree.name if sample.person.pedigree %></td>
-    <td><nobr><%= sample.vendor_id if sample.vendor_id %></nobr></td>
+    <td><nobr><%= sample.sample_vendor_id if sample.sample_vendor_id %></nobr></td>
     <td><%= sample.sample_type.nil? ? 'unknown' : sample.sample_type.name  %></td>
     <td><%= sample.status %></td>
     <td><%= sample.volume %></td>
