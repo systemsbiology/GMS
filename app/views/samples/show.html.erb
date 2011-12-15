@@ -9,7 +9,7 @@
  </td>
  <td >
    <b>Vendor ID:</b>
-   <%= @sample.vendor_id %>
+   <%= @sample.sample_vendor_id %>
  </td>
  <td>
    <b>Person:</b>
@@ -97,7 +97,7 @@
   <% @sample.assays.each do |assay| %>
   <tr>
     <td><%= link_to assay.name, assay %></td>
-    <td><%= assay.sample.vendor_id %></td>
+    <td><%= assay.sample.sample_vendor_id %></td>
     <td><nobr><%= assay.sample.isb_sample_id %></nobr></td>
     <td><nobr><%= assay.sample.person.isb_person_id %></nobr></td>
     <td><%= assay.sample.person.collaborator_id %></td>
@@ -112,3 +112,4 @@
 <% else %>
 <p>No assays for this sample</p>
 <% end %>
+<%= link_to 'Add new assay', new_assay_path(:sample_id => @sample) %>
