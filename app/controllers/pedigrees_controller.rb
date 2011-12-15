@@ -6,6 +6,7 @@ require 'csv'
 
 class PedigreesController < ApplicationController
   unloadable
+  respond_to :json
 
   # GET /pedigrees
   # GET /pedigrees.xml
@@ -73,7 +74,7 @@ class PedigreesController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @pedigree }
-      format.json  { render :json => @pedigree }
+      format.json  { respond_with @pedigree }
     end
   end
 
