@@ -45,7 +45,21 @@ class AssaysController < ApplicationController
 
     respond_to do |format|
       if @assay.save
-        format.html { redirect_to(@assay, :notice => 'Assay was successfully created.') }
+        notice = 'Assay was successfully created.'
+        # create a link between the sample passed in and this assay that was createda
+	logger.debug("params are #{params.inspect}")
+        if params[:sample] then
+	  sa = SampleAssay.new(params[:sample])
+	  sa.assay_id = @assay.id
+	  logger.debug("saving sampleassay of #{sa.inspect}")
+	  if sa.save
+            notice = 'Assay and Sample <=> Assay link was successfully created.'
+	  else
+	    logger.debug("could not save sampleassay #{sa.errors.inspect}")
+	    notice = "Assay saved, but could not save sample <=> assay link."
+	  end
+	end
+        format.html { redirect_to(@assay, :notice => notice) }
         format.xml  { render :xml => @assay, :status => :created, :location => @assay }
       else
         format.html { render :action => "new" }

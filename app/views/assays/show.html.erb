@@ -16,6 +16,15 @@
 </td>
 </tr>
 <tr>
+  <td colspan="2">
+  <b>Vendor:</b>
+  <%= @assay.vendor %>
+  </td>
+  <td><b>Status:</b>
+  <%= @assay.status %>
+  </td>
+</tr>
+<tr>
 <td colspan="3">
   <b>Description:</b>
   <%= @assay.description %>
@@ -23,11 +32,17 @@
 </tr>
 </table>
 <%= link_to 'Edit', edit_assay_path(@assay) %> |
-<%= link_to 'Back', assays_path %>
+<%= link_to "Back to sample #{@assay.sample.identifier}", sample_path(@assay.sample) unless @assay.sample.nil? %> |
+<%= link_to "Back to person #{@assay.sample.person.identifier}", person_path(@assay.sample.person) unless @assay.sample.nil? or @assay.sample.person.nil? %>
 <br /><br />
+<% if @assay.sample.nil? then %>
+<%= link_to "Link a sample to this assay", new_sample_assay_path(:assay_id => @assay) %>
+<br /><br />
+<% end %>
 <h1>Listing Assemblies</h1>
 <% if @assay.assemblies.size > 0 %>
 <%= render 'assemblies/list', :assemblies => @assay.assemblies %>
 <% else %>
 <p>No assemblies for this assay.</p>
 <% end %>
+<%= link_to "Add an assembly for this assay", new_assembly_path(:assay_id => @assay) %>

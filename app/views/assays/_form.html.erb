@@ -2,21 +2,35 @@
   <%= render "partials/error_messages", :target => @assay %>
 
   <div class="field">
-    <%= f.label :name %><br />
+    <%= f.label :name %> (ex: GS000005701-DID or SS6002862)<br />
     <%= f.text_field :name %>
   </div>
   <div class="field">
     <%= f.label :assay_type %><br />
-    <%= f.text_field :assay_type %>
+    <%= f.collection_select(:assay_type, Assay.find(:all, :select => 'DISTINCT assay_type'), :assay_type, :assay_type) %>
+  </div>
+  <div class="field">
+    <%= f.label :vendor %><br />
+    <%= f.collection_select(:vendor, Assay.find(:all, :select => 'DISTINCT vendor'), :vendor, :vendor) %>
   </div>
   <div class="field">
     <%= f.label :technology %><br />
-    <%= f.text_field :technology %>
+    <%= f.collection_select(:technology, Assay.find(:all, :select => 'DISTINCT technology'), :technology, :technology) %>
   </div>
   <div class="field">
     <%= f.label :description %><br />
     <%= f.text_field :description %>
   </div>
+  <div class="field">
+    <%= f.label :status %><br />
+    <%= f.collection_select(:status, Assay.find(:all, :select => 'DISTINCT status'), :status, :status) %>
+  </div>
+  <% if params[:action] == 'new' then %>
+    <div class="field">
+      <%= label(Sample, :sample) %><br />
+      <%= collection_select(:sample, :sample_id, Sample.all, :id, :identifier, :selected => params[:sample_id]) %>
+    </div>
+  <% end %>
   <div class="actions">
     <%= f.submit %>
   </div>
