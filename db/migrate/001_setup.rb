@@ -154,7 +154,7 @@ class Setup < ActiveRecord::Migration
       t.integer :id
       t.string :isb_sample_id
       t.references :sample_type
-      t.string :vendor_id
+      t.string :sample_vendor_id
       t.string :status
       t.string :protocol
       t.date :date_received
