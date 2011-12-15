@@ -22,6 +22,30 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
   add_index "acquisitions", ["person_id"], :name => "acquisitions_person"
   add_index "acquisitions", ["sample_id"], :name => "acquisitions_sample"
 
+  create_table "assay_files", :force => true do |t|
+    t.integer  "genome_reference_id"
+    t.integer  "assay_id"
+    t.string   "name"
+    t.string   "description"
+    t.string   "location"
+    t.string   "file_type"
+    t.date     "file_date"
+    t.text     "metadata"
+    t.string   "disk_id",             :limit => 50
+    t.string   "software"
+    t.string   "software_version"
+    t.date     "record_date"
+    t.boolean  "current"
+    t.text     "comments"
+    t.integer  "created_by"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+    t.string   "ancestry"
+  end
+
+  add_index "assay_files", ["ancestry"], :name => "index_assay_files_on_ancestry"
+  add_index "assay_files", ["assay_id"], :name => "assay_files_assay"
+
   create_table "assays", :force => true do |t|
     t.string   "name"
     t.string   "vendor"
@@ -128,6 +152,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
 
   create_table "genome_references", :force => true do |t|
     t.string   "name"
+    t.string   "build_name"
     t.string   "description"
     t.string   "code"
     t.string   "location"
@@ -200,6 +225,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.integer  "person_id"
     t.integer  "relation_id"
     t.string   "relationship_type"
+    t.integer  "child_order"
     t.boolean  "divorced",                        :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
@@ -238,13 +264,13 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
   create_table "samples", :force => true do |t|
     t.string   "isb_sample_id"
     t.integer  "sample_type_id"
-    t.string   "vendor_id"
+    t.string   "sample_vendor_id"
     t.string   "status"
     t.date     "date_submitted"
     t.string   "protocol"
-    t.string   "volume",         :limit => 25
-    t.string   "concentration",  :limit => 25
-    t.string   "quantity",       :limit => 25
+    t.string   "volume",           :limit => 25
+    t.string   "concentration",    :limit => 25
+    t.string   "quantity",         :limit => 25
     t.date     "date_received"
     t.text     "description"
     t.text     "comments"
