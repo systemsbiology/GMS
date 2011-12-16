@@ -2,16 +2,11 @@ class AssemblyFile < ActiveRecord::Base
   has_ancestry
   belongs_to :assembly
   belongs_to :genome_reference
+  belongs_to :file_type
 
   auto_strip_attributes :name, :description, :location, :metadata, :software, :software_version, :comments
-  validates_presence_of :name, :genome_reference_id, :assembly, :location, :file_type, :software, :software_version, :file_date
+  validates_presence_of :name, :genome_reference_id, :assembly, :location, :software, :software_version, :file_date
   validates_uniqueness_of :name, :location
-
-  scope :has_file_type, lambda { |file_type|
-    unless file_type.blank?
-      where(:file_types_id => file_type)
-    end
-  }
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
@@ -32,7 +27,7 @@ class AssemblyFile < ActiveRecord::Base
   }
 
   def identifier
-    "#{name} - #{vendor} - #{file_type}"
+    "#{name} - #{vendor} - #{self.file_type.type_name}"
   end
 
 end
