@@ -22,30 +22,6 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
   add_index "acquisitions", ["person_id"], :name => "acquisitions_person"
   add_index "acquisitions", ["sample_id"], :name => "acquisitions_sample"
 
-  create_table "assay_files", :force => true do |t|
-    t.integer  "genome_reference_id"
-    t.integer  "assay_id"
-    t.string   "name"
-    t.string   "description"
-    t.string   "location"
-    t.string   "file_type"
-    t.date     "file_date"
-    t.text     "metadata"
-    t.string   "disk_id",             :limit => 50
-    t.string   "software"
-    t.string   "software_version"
-    t.date     "record_date"
-    t.boolean  "current"
-    t.text     "comments"
-    t.integer  "created_by"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-    t.string   "ancestry"
-  end
-
-  add_index "assay_files", ["ancestry"], :name => "index_assay_files_on_ancestry"
-  add_index "assay_files", ["assay_id"], :name => "assay_files_assay"
-
   create_table "assays", :force => true do |t|
     t.string   "name"
     t.string   "vendor"
@@ -90,7 +66,6 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.string   "name"
     t.string   "description"
     t.string   "location"
-    t.string   "file_type"
     t.date     "file_date"
     t.text     "metadata"
     t.string   "disk_id",             :limit => 50
