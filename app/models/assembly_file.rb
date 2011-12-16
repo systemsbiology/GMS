@@ -22,6 +22,12 @@ class AssemblyFile < ActiveRecord::Base
     end
   }
 
+  scope :has_file_type_id, lambda { |file_type_id|
+    unless file_type_id.blank?
+      where('file_type_id = ?',file_type_id)
+    end
+  }
+
   scope :is_current, lambda {
     { :conditions => [ 'current = ?', '1'] }
   }
