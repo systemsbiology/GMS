@@ -1,3 +1,6 @@
+require 'will_paginate'
+require 'will_paginate/array'
+
 class AssemblyFilesController < ApplicationController
   # GET /assembly_files
   # GET /assembly_files.xml
@@ -7,11 +10,12 @@ class AssemblyFilesController < ApplicationController
 #    @assembly_files = find_all_by_pedigree_id(params[:pedigree_filter][:id]) if (params[:pedigree_filter])
 #    @assembly_files = @assembly_files.find(:all, :include => { :assembly => { :assay => { :sample => { :person => :pedigree } } } },
 #                                        :conditions => [ 'pedigrees.id = ?', params[:pedigree_filter][:id] ]) if (params[:pedigree_filter])
-    if params[:file_type].blank? then
-      logger.debug("setting params[:file_type] to nil because it is blank #{params[:file_type]} #{params[:file_type].blank?}")
-      params[:file_type] = nil
+    if params[:file_type_id].blank? then
+    #  logger.debug("setting params[:file_type_id] to nil because it is blank #{params[:file_type_id]} #{params[:file_type_id].blank?}")
+      params[:file_type_id] = nil
     end
-    @assembly_files = AssemblyFile.has_file_type(params[:file_type]).has_pedigree(params[:pedigree_filter]).order("assembly_id")
+    # has_file_type(params[:file_type]).
+    @assembly_files = AssemblyFile.has_file_type_id(params[:file_type_id]).has_pedigree(params[:pedigree_filter]).order("assembly_id").paginate :page => params[:page], :per_page => 100
 
     respond_to do |format|
       format.html # index.html.erb
