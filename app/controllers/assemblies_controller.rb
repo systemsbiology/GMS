@@ -4,8 +4,6 @@ class AssembliesController < ApplicationController
   # GET /assembly
   # GET /assembly.xml
   def index
-    #@assembly = Assembly.find(:all, :conditions => ['file_type = ?', params[:file_type]]) if (params[:file_type])
-#    @assembly = @assembly.find_all_by_file_type(params[:file_type]) if (params[:file_type])
 #    @assembly = find_all_by_pedigree_id(params[:pedigree_filter][:id]) if (params[:pedigree_filter])
 #    @assembly = @assembly.find(:all, :include => { :assay => { :sample => { :person => :pedigree } } },
 #                                        :conditions => [ 'pedigrees.id = ?', params[:pedigree_filter][:id] ]) if (params[:pedigree_filter])
