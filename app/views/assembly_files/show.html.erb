@@ -4,7 +4,7 @@
   <tr>
     <td><b>Name:</b> <nobr><%= @assembly_file.name %></nobr> </td>
     <td><b>Genome reference:</b> <%= @assembly_file.genome_reference.name %> </td>
-    <td colspan="2"> <b>File type:</b> <%= @assembly_file.file_type %> </td>
+    <td colspan="2"> <b>File type:</b> <%= @assembly_file.file_type.type_name %> </td>
   </tr>
   <tr>
     <td><b>Software:</b> <%= @assembly_file.software %> </td>
@@ -26,7 +26,7 @@
   </tr>
 </table>
 
-<% if @assembly_file.file_type == 'SUMMARY' %>
+<% if @assembly_file.file_type.type_name == 'SUMMARY' %>
 <div>
   <div><span style="font-weight:bold; text-decoration: underline;">Summary File Contents</span></div>
   <div>
