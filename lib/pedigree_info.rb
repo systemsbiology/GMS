@@ -107,8 +107,9 @@ def pedfile(pedigree_id)
  
                 af_list = assembly.assembly_files
                 file_list = Array.new
-                af_list.group_by {|t| t.file_type }.each do |assay_key, assembly_file_array|
-                  #puts "assay_key is #{assay_key.inspect} asasy_file_array is #{assembly_file_array.inspect}"
+                af_list.group_by {|t| t.file_type_id }.each do |file_type_id, assembly_file_array|
+#                  puts "file_type_id is #{file_type_id.inspect} assay_file_array is #{assembly_file_array.inspect}"
+		  assay_key = FileType.find(file_type_id).type_name
                   next if assay_key == "ASSEMBLY" 
                   assembly_file_array.each do |assembly_file|
                     file_info = Hash.new
