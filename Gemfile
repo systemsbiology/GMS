@@ -46,6 +46,7 @@ gem 'madeline', '~> 0.1.8'
 
 gem 'rubyzip'
 gem 'auto_strip_attributes', "~> 1.0"
+gem 'json_builder'
 
 # Bundle the extra gems:
 # gem 'bj'
