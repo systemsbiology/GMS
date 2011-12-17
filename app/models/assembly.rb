@@ -38,8 +38,9 @@ class Assembly < ActiveRecord::Base
   # in the config files.
   def ensure_files_up_to_date
     files = find_assembly_files
-    add_files,update_files = check_assembly_files(files)
+    add_files = check_add_assembly_files(files)
     add_assembly_files(add_files)
+    update_files = check_update_assembly_files(files)
     update_assembly_files(update_files)
   end
 
