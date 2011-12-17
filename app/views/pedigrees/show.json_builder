@@ -1,0 +1,8 @@
+study_id @pedigree.study_id
+version @pedigree.version
+pedigree_name @pedigree.name
+pedigree_directory @pedigree.directory
+pedigree_description @pedigree.description
+pedigree_id @pedigree.id
+pedigree_tag @pedigree.tag
+pedigree_isb_pedigree_id @pedigree.isb_pedigree_id
