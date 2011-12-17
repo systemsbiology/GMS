@@ -1,0 +1,5 @@
+<p>Does the above table not contain the information you're looking for?  Try one of the following links (will not save any edits made above, so remember to 'Update Person' if you have changed any of the above information.</p>
+<p>If you are trying to add a <span style="font-weight:bold;">disease diagnosis</span> for this person, click <%= link_to "here", new_diagnosis_path(:person_id => @person) %></p>
+<p>If you are trying to add a <span style="font-weight:bold;">phenotype</span> for this person, click <%= link_to "here", new_trait_path(:person_id => @person) %></p>
+<p>If you are trying to add a <span style="font-weight:bold;">sample</span> for this person, click <%= link_to "here", new_sample_path(:person_id => @person) %></p>
+<p>If you are trying to add a <span style="font-weight:bold;">relationship</span> for this person, click <%= link_to "here", new_relationship_path(:person => @person) %></p>
