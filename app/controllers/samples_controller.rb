@@ -15,6 +15,7 @@ class SamplesController < ApplicationController
       format.html # index.html.erb
       format.xml  { render :xml => @samples }
       format.json { render :json => @samples }
+      format.js
     end
   end
 
