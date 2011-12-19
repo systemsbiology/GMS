@@ -88,7 +88,7 @@ class Assembly < ActiveRecord::Base
       af = AssemblyFile.find_by_name(filename)
 
       if !af.nil? then
-        if af.location != file_path then
+        if af.location != file_path or af.file_type != file_type then
 	  #puts "updating file #{file_path} #{af.inspect}"
 	  update[af.id] = Hash.new
           update[af.id]['path'] = file_path
