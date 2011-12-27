@@ -3,7 +3,7 @@
 
   <div class="field">
     <%= f.label :person %><br />
-    <%= collection_select(:person, :id, Person.all, :id, :full_identifier, options = {:selected => params[:person_id] || ''}) %>
+    <%= collection_select(:person, :id, Person.all, :id, :full_identifier, options = {:selected => params[:person_id] || @sample.person.id  || ''}) %>
   </div>
   <div class="field">
     <%= f.label :sample_type_id %><br />

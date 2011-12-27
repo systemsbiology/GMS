@@ -113,11 +113,21 @@ describe SamplesController do
         assigns(:sample).should eq(sample)
       end
 
+# this is probably wrong...
+      it "updates the acquisitions table if necessary" do
+        sample = Sample.create! valid_attributes
+	person = Person.create! valid_attributes
+	sample.person = person
+	put :update, :id => sample.id, :sample => valid_attributes
+	assigns(:sample).should eq(sample)
+      end
+
       it "redirects to the sample" do
         sample = Sample.create! valid_attributes
         put :update, :id => sample.id, :sample => valid_attributes
         response.should redirect_to(sample)
       end
+
     end
 
     describe "with invalid params" do

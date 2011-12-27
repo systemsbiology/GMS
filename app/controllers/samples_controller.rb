@@ -92,10 +92,45 @@ class SamplesController < ApplicationController
   def update
     @sample = Sample.find(params[:id])
 
+    ac_notice = ''
+    if (params[:person] and params[:person][:id]) then
+      if (params[:person][:id].to_i != @sample.person.id.to_i) then
+        logger.debug("updating the person associated with this sample from #{@sample.person.id} to #{params[:person][:id]}")
+	#check that there isn't an entry for this acquisition in the db already!
+	check_aq = Acquisition.find(:all, :conditions => {:person_id => params[:person][:id], :sample_id => @sample.id})
+	if (check_aq.size > 0) then
+	  @sample.errors.add("Cannot create duplicate sample (#{@sample.id}) and person (#{@sample.person.id}) link.")
+	else 
+  	  acquisition = Acquisition.find(:all, :conditions => {:person_id => @sample.person.id, :sample_id => @sample.id})
+	  if (acquisition.size > 1) then
+	    logger.debug("Found multiple samples for this sample (#{@sample.id}) and person(#{@sample.person.id}) combination!!!  This is an error in the database!!  Fix it manually!  #{acquisition.inspect}")
+	    @sample.errors.add("Found multiple samples for sample #{@sample.id} and person #{@sample.person.id}.  Fix manually.")
+	  else 
+	    acquisition = acquisition.first
+	    acquisition.person_id = params[:person][:id]
+	    if (acquisition.save) then
+	      ac_notice << "Sample association with Person was successfully updated."
+	      # check to see if sequenced is true on person.  if not, then update it to yes.
+	      if (@sample.person.sequenced? == false) then
+	        person = @sample.person
+		person.planning_on_sequencing = 1
+		if (person.save) then
+		  ac_notice << "Updated person to show that sequencing was done."
+		end
+	      end
+	    else
+	      ac_notice << "Sample association update failed."
+	      @sample.errors.add(ac_notice)
+	    end
+	  end
+	end
+      end
+    end
+
     respond_to do |format|
       if @sample.update_attributes(params[:sample])
         logger.debug("sample is #{@sample.inspect} after params #{params[:sample]}")
-        format.html { redirect_to(@sample, :notice => 'Sample was successfully updated.') }
+        format.html { redirect_to(@sample, :notice => "Sample was successfully updated. #{ac_notice}") }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
