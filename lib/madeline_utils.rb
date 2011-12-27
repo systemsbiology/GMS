@@ -91,7 +91,7 @@ def create_row(person, familyID, diseases, phenotypes, twin_letter)
     end
 
     #Sampled
-    if (person.sequenced? == true) then
+    if (person.sequenced? == true and person.samples.size > 0) then
       current_person.push('Y')
     else
       current_person.push('.')

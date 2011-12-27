@@ -68,7 +68,7 @@
         <td><%= person.gender %></td>
         <td><%= person.dob %></td>
         <td><%= person.dod %></td>
-	<td><% if person.sequenced? then %><%= link_to person.samples.count, person unless person.samples.nil? %><% else %>NA<% end %></td>
+	<td><% if person.sequenced? and person.samples.count > 0 %><%= link_to person.samples.count, person unless person.samples.nil? %><% else %>NA<% end %></td>
 	<td><%= person.phenotypes.count > 0 ? link_to(person.phenotypes.count, traits_path(:person => person)) : person.phenotypes.count  %></td>
 	<td><%= person.diseases.count > 0 ? link_to(person.diseases.count, person_path(person)) : person.diseases.count %></td>
       </tr>
