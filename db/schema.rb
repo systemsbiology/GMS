@@ -62,7 +62,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
   create_table "assembly_files", :force => true do |t|
     t.integer  "genome_reference_id"
     t.integer  "assembly_id"
-    t.integer  "file_types_id"
+    t.integer  "file_type_id"
     t.string   "name"
     t.string   "description"
     t.string   "location"
