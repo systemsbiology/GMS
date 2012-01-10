@@ -2,7 +2,7 @@
 <table class="tablesorter">
   <thead>
   <tr>
-    <th>ISB sample</th>
+    <th class="{sorter: 'digit'}">ISB sample</th>
     <th>ISB Person</th>
     <th>Person</th>
     <th>Pedigree</th>
@@ -17,8 +17,8 @@
   <tbody>
 <% @samples.each do |sample| %>
   <tr>
-    <td><nobr><%= link_to sample.isb_sample_id, sample %></nobr></td>
-    <td><nobr><%= sample.person.isb_person_id %></nobr></td>
+    <td><%= link_to sample.isb_sample_id, sample, :id => sample.id %></td>
+    <td><%= sample.person.isb_person_id %></td>
     <td><%= sample.person.collaborator_id %></td>
     <td><%= sample.person.pedigree.name if sample.person.pedigree %></td>
     <td><nobr><%= sample.sample_vendor_id if sample.sample_vendor_id %></nobr></td>
