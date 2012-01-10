@@ -39,10 +39,16 @@
 <%= link_to 'Edit', edit_person_path(@person) %> |
 <%= link_to 'Back', people_path %>
 <br />
-<%= link_to "Back to Pedigree #{@person.pedigree.name}", @person.pedigree %>
+<%= link_to "Back to Pedigree #{@person.pedigree.name}", @person.pedigree if @person.pedigree %>
+<br />
+<%= link_to 'Delete this person', @person, :confirm => 'Are you sure?', :method => :delete %>
 <br />
 <h1>Listing Family Memberships</h1>
+<% unless @person.membership.nil? %>
 <%= render 'memberships/list', :memberships => [@person.membership] %>
+<% else %>
+<p>Not a member of a family.</p>
+<% end %>
 <br />
 <h1>Diagnosed with the following Diseases</h1>
 <%= render 'diagnoses/list', :diagnoses => @person.diagnoses %>
@@ -80,7 +86,7 @@
     <td><nobr><%= link_to sample.isb_sample_id, sample %></nobr></td>
     <td><nobr><%= sample.person.isb_person_id %></nobr></td>
     <td><%= sample.person.collaborator_id %></td>
-    <td><%= sample.person.pedigree.name %></td>
+    <td><%= sample.person.pedigree.nil? ? 'NA' : sample.person.pedigree.name %></td>
     <td><%= sample.sample_type.nil? ? 'unknown' : sample.sample_type.name  %></td>
     <td><%= sample.status %></td>
     <td><%= sample.volume %></td>
