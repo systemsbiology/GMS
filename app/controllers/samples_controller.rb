@@ -2,7 +2,7 @@ class SamplesController < ApplicationController
   # GET /samples
   # GET /samples.xml
   def index
-    @samples = Sample.has_pedigree(params[:pedigree_filter]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
+    @samples = Sample.has_pedigree(params[:pedigree_filter]).find(:all, :include => [:assays, {:person => :pedigree }], :order => ['pedigrees.name'])
     if params[:sample_vendor_id] then
       if params[:sample_vendor_id].match(/%/) then
         @samples = Sample.has_pedigree(params[:pedigree_filter]).where("sample_vendor_id like ?", params[:sample_vendor_id]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
@@ -22,11 +22,12 @@ class SamplesController < ApplicationController
   # GET /samples/1
   # GET /samples/1.xml
   def show
-    @sample = Sample.find(params[:id])
+    @sample = Sample.find(params[:id], :include => [:assays, { :person => :pedigree}])
 
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @sample }
+      format.json { render :json => @sample.to_json(:include => :assays) }
     end
   end
 
@@ -144,7 +145,6 @@ class SamplesController < ApplicationController
   def destroy
     @sample = Sample.find(params[:id])
     @sample.destroy
-
     respond_to do |format|
       format.html { redirect_to(samples_url) }
       format.xml  { head :ok }
