@@ -1,5 +1,18 @@
 <script>
-  $(document).ready(function() { setupTablesorter() });
+  $(document).ready(function() { 
+    $("table").tablesorter({
+      textExtraction: function(node) {
+        if (node.innerHTML.indexOf("isb_sample_") != -1){
+	  var id = node.childNodes[0].id;
+	  return id;
+	} else if (node.innerHTML.indexOf("isb_ind_") != -1) {
+	  var id = node.innerHTML.replace("isb_ind_","");
+	  return id;
+	}
+	return node.innerHTML;
+      }
+    });
+  });
 </script>
 <h1>Listing samples</h1>
 <%= render "partials/filter" %> OR
