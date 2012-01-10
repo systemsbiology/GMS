@@ -55,10 +55,14 @@ class AssembliesController < ApplicationController
     if File.exists?(dir) then
       @assembly.file_date = creation_time(dir)
     end
-
+    if (params[:genome_reference]) then
+      gr = GenomeReference.find_by_name(params[:genome_reference])
+      @assembly.genome_reference = gr
+    end
+    @assembly.status = 'created'
     respond_to do |format|
         if @assembly.save
-          format.html { redirect_to(@assembly, :notice => 'Assay file was successfully created.') }
+          format.html { redirect_to(@assembly, :notice => 'Assembly file was successfully created.') }
           format.xml  { render :xml => @assembly, :status => :created, :location => @assembly }
           format.json  { render :json => @assembly, :status => :created, :location => @assembly }
         else
@@ -76,7 +80,7 @@ class AssembliesController < ApplicationController
 
     respond_to do |format|
       if @assembly.update_attributes(params[:assembly])
-        format.html { redirect_to(@assembly, :notice => 'Assay file was successfully updated.') }
+        format.html { redirect_to(@assembly, :notice => 'Assembly file was successfully updated.') }
         format.xml  { head :ok }
       else
         format.html { render :action => "edit" }
