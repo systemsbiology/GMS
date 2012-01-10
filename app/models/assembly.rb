@@ -4,7 +4,7 @@ require 'utils'
 class Assembly < ActiveRecord::Base
   belongs_to :assay
   belongs_to :genome_reference
-  has_many :assembly_files
+  has_many :assembly_files, :dependent => :destroy
   after_save :ensure_files_up_to_date
 
   auto_strip_attributes :name, :location, :description, :metadata, :software, :software_version, :comments
@@ -136,6 +136,10 @@ class Assembly < ActiveRecord::Base
 
       xml = header.to_xml(:root => "assembly-file")
       filename = File.basename(file_path)
+      if filename.match(/~$/) then
+        logger.debug("Skipping a file with a tilda when adding assembly files.  filename #{filename}")
+        next
+      end
       #puts "file_type_id #{file_type_id} for assembly #{self.inspect} #{self.location} trying to add #{file_path}"
       assembly_file = AssemblyFile.new( 
       					:genome_reference_id => self.genome_reference_id,
