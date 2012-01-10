@@ -61,18 +61,26 @@ class PeopleController < ApplicationController
       @person.dod = nil
     end
 
+    begin
+      pedigree = Pedigree.find(params[:pedigree][:id])
+    rescue
+      @person.errors.add(:pedigree, 'must be selected')
+      render :action => "new" and return
+    end
+    @person.pedigree = pedigree
+
     respond_to do |format|
       if @person.save
         isb_person_id = "isb_ind_#{@person.id}"
 	@person.isb_person_id = isb_person_id
 	@person.save
 
-	# create memberships
-	membership = Membership.new
-	# this should be params[:pedigree][:id] because that's what the create form passes in
-	membership.pedigree_id = params[:pedigree][:id]
-        membership.person_id = @person.id
-	membership.save
+#	# create memberships
+#	membership = Membership.new
+#	# this should be params[:pedigree][:id] because that's what the create form passes in
+#	membership.pedigree_id = params[:pedigree][:id]
+#        membership.person_id = @person.id
+#	membership.save
 
         format.html { redirect_to(@person, :notice => 'Person was successfully created.') }
         format.xml  { render :xml => @person, :status => :created, :location => @person }
@@ -99,6 +107,13 @@ class PeopleController < ApplicationController
     else
       @values.delete_if{|k,v| k.match(/^dob/)}
       @values.delete_if{|k,v| k.match(/^dod/)}
+    end
+
+    # update the pedigree of the person
+    if (params[:pedigree] and params[:pedigree][:id])
+      pedigree = Pedigree.find(params[:pedigree][:id])
+      @person.pedigree = pedigree
+      @person.save
     end
 
     respond_to do |format|
