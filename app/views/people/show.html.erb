@@ -83,8 +83,8 @@
   <tbody>
 <% @person.samples.each do |sample| %>
   <tr>
-    <td><nobr><%= link_to sample.isb_sample_id, sample %></nobr></td>
-    <td><nobr><%= sample.person.isb_person_id %></nobr></td>
+    <td><%= link_to sample.isb_sample_id, sample %></td>
+    <td><%= sample.person.isb_person_id %></td>
     <td><%= sample.person.collaborator_id %></td>
     <td><%= sample.person.pedigree.nil? ? 'NA' : sample.person.pedigree.name %></td>
     <td><%= sample.sample_type.nil? ? 'unknown' : sample.sample_type.name  %></td>

@@ -27,7 +27,7 @@
           <td style="background-color: red">&nbsp;</td>
           <td>No sample information</td>
           <td>NA</td>
-          <td><nobr><%= link_to person.isb_person_id, person %></nobr></td>
+          <td><%= link_to person.isb_person_id, person %></td>
           <td><%= person.full_collaborator %></td>
 	  <td><%= link_to person.pedigree.name, person.pedigree %></td>
           <td>NA</td>
@@ -48,9 +48,9 @@
 		 elsif sample.status == 'pending' %>#CC6600<%
 	         elsif sample.status.nil? %>red<%
 	         end %>">&nbsp;</td>
-            <td><nobr><%= sample.sample_vendor_id %><nobr></td>
-            <td><nobr><%= link_to sample.isb_sample_id, sample_path(sample) %></nobr></td>
-            <td><nobr><%= link_to person.isb_person_id, person_path(person) %></nobr></td>
+            <td><%= sample.sample_vendor_id %></td>
+            <td><%= link_to sample.isb_sample_id, sample_path(sample) %></td>
+            <td><%= link_to person.isb_person_id, person_path(person) %></td>
             <td><%= person.full_collaborator %></td>
 	    <td><%= link_to person.pedigree.name, person.pedigree %></td>
             <td>NA</td>
@@ -75,9 +75,9 @@
 	           elsif sample.status.nil? %>#CC6600<%
 	           end
 	         end %>">&nbsp;</td>
-            <td><nobr><%= sample.sample_vendor_id %><nobr></td>
-            <td><nobr><%= link_to sample.isb_sample_id, sample_path(sample) %></nobr></td>
-            <td><nobr><%= link_to person.isb_person_id, person_path(person) %></nobr></td>
+            <td><%= sample.sample_vendor_id %></td>
+            <td><%= link_to sample.isb_sample_id, sample_path(sample) %></td>
+            <td><%= link_to person.isb_person_id, person_path(person) %></td>
             <td><%= person.full_collaborator %></td>
 	    <td><%= link_to person.pedigree.name, person.pedigree %></td>
             <td><%= assay.vendor %></td>

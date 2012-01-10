@@ -22,7 +22,7 @@
     <td><%= link_to assay.name, assay %></td>
     <td></td>
     <td></td>
-    <td></nobr></td>
+    <td></td>
     <td></td>
     <td></td>
     <td><%= assay.assay_type %></td>
@@ -33,8 +33,8 @@
   <tr>
     <td><%= link_to assay.name, assay %></td>
     <td><%= assay.sample.sample_vendor_id %></td>
-    <td><nobr><%= assay.sample.isb_sample_id %></nobr></td>
-    <td><nobr><%= assay.sample.person.isb_person_id %></nobr></td>
+    <td><%= assay.sample.isb_sample_id %></td>
+    <td><%= assay.sample.person.isb_person_id %></td>
     <td><%= assay.sample.person.collaborator_id %></td>
     <td><%= assay.sample.person.pedigree.name %></td>
     <td><%= assay.assay_type %></td>
@@ -46,3 +46,5 @@
 </tbody>
 </table>
 <% end %>
+
+<%= will_paginate @assays %>

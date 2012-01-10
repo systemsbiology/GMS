@@ -17,10 +17,10 @@
   <tbody>
 <% assemblies.each do |assembly| %>
   <tr>
-    <td><nobr><%= image_tag('file_location.png', :size => "20x20", :onmouseover => "$('#assembly_loc_#{assembly.id}').poshytip('show')", :onmouseout => "$('#assembly_loc_#{assembly.id}').poshytip('hide')", :id => "assembly_loc_#{assembly.id}") %><%= link_to assembly.assay.sample.sample_vendor_id, assembly.assay.sample %></nobr></td>
+    <td><%= image_tag('file_location.png', :size => "20x20", :onmouseover => "$('#assembly_loc_#{assembly.id}').poshytip('show')", :onmouseout => "$('#assembly_loc_#{assembly.id}').poshytip('hide')", :id => "assembly_loc_#{assembly.id}") %><%= link_to assembly.assay.sample.sample_vendor_id, assembly.assay.sample %></td>
     <td><%= assembly.assay.sample.nil? ? '' : assembly.assay.sample.person.nil? ? '' : link_to(assembly.assay.sample.person.pedigree.name, assembly.assay.sample.person.pedigree) %></td>
     <td><%= assembly.genome_reference.name %></td>
-    <td><nobr><%= link_to assembly.name, assembly %><nobr></td>
+    <td><%= link_to assembly.name, assembly %></td>
     <td><%= assembly.file_type %></td>
     <td><%= assembly.software %></td>
     <td><%= assembly.software_version %></td>

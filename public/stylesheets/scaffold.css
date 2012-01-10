@@ -77,3 +77,6 @@ div.page {
   position: relative;
   float: right;
 }
+td {
+  white-space: nowrap;
+}
