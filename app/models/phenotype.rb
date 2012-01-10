@@ -1,6 +1,6 @@
 class Phenotype < ActiveRecord::Base
   has_many :people, :through => :traits
-  has_many :traits
+  has_many :traits, :dependent => :destroy
   belongs_to :disease
 
   auto_strip_attributes :name, :description
