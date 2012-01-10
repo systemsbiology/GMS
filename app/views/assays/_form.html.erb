@@ -28,7 +28,7 @@
   <% if params[:action] == 'new' then %>
     <div class="field">
       <%= label(Sample, :sample) %><br />
-      <%= collection_select(:sample, :sample_id, Sample.all, :id, :identifier, :selected => params[:sample_id]) %>
+      <%= collection_select(:sample, :sample_id, Sample.all, :id, :identifier, { :selected => params[:sample_id] || ''} ) %>
     </div>
   <% end %>
   <div class="actions">
