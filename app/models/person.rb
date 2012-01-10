@@ -1,20 +1,20 @@
 class Person < ActiveRecord::Base
 #  has_many :memberships
-  has_one :membership
+  has_one :membership, :dependent => :destroy
   has_one :pedigree, :through => :membership
-  has_many :offspring, :class_name => "Relationship", :foreign_key => "person_id", :conditions => { :relationship_type => 'parent' }
+  has_many :offspring, :class_name => "Relationship", :foreign_key => "person_id", :conditions => { :relationship_type => 'parent' }, :dependent => :destroy
   # either check the relationship_type parent for the relation_id, OR check for relationship_type child for person_id
 #  has_many :parents, :class_name => "Relationship", :foreign_key => "relation_id", :conditions => { :relationship_type => 'parent' }
-  has_many :parents, :class_name => "Relationship", :foreign_key => "person_id", :conditions => { :relationship_type => 'child'}
+  has_many :parents, :class_name => "Relationship", :foreign_key => "person_id", :conditions => { :relationship_type => 'child'}, :dependent => :destroy
 #  has_many :parents, :class_name => "Relationship", :foreign_key => "relation_id", :conditions => { :relationship_type => 'parent'}, :include => :person, :order => "people.gender desc"
-  has_many :spouses, :class_name => "Relationship", :foreign_key => "person_id", :conditions => ["relationship_type = ? and name not like ?", "undirected", "%twin%"] 
-  has_many :twins, :class_name => "Relationship", :foreign_key => "person_id", :conditions => ["name like ?","%twin%"]
-  has_many :person_aliases, :class_name => "PersonAlias"
-  has_many :traits
+  has_many :spouses, :class_name => "Relationship", :foreign_key => "person_id", :conditions => ["relationship_type = ? and name not like ?", "undirected", "%twin%"], :dependent => :destroy
+  has_many :twins, :class_name => "Relationship", :foreign_key => "person_id", :conditions => ["name like ?","%twin%"], :dependent => :destroy
+  has_many :person_aliases, :class_name => "PersonAlias", :dependent => :destroy
+  has_many :traits, :dependent => :destroy
   has_many :phenotypes, :through => :traits
-  has_many :acquisitions
-  has_many :samples, :through => :acquisitions
-  has_many :diagnoses
+  has_many :samples, :through => :acquisitions, :dependent => :destroy
+  has_many :acquisitions, :dependent => :destroy
+  has_many :diagnoses, :dependent => :destroy
   has_many :diseases, :through => :diagnoses
 
 
