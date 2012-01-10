@@ -1,8 +1,9 @@
 class Sample < ActiveRecord::Base
-  has_many :sample_assays
-  has_many :assays, :through => :sample_assays
+  # assays has to come before sample_assays in order for the dependent destroy to work
+  has_many :assays, :through => :sample_assays, :dependent => :destroy
+  has_many :sample_assays, :dependent => :destroy
   belongs_to :sample_type
-  has_one :acquisition
+  has_one :acquisition, :dependent => :destroy
   has_one :person, :through => :acquisition
 
   auto_strip_attributes :sample_vendor_id, :volume, :concentration, :quantity, :protocol, :comments
@@ -21,7 +22,11 @@ class Sample < ActiveRecord::Base
   }
 
   def identifier 
-    return "#{isb_sample_id} - #{sample_vendor_id} - #{self.person.identifier}"
+    if self.person.nil? then
+      return "#{isb_sample_id} - #{sample_vendor_id} - NA"
+    else 
+      return "#{isb_sample_id} - #{sample_vendor_id} - #{self.person.identifier}"
+    end
   end
 
 end
