@@ -1,5 +1,5 @@
 class Assay < ActiveRecord::Base
-  has_many :assemblies
+  has_many :assemblies, :dependent => :destroy
   has_one :sample_assay
   has_one :sample, :through => :sample_assay
 
@@ -15,6 +15,12 @@ class Assay < ActiveRecord::Base
           :conditions => [ 'pedigrees.id = ?', pedigree_id]
         }
       end
+    end
+  }
+
+  scope :has_name, lambda { |name|
+    unless name.blank?
+      where('name = ?',name)
     end
   }
 
