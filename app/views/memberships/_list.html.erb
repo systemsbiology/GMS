@@ -8,6 +8,7 @@
   </thead>
   <tbody>
 <% memberships.each do |membership| %>
+  <% next if membership.nil? %>
   <tr>
     <td><%= membership.pedigree.nil? ? '' : link_to(membership.pedigree.name, membership.pedigree) %></td>
     <td><%= link_to membership.person.identifier, membership.person %></td>
