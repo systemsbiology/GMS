@@ -42,5 +42,8 @@ Dir[File.dirname(__FILE__) + "/../vendor/*"].each do |path|
   require gem_path if File.exists? gem_path
 end
 
+# don't include the root, override as_json if you do need the root
+ActiveRecord::Base.include_root_in_json = false
+
 # Initialize the rails application
 Gms::Application.initialize!
