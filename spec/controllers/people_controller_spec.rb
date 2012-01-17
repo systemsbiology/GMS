@@ -24,7 +24,26 @@ describe PeopleController do
   # Person. As you add validations to Person, be sure to
   # update the return value of this method accordingly.
   def valid_attributes
-    {}
+    {
+      :collaborator_id => 'L140',
+      :gender => 'male',
+      :isb_person_id => 'isb_ind_39'
+    }
+  end
+
+  def valid_pedigree_attributes
+    {
+      :id => 1,
+      :name => "test",
+      :tag => "test",
+      :study => mock_model(Study)
+    }
+  end
+
+  before(:each) do 
+    # need to create the pedigree that we are going to add the person to
+    @pedigree = Pedigree.create! valid_pedigree_attributes
+    Pedigree.stub!(:find).and_return(@pedigree)
   end
 
   describe "GET index" do
@@ -59,27 +78,34 @@ describe PeopleController do
   end
 
   describe "POST create" do
+
     describe "with valid params" do
       it "creates a new Person" do
         expect {
-          post :create, :person => valid_attributes
+          post :create, :person => valid_attributes, :pedigree => { :id => '1' }
         }.to change(Person, :count).by(1)
       end
 
       it "assigns a newly created person as @person" do
-        post :create, :person => valid_attributes
+        post :create, :person => valid_attributes, :pedigree => { :id => '1' }
         assigns(:person).should be_a(Person)
         assigns(:person).should be_persisted
       end
 
       it "redirects to the created person" do
-        post :create, :person => valid_attributes
+        post :create, :person => valid_attributes,  :pedigree => { :id => '1' }
         response.should redirect_to(Person.last)
       end
     end
 
     describe "with invalid params" do
-      it "assigns a newly created but unsaved person as @person" do
+      it "fails to create a new Person without pedigree id" do
+        expect {
+	  post :create, :person => valid_attributes
+	  }.to change(Person, :count).by(0)
+      end
+
+     it "assigns a newly created but unsaved person as @person" do
         # Trigger the behavior that occurs when invalid params are submitted
         Person.any_instance.stub(:save).and_return(false)
         post :create, :person => {}
