@@ -4,31 +4,31 @@ describe AssembliesController do
   describe "routing" do
 
     it "routes to #index" do
-      get("/assembly").should route_to("assembly#index")
+      get("/assemblies").should route_to("assemblies#index")
     end
 
     it "routes to #new" do
-      get("/assembly/new").should route_to("assembly#new")
+      get("/assemblies/new").should route_to("assemblies#new")
     end
 
     it "routes to #show" do
-      get("/assembly/1").should route_to("assembly#show", :id => "1")
+      get("/assemblies/1").should route_to("assemblies#show", :id => "1")
     end
 
     it "routes to #edit" do
-      get("/assembly/1/edit").should route_to("assembly#edit", :id => "1")
+      get("/assemblies/1/edit").should route_to("assemblies#edit", :id => "1")
     end
 
     it "routes to #create" do
-      post("/assembly").should route_to("assembly#create")
+      post("/assemblies").should route_to("assemblies#create")
     end
 
     it "routes to #update" do
-      put("/assembly/1").should route_to("assembly#update", :id => "1")
+      put("/assemblies/1").should route_to("assemblies#update", :id => "1")
     end
 
     it "routes to #destroy" do
-      delete("/assembly/1").should route_to("assembly#destroy", :id => "1")
+      delete("/assemblies/1").should route_to("assemblies#destroy", :id => "1")
     end
 
   end
