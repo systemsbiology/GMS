@@ -24,7 +24,10 @@ describe MembershipsController do
   # Membership. As you add validations to Membership, be sure to
   # update the return value of this method accordingly.
   def valid_attributes
-    {}
+    {
+      :pedigree_id => 1,
+      :person_id => 1
+    }
   end
 
   describe "GET index" do
