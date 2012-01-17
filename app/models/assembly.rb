@@ -103,6 +103,8 @@ class Assembly < ActiveRecord::Base
 
   def add_assembly_files(files=self.check_add_assembly_files)
     files.each do |file_path, file_type|
+      #puts "file type is #{file_type} and path is #{file_path}"
+      #puts FileType.find_by_type_name(file_type).id
       file_type_id = FileType.find_by_type_name(file_type).id
       # header returns the top of the file, use variables in environment.rb to 
       # figure out what the names of the fields are that we're looking for
