@@ -12,7 +12,7 @@
   <tr>
     <td><%= link_to disease.name, disease %></td>
     <td><%= link_to disease.omim_id, "http://omim.org/entry/#{disease.omim_id}" %></td>
-    <td><%= raw disease.description.gsub(/\(\d+\)/) { |digits| digits.sub!("(",""); digits.sub!(")",""); link_to("(#{digits})", "http://omim.org/entry/#{digits}")} %></td>
+    <td><%= if !disease.description.nil? then raw disease.description.gsub(/\(\d+\)/) { |digits| digits.sub!("(",""); digits.sub!(")",""); link_to("(#{digits})", "http://omim.org/entry/#{digits}")} end %></td>
     <% if false %>
     <td><%= link_to 'Show', disease %></td>
     <td><%= link_to 'Edit', edit_disease_path(disease) %></td>
