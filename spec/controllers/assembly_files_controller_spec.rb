@@ -24,8 +24,24 @@ describe AssemblyFilesController do
   # AssemblyFile. As you add validations to AssemblyFile, be sure to
   # update the return value of this method accordingly.
   def valid_attributes
-    {}
+    {
+      :name => 'test assembly file',
+      :genome_reference_id => 1,
+      :location => '/proj/famgen/studies/fake/sequence/blah',
+      :software => 'cgatools',
+      :software_version => '1.1.1.10',
+      :file_date => '2011-12-20',
+      :assembly_id => @assembly.id
+    }
   end
+
+  before(:each) do
+    @genome_reference = GenomeReference.create! :name => "hg18"
+    GenomeReference.stub!(:find).and_return(@genome_reference)
+    @assembly = mock_model(Assembly)
+    Assembly.stub(:find).with(@assembly.id).and_return(@assembly)
+  end
+
 
   describe "GET index" do
     it "assigns all assembly_files as @assembly_files" do
@@ -59,7 +75,7 @@ describe AssemblyFilesController do
   end
 
   describe "POST create" do
-    describe "with valid params" do
+   describe "with valid params" do
       it "creates a new AssemblyFile" do
         expect {
           post :create, :assembly_file => valid_attributes
