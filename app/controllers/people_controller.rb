@@ -61,14 +61,14 @@ class PeopleController < ApplicationController
       @person.dod = nil
     end
 
-#    begin
-#      pedigree = Pedigree.find(params[:pedigree][:id])
-#    rescue
-#      @person.errors.add(:pedigree, 'must be selected')
-#      render :action => "new" and return
-#    end
-#    @person.pedigree = pedigree
-#
+    begin
+      pedigree = Pedigree.find(params[:pedigree][:id])
+    rescue
+      @person.errors.add(:pedigree, 'must be selected')
+      render :action => "new" and return
+    end
+    @person.pedigree = pedigree
+
     respond_to do |format|
       if @person.save
         isb_person_id = "isb_ind_#{@person.id}"
