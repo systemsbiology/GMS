@@ -11,7 +11,7 @@
 
   <div class="field">
     <%= f.label :pedigree_name %><br />
-    <%= f.collection_select(:pedigree_id, Pedigree.all(:include=> :study, :order => ['studies.name', 'pedigrees.name']), :id, :name, options = {:include_blank => '-Select the pedigree this person belongs to', :selected => cur_pedigree_id}, :class => "pedigree_select") %>
+    <%= collection_select(:pedigree, :id, Pedigree.all(:include=> :study, :order => ['studies.name', 'pedigrees.name']), :id, :name, options = {:include_blank => '-Select the pedigree this person belongs to', :selected => cur_pedigree_id}, :class => "pedigree_select") %>
   </div>
   <div class="field">
     <span>Collaborator ID</span><br />
