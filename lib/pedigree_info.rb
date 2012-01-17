@@ -60,7 +60,7 @@ def pedfile(pedigree_id)
     person["DOB"] = ind.dob
     person["DOD"] = ind.dod
     person["deceased"] = ind.deceased
-    person["phenotype"] = ind.phenotypes.map(&:name).join(", ")
+    person["phenotype"] = person_traits(ind)
     person["comments"] = ind.comments
 
     samples_list = Array.new
@@ -155,6 +155,25 @@ def pedfile(pedigree_id)
   return output_pedigree
 
 end  # end pedigree
+
+def person_traits(person)
+ 
+  traits = Array.new
+  person.traits.each do |trait|
+    pheno = trait.phenotype
+    if trait.trait_information.nil? then
+      traits << pheno.name
+    else
+      traits << pheno.name+": "+trait.trait_information
+    end
+  end
+
+  if traits.size == 0 then
+    return nil
+  else
+    return traits
+  end
+end
 
 def pedigree_relationships(pedigree_id)
   ped = Pedigree.find(pedigree_id)
