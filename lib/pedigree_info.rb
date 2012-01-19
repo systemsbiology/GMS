@@ -56,6 +56,11 @@ def pedfile(pedigree_id)
     person = Hash.new
     person["id"] = ind.isb_person_id
     person["collaborator_id"] = ind.collaborator_id
+    aliases = Array.new
+    ind.person_aliases.each do |ali|
+      aliases << ali.value if ali.name == 'collaborator_id'
+    end
+    person["aliases"] = aliases.size > 0 ? aliases : nil
     person["gender"] = ind.gender
     person["DOB"] = ind.dob
     person["DOD"] = ind.dod
