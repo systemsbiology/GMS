@@ -21,7 +21,7 @@
     <% if sample.person.nil? then %>
     <td colspan="3">No person information for this sample</td>
     <% else %>
-    <td><%= sample.person.isb_person_id.nil%></td>
+    <td><%= sample.person.isb_person_id %></td>
     <td><%= sample.person.collaborator_id %></td>
     <td><%= sample.person.pedigree.name if sample.person.pedigree %></td>
     <% end %>
