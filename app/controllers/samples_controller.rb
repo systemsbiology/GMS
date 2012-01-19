@@ -66,6 +66,14 @@ class SamplesController < ApplicationController
       @sample.status = params[:status]
     end
 
+    # need to make usre thatperson[id] is not null
+    begin 
+      person = Person.find(params[:person][:id])
+    rescue
+      @sample.errors.add(:person, 'must be selected')
+      render :action => "new" and return
+    end
+    @sample.person = person
 
     respond_to do |format|
       if @sample.save
