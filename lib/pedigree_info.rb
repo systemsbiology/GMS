@@ -51,8 +51,22 @@ def pedfile(pedigree_id)
   output_pedigree["pedigree_version"] = ped.version
   output_pedigree["pedigree_subDir"] = ped.directory
 
+  check = ped.people.count
+  if check <= 0 then
+    puts "No people for this pedigree, skipping"
+    return output_pedigree
+  end
+
+  ordered_ped = ordered_pedigree(pedigree_id)
+  output_ordered = Array.new
+  ordered_ped.each do |person|
+    output_ordered << person.isb_person_id  # can use other identifiers here instead...
+  end
+  output_pedigree["ordered_pedigree"] =  output_ordered
+
   individuals = Array.new
-  ped.people.each do |ind|
+  #ped.people.each do |ind|
+  ordered_ped.each do |ind|
     person = Hash.new
     person["id"] = ind.isb_person_id
     person["collaborator_id"] = ind.collaborator_id
