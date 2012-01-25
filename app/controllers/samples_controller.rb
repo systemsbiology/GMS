@@ -81,12 +81,15 @@ class SamplesController < ApplicationController
          @sample.isb_sample_id = isb_sample_id
          @sample.save
 
-         #create acquisition
-         acquisition = Acquisition.new
-         acquisition.person_id = params[:person][:id]
-         acquisition.sample_id = @sample.id
-         acquisition.save
-
+         #check acquisition
+	 acq_check = Acquisition.find_by_person_id_and_sample_id(params[:person][:id], @sample.id)
+	 if acq_check.nil? then
+           #create acquisition
+           acquisition = Acquisition.new
+           acquisition.person_id = params[:person][:id]
+           acquisition.sample_id = @sample.id
+           acquisition.save
+         end
         format.html { redirect_to(@sample, :notice => 'Sample was successfully created.') }
         format.xml  { render :xml => @sample, :status => :created, :location => @sample }
       else
