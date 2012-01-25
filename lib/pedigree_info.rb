@@ -135,7 +135,7 @@ def pedfile(pedigree_id)
 	            file_info["file_type"] = assay_key
                     file_info["file_id"] = assembly_file.name
                     file_info["assembly_date"] = assembly_file.file_date
-                    file_info["assember_swversion"] = assembly_file.software_version
+                    file_info["assembler_swversion"] = assembly_file.software_version
                     file_info["assembly_desc"] = assembly_file.description
                     file_info["reference"] = assembly_file.genome_reference.name
                     file_info["file"] = assembly_file.location
