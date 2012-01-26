@@ -46,6 +46,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.string   "location"
     t.string   "file_type"
     t.date     "file_date"
+    t.string   "status",              :limit => 50
     t.text     "metadata"
     t.string   "disk_id",             :limit => 50
     t.string   "software"
@@ -200,7 +201,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.integer  "person_id"
     t.integer  "relation_id"
     t.string   "relationship_type"
-    t.integer  "child_order"
+    t.integer  "relation_order"
     t.boolean  "divorced",                        :default => false
     t.datetime "created_at"
     t.datetime "updated_at"
