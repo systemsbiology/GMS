@@ -2,7 +2,7 @@ class Person < ActiveRecord::Base
 #  has_many :memberships
   has_one :membership, :dependent => :destroy
   has_one :pedigree, :through => :membership
-  has_many :offspring, :class_name => "Relationship", :foreign_key => "person_id", :conditions => { :relationship_type => 'parent' }, :dependent => :destroy
+  has_many :offspring, :class_name => "Relationship", :foreign_key => "person_id", :conditions => { :relationship_type => 'parent' }, :include => :person, :order => "people.dob, relation_id", :dependent => :destroy
   # either check the relationship_type parent for the relation_id, OR check for relationship_type child for person_id
 #  has_many :parents, :class_name => "Relationship", :foreign_key => "relation_id", :conditions => { :relationship_type => 'parent' }
   has_many :parents, :class_name => "Relationship", :foreign_key => "person_id", :conditions => { :relationship_type => 'child'}, :dependent => :destroy
