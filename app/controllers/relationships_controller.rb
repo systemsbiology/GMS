@@ -65,45 +65,44 @@ class RelationshipsController < ApplicationController
 
     end
 
-
-      if !params[:status].nil? then
-        if !params[:status][:divorced].nil? then
-          if params[:status][:divorced] == "1" then
-	    @relationship.divorced = 1
-          end
+    if !params[:status].nil? then
+      if !params[:status][:divorced].nil? then
+        if params[:status][:divorced] == "1" then
+          @relationship.divorced = 1
         end
       end
+    end
 
-      check_rel = Relationship.find_by_person_id_and_relation_id_and_relationship_type_and_name(@relationship.person_id, @relationship.relation_id, @relationship.relationship_type, @relationship.name)
-      if !check_rel.nil? then
-         @relationship.errors[:base] << "An identical relationship between these two people is already in the database."
+    check_rel = Relationship.find_by_person_id_and_relation_id_and_relationship_type_and_name(@relationship.person_id, @relationship.relation_id, @relationship.relationship_type, @relationship.name)
+    if !check_rel.nil? then
+       @relationship.errors[:base] << "An identical relationship between these two people is already in the database."
+    end
+
+    if @relationship.is_undirected? then
+      @reciprocal = Relationship.new
+      @reciprocal.person_id = @relationship.relation_id
+      @reciprocal.relation_id = @relationship.person_id
+      @reciprocal.relationship_type = @relationship.relationship_type
+      @reciprocal.name = @relationship.reverse_name
+      @reciprocal.divorced = @relationship.divorced
+
+      if @reciprocal.name.nil? then
+        logger.debug("Settings relationship_reverse does not include #{@relationship.name}, please add it before adding this relationship")
+        @relationship.errors[:base] << "Settings relationship_reverse does not include #{@relationship.name}, please add it before adding this relationship"
+        render :action => "new"
       end
 
-      if @relationship.is_undirected? then
-        @reciprocal = Relationship.new
-        @reciprocal.person_id = @relationship.relation_id
-        @reciprocal.relation_id = @relationship.person_id
-        @reciprocal.relationship_type = @relationship.relationship_type
-        @reciprocal.name = @relationship.reverse_name
-        @reciprocal.divorced = @relationship.divorced
-
-        if @reciprocal.name.nil? then
-          logger.debug("Settings relationship_reverse does not include #{@relationship.name}, please add it before adding this relationship")
-          @relationship.errors[:base] << "Settings relationship_reverse does not include #{@relationship.name}, please add it before adding this relationship"
-          render :action => "new"
-        end
-
-      elsif @relationship.is_directed? then  # finds 'parent' and 'child' relationship_types
-        @reciprocal = Relationship.new
-        @reciprocal.person_id = @relationship.relation_id
-        @reciprocal.relation_id = @relationship.person_id
-        @reciprocal.name = @relationship.reverse_name
-        @reciprocal.relationship_type = @reciprocal.lookup_relationship_type
+    elsif @relationship.is_directed? then  # finds 'parent' and 'child' relationship_types
+      @reciprocal = Relationship.new
+      @reciprocal.person_id = @relationship.relation_id
+      @reciprocal.relation_id = @relationship.person_id
+      @reciprocal.name = @relationship.reverse_name
+      @reciprocal.relationship_type = @reciprocal.lookup_relationship_type
 
 
-      else
-        logger.debug("Error with relationship creation: relationship is not directed or undirected #{@relationship}")
-      end
+    else
+      logger.debug("Error with relationship creation: relationship is not directed or undirected #{@relationship}")
+    end
 
 
     respond_to do |format|
@@ -135,11 +134,10 @@ class RelationshipsController < ApplicationController
   def update
     @relationship = Relationship.find(params[:id])
 
-    recip = Relationship.find_by_person_id_and_relation_id_and_relationship_type_and_name(@relationship.relation_id, @relationship.person_id, @relationship.lookup_relationship_type, @relationship.reverse_name)
-    if params[:status] then
-      logger.debug("foudn status #{params[:status]}")
-      if (params[:status][:divorced]) then
-        logger.debug("found status divorced #{params[:status][:divorced]}")
+    recip = Relationship.find_by_person_id_and_relation_id_and_relationship_type_and_name(@relationship.relation_id, @relationship.person_id, @relationship.lookup_relationship_type(@relationship.reverse_name), @relationship.reverse_name)
+#    logger.debug("trying ot find person_id #{@relationship.relation_id} with relation_id #{@relationship.person_id} and relationship_reverse #{@relationship.lookup_relationship_type(@relationship.reverse_name)} and name #{@relationship.reverse_name}")
+    if params[:status] and params[:status][:divorced] then
+      if (params[:status][:divorced] == 1) then
         @relationship.divorced = 1
 	recip.divorced = 1
       else
@@ -153,12 +151,12 @@ class RelationshipsController < ApplicationController
 
     respond_to do |format|
       if @relationship.update_attributes(params[:relationship])
-
         # update recip to the new values
 	recip.person_id = @relationship.relation_id
 	recip.relation_id = @relationship.person_id
 	recip.name = @relationship.reverse_name
-        recip.relationship_type = @relationship.lookup_relationship_type
+        recip.relationship_type = @relationship.lookup_relationship_type(@relationship.reverse_name)
+	recip.relation_order = @relationship.relation_order
 	recip.save
 
         format.html { redirect_to(@relationship, :notice => 'Relationship was successfully updated.') }
