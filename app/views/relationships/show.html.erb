@@ -28,6 +28,7 @@
       <th><%= person_type %></th>
       <th>Relationship Name</th>
       <th><%= relation_type %></th>
+      <th>Relation Order</th>
     </tr>
     </thead>
     <tbody>
@@ -36,6 +37,7 @@
     <td><%= link_to @relationship.person.identifier, @relationship.person %></td>
     <td> is the <% if (@relationship.divorced) then %>divorced <% end %><%= @relationship.name %> of </td>
     <td><%= link_to @relationship.relation.identifier, @relationship.relation %></td>
+    <td><%= @relationship.relation_order %></td>
     </tr>
     </tbody>
 </table>
@@ -47,7 +49,7 @@
 <br />
 
 <h1>Other Relationships involving <%= person_type %>: <%= @relationship.person.identifier %></h1>
-<% person_rels = Relationship.find_all_by_person_id(@relationship.person.id) %>
+<% person_rels = Relationship.order(:relation_order).find_all_by_person_id(@relationship.person.id) %>
 <% if person_rels.nil? or person_rels.size == 1 then %>
   <p>No other relationships for <%= @relationship.person.identifier %></p>
 <% else %>
@@ -58,6 +60,7 @@
       <th>Relationship Name</th>
       <th><%= person_type %></th>
       <th><%= relation_type %></th>
+      <th>Relation Order</th>
       <th class="nosort">Controls</th>
     </tr>
     </thead>
@@ -69,6 +72,7 @@
       <td><%= link_to prel.person.identifier, prel.person %></td>
       <td> is the <%= link_to prel.name, prel %> of </td>
       <td><%= link_to prel.relation.identifier, prel.relation %></td>
+      <td><%= prel.relation_order %></td>
       <td><%= link_to 'Edit', edit_relationship_path(prel) %></td>
     </tr>
   <% end %>
@@ -79,7 +83,7 @@
 <br />
 <br />
 <h1>Other Relationships involving <%= relation_type %>: <%= @relationship.relation.identifier %></h1>
-<% relation_rels = Relationship.find_all_by_relation_id(@relationship.relation.id) %>
+<% relation_rels = Relationship.order(:relation_order).find_all_by_relation_id(@relationship.relation.id) %>
 <% if relation_rels.nil? or relation_rels.size == 1 then %>
   <p>No other relationships for <%= link_to @relationship.relation.identifier, @relationship.relation %></p>
 <% else %>
@@ -90,6 +94,8 @@
       <th><%= relation_type %></th>
       <th>Relationship Name</th>
       <th><%= person_type %></th>
+      <th>Relation Order</th>
+      <th>Controls</th>
     </tr>
     </thead>
     <tbody>
@@ -100,6 +106,8 @@
       <td><%= link_to crel.relation.identifier, crel.relation %></td>
       <td>is the <%= link_to crel.reverse_name, crel %> of </td>
       <td><%= link_to crel.person.identifier, crel.person %></td>
+      <td><%= crel.relation_order %></td>
+      <td><%= link_to 'Edit', edit_relationship_path(crel) %></td>
     </tr>
   <% end %>
   </tbody>
