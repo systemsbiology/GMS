@@ -100,9 +100,9 @@ class Relationship < ActiveRecord::Base
   end
 
   # returns the type for a relationship father -> directed, husband -> undirected, defined in app/config/application.yml
-  def lookup_relationship_type
+  def lookup_relationship_type(name=self.name)
     relationship_types = Settings.relationship_types
-    return relationship_types[self.name]
+    return relationship_types[name]
   end
 
   def correct_gender?
