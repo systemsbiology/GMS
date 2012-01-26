@@ -16,6 +16,10 @@
     <% selected_relation = @relationship.relation.nil? ? '' : @relationship.relation.id %>
     <%= f.collection_select(:relation_id, @people_choices, :id, :full_identifier, options = {:include_blank => '-Select person', :selected => selected_relation}) %>
   </div>
+  <div class="field">
+    <%= f.label :relation_order %> (ex: this is the 3rd child of this parent or the 2nd wife of this man)<br />
+    <%= f.collection_select(:relation_order, (1..20).to_a, :to_i, :to_s, options = { :include_blank => "-Select Relation Order" }) %>
+  </div>
   <div class="actions">
     <%= f.submit %>
   </div>
