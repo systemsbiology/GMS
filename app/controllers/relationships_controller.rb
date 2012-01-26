@@ -137,7 +137,7 @@ class RelationshipsController < ApplicationController
     recip = Relationship.find_by_person_id_and_relation_id_and_relationship_type_and_name(@relationship.relation_id, @relationship.person_id, @relationship.lookup_relationship_type(@relationship.reverse_name), @relationship.reverse_name)
 #    logger.debug("trying ot find person_id #{@relationship.relation_id} with relation_id #{@relationship.person_id} and relationship_reverse #{@relationship.lookup_relationship_type(@relationship.reverse_name)} and name #{@relationship.reverse_name}")
     if params[:status] and params[:status][:divorced] then
-      if (params[:status][:divorced] == 1) then
+      if (params[:status][:divorced] == "1" or params[:status][:divorced] == 1) then
         @relationship.divorced = 1
 	recip.divorced = 1
       else
