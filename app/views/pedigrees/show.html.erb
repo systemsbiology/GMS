@@ -105,6 +105,7 @@
     <th>Parent</th>
     <th>Name</th>
     <th>Child</th>
+    <th>Relation Order</th>
     <th colspan="2" class="nosort">Controls</th>
     </tr>
     </thead>
@@ -114,6 +115,7 @@
     <td><%= link_to relationship.person.collaborator_id, relationship.person %></td>
     <td>is the <%= link_to relationship.name, relationship %> of </td>
     <td><%= link_to relationship.relation.collaborator_id, relationship.relation %></td>
+    <td><%= relationship.relation_order %></td>
     <td><%= link_to 'Edit', edit_relationship_path(relationship) %></td>
   </tr>
 <% end %>
