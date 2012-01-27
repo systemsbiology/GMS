@@ -20,9 +20,9 @@
   <td><b>Deceased:</b> <%= @person.deceased %></td>
 </tr>
 <% if @person.diseases.size > 0 %>
-  <tr><td colspan="2"><b>Diagnosed with following Diseases:</b></td></tr>
+  <tr><td colspan="3"><b>Diagnosed with following Diseases:</b></td></tr>
   <% @person.diagnoses.each do |pd| %>
-    <tr><td><%= pd.person.full_identifier %></td><td><%= pd.disease.name %><% unless pd.disease_information.nil? %>: <%= pd.disease_information %><% end %></td></tr>
+    <tr><td><%= pd.person.full_identifier %></td><td><%= pd.disease.name %><% unless pd.disease_information.nil? %>: <%= pd.disease_information %><% end %></td><td>Age of Onset: <%= pd.age_of_onset %></td></tr>
   <% end %>
 <% end %>
 
