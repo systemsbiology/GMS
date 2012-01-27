@@ -11,7 +11,11 @@
     <div>If disease is not in this list, then <%= link_to "create a new disease", new_disease_path %></div>
   </div>
   <div class="field">
-    <%= f.label :disease_information %> (Ex: age of onset)<br />
+    <%= f.label :age_of_onset %>
+    <%= f.text_field :age_of_onset %>
+  </div>
+  <div class="field">
+    <%= f.label :disease_information %> (Ex: something associated with this person and this disease only and not a general property of this disease.  If this applies to multiple people, then add a phenotype that is associated with this disease instead.<br />
     <%= f.text_field :disease_information %>
   </div>
   <div class="field">
