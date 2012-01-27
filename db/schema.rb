@@ -105,6 +105,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
   create_table "diagnoses", :force => true do |t|
     t.integer "person_id"
     t.integer "disease_id"
+    t.string  "age_of_onset",        :limit => 50
     t.string  "disease_information"
     t.integer "output_order"
     t.date    "created_at"
