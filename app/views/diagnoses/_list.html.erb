@@ -4,6 +4,7 @@
   <tr>
     <th>Person</th>
     <th>Disease</th>
+    <th>Age of Onset</th>
     <th>Disease information</th>
     <th>Output order</th>
     <th class="nosort">Controls</th>
@@ -14,6 +15,7 @@
   <tr>
     <td><%= link_to diagnosis.person.full_identifier, diagnosis.person %></td>
     <td><%= link_to diagnosis.disease.name, diagnosis.disease %></td>
+    <td><%= diagnosis.age_of_onset %></td>
     <td><%= diagnosis.disease_information %></td>
     <td><%= diagnosis.output_order %></td>
     <td><%= link_to 'Show', diagnosis %></td>
