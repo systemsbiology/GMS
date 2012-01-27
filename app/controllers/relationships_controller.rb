@@ -85,6 +85,7 @@ class RelationshipsController < ApplicationController
       @reciprocal.relationship_type = @relationship.relationship_type
       @reciprocal.name = @relationship.reverse_name
       @reciprocal.divorced = @relationship.divorced
+      @reciprocal.relation_order = @relationship.relation_order
 
       if @reciprocal.name.nil? then
         logger.debug("Settings relationship_reverse does not include #{@relationship.name}, please add it before adding this relationship")
@@ -98,6 +99,7 @@ class RelationshipsController < ApplicationController
       @reciprocal.relation_id = @relationship.person_id
       @reciprocal.name = @relationship.reverse_name
       @reciprocal.relationship_type = @reciprocal.lookup_relationship_type
+      @reciprocal.relation_order = @relationship.relation_order
 
 
     else
