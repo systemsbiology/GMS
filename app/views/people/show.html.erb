@@ -29,7 +29,7 @@
 <% if @person.traits.size > 0 %>
   <tr> <td colspan="3"><b>Traits:</b></td></tr>
   <% @person.traits.each do |t| %>
-  <tr><td><%= t.person.full_identifier %></td><td><%= t.phenotype.name %></td><td><% unless t.trait_information.nil? %>: <%= t.trait_information %><% end %></td></tr>
+  <tr><td><%= t.person.full_identifier %></td><td><%= t.phenotype.name %></td><td><% unless t.trait_information.nil? %><%= t.trait_information %><% end %></td></tr>
   <% end %>
 <% end %>
 </table>
