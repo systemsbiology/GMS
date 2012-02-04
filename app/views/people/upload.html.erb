@@ -1,0 +1,31 @@
+<h1> Choose Upload file</h1>
+<h2>Uploads, Parses, validates and stores the people in DB</h2>
+<% if flash[:error] then %>
+<div id="error_explanation"><%= flash[:error].html_safe %></div>
+<% end %>
+<%=form_tag('/people/upload_and_validate', :multipart => true) %>
+<% if params[:pedigree_id] then %>
+<% cur_pedigree_id = params[:pedigree_id] %>
+<% end %>
+
+<div class="field">
+  <%= label "person", :pedigree_name %><br />
+  <%= collection_select(:pedigree, :id, Pedigree.all(:include=> :study, :order => ['studies.name', 'pedigrees.name']), :id, :name, options = {:include_blank => '-Select the pedigree this person belongs to', :selected => cur_pedigree_id}, :class => "pedigree_select") %>
+</div>
+<div class="field">
+  <%= label "disease", :disease_id %><br />
+  <%= collection_select(:disease, :id, Disease.all, :id, :name, options = {:include_blank => "-Select the disease for this pedigree"}) %>
+</div>
+<div class="field">
+   Type of spreadsheet:<br />
+   <%= collection_select(:spreadsheet, :type, ["CGI Manifest","CSV file", "TSV file"], :downcase, :to_s, options = {:include_blank => "-Select type of spreadsheet"}) %>
+</div>
+<div>
+<%= label "person", :excel_file %><br />
+<%= file_field_tag :excel_file %>
+</div>
+<br />
+<div>
+<%= submit_tag "Process this file" %>
+</div>
+</form>

@@ -1,0 +1,20 @@
+<h1>Success</h1>
+<p>Saved objects to DB</p>
+<br />
+<% if @errors.size > 0 %>
+  <h1>Failures</h1>
+  <p>Some errors were generated in creating the linker tables.  Check that people were properly added to the correct pedigree, that samples were assigned to the right person, that disease diagnoses were added to the correct person, and that relationships between people in the pedigree are correct.</p>
+  <p>If you're getting errors about Person not being found then check your identifiers and try to upload again.</p>
+  <% @errors.each do |err_array| %>
+    <% type = err_array[0] %>
+    <% entry = err_array[1] %>
+    <p><b><%= type %>:</b>
+    <% entry.full_messages.each do |msg| %>
+      <%= msg %><br />
+    <% end %>
+    </p>
+  <% end %>
+<% end %>
+<br />
+<br />
+<br />

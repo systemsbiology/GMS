@@ -1,0 +1,126 @@
+<h1>Parsing Spreadsheet</h1>
+<p>Any errors parsing the spreadsheet will be shown first, then any successes.</p>
+<p> If it is parsed correctly then hit the Save button at the bottom of the page to enter the data into the database.  If it is not parsed correctly, then hit the BACK button, edit your spreadsheet, and resubmit the form with the new version of the spreadsheet.</p>
+<p><u>There is a time limit on this page.  If you do not press Save within <b>one hour</b>, the temporary objects will be wiped from the system and you will need to press Back and upload the spreadsheet again.</u></p>
+
+<p><b><%= flash[:notice] unless flash[:notice].empty? %></b></p>
+
+<% if @errors.empty? %>
+<h1>Failures</h1>
+<p>No failures!!</p>
+<% else %>
+<h1>Failures</h1>
+<ul>
+<% @errors.each do |error| %>
+<li>
+Problems in line number <%= error[0] %>:<br/>
+<%= raw error[1]["row"] %>
+<% error[1].each_pair do |type, entry| %>
+  <% next if type == "row" %>
+  <p><b><%= type %>:</b>
+  <% entry.full_messages.each do |msg| %>
+    <%= msg %><br />
+  <% end %>
+  </p>
+<% end %>
+</li>
+<br />
+
+<% end %>
+</ul>
+<% end %>
+
+<% unless @people.empty? and @samples.empty? %>
+<h1>Successes</h1>
+<% end %>
+<% unless @people.empty? %>
+<table>
+  <tr>
+    <th>collaborator_id</th>
+    <th>gender</th>
+    <th>comments</th>
+  </tr>
+
+<% @people.each do |person| %>
+  <tr>
+    <td><%= person.collaborator_id %></td>
+    <td><%= person.gender %></td>
+    <td><%= person.comments %></td>
+  </tr>
+<% end %>
+</table>
+<% end %>
+<% unless @samples.empty? %>
+<table>
+  <thead>
+    <th>vendor_id</th>
+    <th>sample_type</th>
+    <th>volume</th>
+    <th>concentration</th>
+    <th>quantity</th>
+  </thead>
+  <% @samples.each do |sample| %>
+  <tr>
+    <td><%= sample.sample_vendor_id %></td>
+    <td><%= sample.sample_type.name %></td>
+    <td><%= sample.volume %></td>
+    <td><%= sample.concentration %></td>
+    <td><%= sample.quantity %></td>
+  </tr>
+  <% end %>
+</table>
+<% end %>
+<% unless @diagnoses.empty? %>
+<h1>Diagnoses Found</h1>
+<table>
+  <thead>
+    <th>disease</th>
+    <th>person</th>
+  </thead>
+  <% @diagnoses.each do |diag| %>
+  <tr>
+    <td><%= Disease.find(diag[0]).name %></td>
+    <td><%= diag[1] %></td>
+  </tr>
+  <% end %>
+</table>
+
+<% end %>
+<h1>Memberships Found</h1>
+<table>
+  <thead>
+    <th>pedigree</th>
+    <th>person</th>
+  </thead>
+  <% @memberships.each do |mem| %>
+  <tr>
+    <td><%= Pedigree.find(mem[0]).name %></td>
+    <td><%= mem[1] %></td>
+  </tr>
+  <% end %>
+</table>
+<br />
+<h1>Relationships Found</h1>
+<table>
+  <thead>
+    <th>relationship parent</th>
+    <th>relationship child</th>
+  </thead>
+  <% @relationships.each do |rel| %>
+  <tr>
+    <td><%= rel[0] %></td>
+    <td><%= rel[1] %></td>
+  </tr>
+  <% end %>
+</table>
+<br />
+<h1>Save</h1>
+<p>If this data looks correct and you wish to submit to the database, click Save.</p>
+<p>If there are no 'Successes' then this will just check and add the relationship information.</p>
+<p><u>There is a time limit on this page.  If you do not press Save within <b>one hour</b>, the temporary objects will be wiped from the system and you will need to press Back and upload the spreadsheet again.</u></p>
+<%= form_tag('/people/confirm') %>
+<%= hidden_field_tag 'trans_id', @trans_id %>
+<%= submit_tag "Save" %>
+</form>
+<br />
+<br />
