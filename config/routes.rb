@@ -1,16 +1,13 @@
 Gms::Application.routes.draw do
+  root :to => 'welcome#index'
   resources :file_types
-
   resources :diagnoses
-
   resources :reports
   match "terminology" => "terminology#index"
-  root :to => 'welcome#index'
   match '/calendar(/:year(/:month))' => 'calendar#index', :as => :calendar, :constraints => {:year => /\d{4}/, :month => /\d{1,2}/}
   resources :genome_references
   resources :assemblies
   resources :assembly_files
-
   match "assays/summary_report/(:id)", :to =>  "assays#summary_report", :as => "summary_report"
   resources :assays
   resources :sample_assays
@@ -18,6 +15,9 @@ Gms::Application.routes.draw do
   resources :sample_types
   resources :acquisitions
   match "people/receiving_report/(:id)", :to => "people#receiving_report", :as => "receiving_report"
+  match "people/upload", :to => "people#upload", :as => "upload"
+  match "people/upload_and_validate", :to => "people#upload_and_validate", :as => "upload_and_validate"
+  match "people/confirm", :to => "people#confirm", :as => "confirm"
   resources :people
   resources :person_aliases
   resources :traits
