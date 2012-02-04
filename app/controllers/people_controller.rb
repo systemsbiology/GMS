@@ -196,10 +196,8 @@ class PeopleController < ApplicationController
     end
 
     test_file = params[:excel_file]
-    logger.debug("file is #{test_file}")
     file = Tempfile.new(test_file.original_filename)
     file.write(test_file.read.force_encoding("UTF-8"))
-    logger.debug("tempfile is #{file.inspect}")
     book = Spreadsheet.open file.path
     sheet1 = book.worksheet 0
   
@@ -245,7 +243,6 @@ class PeopleController < ApplicationController
     to.trans_id = trans_id 
     to.added = Time.now
     to.object = Marshal.dump(object)
-    logger.debug("to before save is #{to.inspect}")
     if (to.save) then
       return 1
     else
@@ -290,22 +287,18 @@ class PeopleController < ApplicationController
 	      @errors.push(["relationship", rel.errors])
 	      next
 	    end
-            logger.debug("found parent #{parent.inspect} and child #{child.inspect}")
 	    rel.person = parent
 	    rel.relation = child
 	    rel.name = rel_name
 	    rel.relationship_type = rel.lookup_relationship_type(rel_name)
-	    logger.debug("rel is #{rel.inspect}")
 	    if rel.valid? then
 	      rel.save
 
 	      recip = Relationship.new
 	      recip.person = child
 	      recip.relation = parent
-	      logger.debug("calling reverse_name in confirm")
 	      recip.name = rel.reverse_name
 	      recip.relationship_type = recip.lookup_relationship_type(rel.reverse_name)
-	      logger.debug("recip is #{recip.inspect}")
 	      if recip.valid? then
 	        recip.save
               else
@@ -324,7 +317,6 @@ class PeopleController < ApplicationController
 	    else
 	      m.person_id = person.id
 	      m.pedigree_id = ped.id
-	      logger.debug("membership is #{m.inspect}")
 	      if m.valid? then
 	        m.save
 	      else
@@ -337,7 +329,6 @@ class PeopleController < ApplicationController
 	    diagnosis = Diagnosis.new
 	    diagnosis.person_id = person.id
 	    diagnosis.disease_id = disease.id
-	    logger.debug("diagnosis is #{diagnosis.inspect}")
 	    if diagnosis.valid? then
 	      diagnosis.save
 	    else
@@ -346,7 +337,6 @@ class PeopleController < ApplicationController
 	  end
 	else
 	  if obj.valid? then
-            logger.debug("saving obj #{obj.inspect} to db class #{obj.class}")
 	    obj.save
 	  else
 	    @errors.push(["#{temp_obj.object_type}",obj.errors])
