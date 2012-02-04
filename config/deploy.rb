@@ -2,10 +2,14 @@ require 'fileutils.rb'
 
 set :application, "GMS"
 set :deploy_to, "/u5/www/software/gms/"
-set :rail_env, "production"
 set :keep_releases, 3
 set :user, "dmauldin"
 set :shared_host, "bobama.systemsbiology.net"
+set :whenever_command, "bundle exec whenever"
+set :whenever_environment, defer { environment }
+set :whenever_identifier, defer { "#{application}_#{environment}" }
+set :rail_env, "production"
+require 'whenever/capistrano'
 
 #set :scm, :subversion
 # Or: `accurev`, `bzr`, `cvs`, `darcs`, `git`, `mercurial`, `perforce`, `subversion` or `none`
