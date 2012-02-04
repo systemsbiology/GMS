@@ -16,8 +16,13 @@ def pedindex(protocol,id_type)
   data_store["pedigree_databases_version"] = Time.now
   data_store["pedigree_databases_last_updated"] = Time.now
   data_store["pedigree_studies_root"] = PEDIGREE_ROOT
-  data_store["pedigree_databases"] = Array.new
+  data_store["study_pedigrees"] = Array.new
+  Study.all.each do |study|
+    study_to_ped = study_pedigree_index(study.id)
+    data_store["study_pedigrees"].push(study_to_ped)
+  end
 
+  data_store["pedigree_databases"] = Array.new
   Pedigree.all.each do |ped|
       local_hash = Hash.new
       if id_type == ('TAG') then
@@ -29,11 +34,23 @@ def pedindex(protocol,id_type)
       else
         raise ArgumentError "Did not provide a correct value for protocol to pedindex"
       end
-
       data_store["pedigree_databases"].push(local_hash)
   end
 
   return data_store
+end
+
+def study_pedigree_index(study_id)
+  study = Study.find(study_id)
+  peds = study.pedigrees
+  ped_array = Array.new
+  peds.each do |pedigree|
+    ped_array << pedigree.id
+  end
+  study_to_peds = Hash.new
+  study_to_peds[study_id] = ped_array
+
+  return study_to_peds
 end
 
 
