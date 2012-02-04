@@ -90,10 +90,9 @@ class Relationship < ActiveRecord::Base
   # return the reverse name of a relationship father -> son, wife -> husband, defined in app/config/application.yml
   def reverse_name
     reverse_lookup = Settings.relationship_reverse
-
     reverse_name =  reverse_lookup[self.name]
     if reverse_name.kind_of?(Hash) then
-      return reverse_name[self.relation.gender]
+      return reverse_name[self.relation.gender.downcase]
     else
       return reverse_name
     end

@@ -17,7 +17,6 @@ class Person < ActiveRecord::Base
   has_many :diagnoses, :dependent => :destroy
   has_many :diseases, :through => :diagnoses
 
-
   auto_strip_attributes :collaborator_id
   validates_presence_of :collaborator_id, :gender
   validates_uniqueness_of :collaborator_id, :isb_person_id
