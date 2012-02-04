@@ -33,6 +33,7 @@ gem 'devise_ldap_authenticatable'
 gem 'cancan'
 
 gem 'paperclip'
+gem 'spreadsheet'
 
 gem 'ancestry'
 gem 'awesome_nested_set'
@@ -47,6 +48,9 @@ gem 'madeline', '~> 0.1.8'
 gem 'rubyzip'
 gem 'auto_strip_attributes', "~> 1.0"
 gem 'json_builder'
+
+# create cron jobs to clean the temporary objects from the database
+gem 'whenever'
 
 # Bundle the extra gems:
 # gem 'bj'
