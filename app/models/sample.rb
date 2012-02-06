@@ -21,6 +21,12 @@ class Sample < ActiveRecord::Base
     end
   }
 
+  scope :order_by_pedigree 
+    {
+      :include => { :person => :pedigree},
+      :order => 'pedigrees.name'
+    }
+
   def identifier 
     if self.person.nil? then
       return "#{isb_sample_id} - #{sample_vendor_id} - NA"

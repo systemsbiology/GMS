@@ -8,7 +8,7 @@ class PeopleController < ApplicationController
   # GET /people
   # GET /people.xml
   def index
-    @people = Person.has_pedigree(params[:pedigree_filter])
+    @people = Person.has_pedigree(params[:pedigree_filter]).paginate :page => params[:page], :per_page => 100
 
     respond_to do |format|
       format.html # index.html.erb

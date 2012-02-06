@@ -2,7 +2,8 @@ class SamplesController < ApplicationController
   # GET /samples
   # GET /samples.xml
   def index
-    @samples = Sample.has_pedigree(params[:pedigree_filter]).find(:all, :include => [:assays, {:person => :pedigree }], :order => ['pedigrees.name'])
+#    @samples = Sample.has_pedigree(params[:pedigree_filter]).find(:all, :include => [:assays, {:person => :pedigree }], :order => ['pedigrees.name'])
+    @samples = Sample.has_pedigree(params[:pedigree_filter]).order_by_pedigree.paginate :page => params[:page], :per_page => 100
     if params[:sample_vendor_id] then
       if params[:sample_vendor_id].match(/%/) then
         @samples = Sample.has_pedigree(params[:pedigree_filter]).where("sample_vendor_id like ?", params[:sample_vendor_id]).find(:all, :include => {:person => :pedigree}, :order => ['pedigrees.name'])
