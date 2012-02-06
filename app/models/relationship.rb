@@ -109,7 +109,7 @@ class Relationship < ActiveRecord::Base
 
     if self.name == 'monozygotic twin' then
       # monozygotic twins are always the same sex (unless they have a disease, which may mean this check should be removed if we get any cases of this)
-      logger.debug("monozygotic twins test #{self.person.gender} to #{self.relation.gender}")
+      #logger.debug("monozygotic twins test #{self.person.gender} to #{self.relation.gender}")
       if self.person.gender == self.relation.gender then
         return true
       else

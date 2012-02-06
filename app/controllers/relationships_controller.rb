@@ -88,7 +88,7 @@ class RelationshipsController < ApplicationController
       @reciprocal.relation_order = @relationship.relation_order
 
       if @reciprocal.name.nil? then
-        logger.debug("Settings relationship_reverse does not include #{@relationship.name}, please add it before adding this relationship")
+        logger.error("Settings relationship_reverse does not include #{@relationship.name}, please add it before adding this relationship")
         @relationship.errors[:base] << "Settings relationship_reverse does not include #{@relationship.name}, please add it before adding this relationship"
         render :action => "new"
       end
@@ -103,7 +103,7 @@ class RelationshipsController < ApplicationController
 
 
     else
-      logger.debug("Error with relationship creation: relationship is not directed or undirected #{@relationship}")
+      logger.error("Error with relationship creation: relationship is not directed or undirected #{@relationship}")
     end
 
 

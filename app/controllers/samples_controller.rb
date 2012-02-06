@@ -107,7 +107,7 @@ class SamplesController < ApplicationController
     ac_notice = ''
     if (params[:person] and params[:person][:id]) then
       if (params[:person][:id].to_i != @sample.person.id.to_i) then
-        logger.debug("updating the person associated with this sample from #{@sample.person.id} to #{params[:person][:id]}")
+        #logger.debug("updating the person associated with this sample from #{@sample.person.id} to #{params[:person][:id]}")
 	#check that there isn't an entry for this acquisition in the db already!
 	check_aq = Acquisition.find(:all, :conditions => {:person_id => params[:person][:id], :sample_id => @sample.id})
 	if (check_aq.size > 0) then
@@ -115,7 +115,7 @@ class SamplesController < ApplicationController
 	else 
   	  acquisition = Acquisition.find(:all, :conditions => {:person_id => @sample.person.id, :sample_id => @sample.id})
 	  if (acquisition.size > 1) then
-	    logger.debug("Found multiple samples for this sample (#{@sample.id}) and person(#{@sample.person.id}) combination!!!  This is an error in the database!!  Fix it manually!  #{acquisition.inspect}")
+	    #logger.debug("Found multiple samples for this sample (#{@sample.id}) and person(#{@sample.person.id}) combination!!!  This is an error in the database!!  Fix it manually!  #{acquisition.inspect}")
 	    @sample.errors.add("Found multiple samples for sample #{@sample.id} and person #{@sample.person.id}.  Fix manually.")
 	  else 
 	    acquisition = acquisition.first

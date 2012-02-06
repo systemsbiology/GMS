@@ -102,7 +102,6 @@ class Person < ActiveRecord::Base
   }
 
   def sequenced?
-    logger.debug("self.planning_on_seuqencing #{self.planning_on_sequencing}")
     if (self.planning_on_sequencing) then
       return true
     else
