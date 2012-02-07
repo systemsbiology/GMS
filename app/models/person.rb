@@ -21,6 +21,15 @@ class Person < ActiveRecord::Base
   validates_presence_of :collaborator_id, :gender
   validates_uniqueness_of :collaborator_id, :isb_person_id
 
+  after_save :check_isb_person_id
+
+  def check_isb_person_id
+    if self.isb_person_id.nil? then
+      isb_person_id = 'isb_ind_'+self.id
+      self.update_attributes(:isb_person_id => isb_person_id)
+    end
+  end
+
   def ordered_parents
     parent_relationships = self.parents
     male = Array.new
