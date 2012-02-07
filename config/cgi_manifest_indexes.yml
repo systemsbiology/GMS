@@ -1,0 +1,58 @@
+3.3:
+  Complete Genomics Sample ID:   0
+  Well: 1
+  Customer Sample ID: 2
+  Customer Subject ID: 3
+  Part Number: 4
+  Gender: 5
+  Volume: 6
+  Concentration: 7
+  Quantity: 8
+  Sample Type: 9
+  Sample Source: 10
+  Tumor Status: 11
+  Mother's Subject ID: 13
+  Father's Subject ID: 14
+  Ethnicity: 15
+  Phenotype: 16
+  Comments: 17
+
+3.4:
+  Complete Genomics Sample ID:   0
+  Well: 1
+  Customer Sample ID: 2
+  Customer Subject ID: 3
+  Part Number: 4
+  Gender: 5
+  Volume: 6
+  Concentration: 7
+  Quantity: 8
+  Sample Type: 9
+  Sample Source: 10
+  Tumor Status: 11
+  Mother's Subject ID: 13
+  Father's Subject ID: 14
+  Ethnicity: 15
+  Phenotype: 16
+  Comments: 17
+
+3.5:
+  Complete Genomics Sample ID:   0
+  Well: 1
+  Customer Sample ID: 3
+  Customer Subject ID: 4
+  Part Number: 5
+  Gender: 6
+  Volume: 7
+  Concentration: 8
+  Quantity: 9
+  Sample Type: 10
+  Sample Source: 11
+  Tumor Status: 12
+  Replaced Sample: 13
+  Mother's Subject ID: 15
+  Father's Subject ID: 16
+  Ethnicity: 17
+  Phenotype: 18
+  Comments: 19
+

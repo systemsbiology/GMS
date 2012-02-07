@@ -24,7 +24,10 @@ describe RelationshipsController do
   # Relationship. As you add validations to Relationship, be sure to
   # update the return value of this method accordingly.
   def valid_attributes
-    {}
+    {
+	:relationship_type => "parent",
+	:name => "mother"
+    }
   end
 
   describe "GET index" do
