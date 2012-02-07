@@ -23,6 +23,10 @@ CGI_SOFTWARE_VERSION = "SOFTWARE_VERSION"
 CGI_FORMAT_VERSION = "FORMAT_VERSION"
 CGI_FILE_TYPE = "TYPE"
 
+# where to find the header file for the Excel spreadsheet uploads
+EXCEL_CGI_HEADER_INDEX_FILE = "config/cgi_manifest_indexes.yml"
+EXCEL_FGG_HEADER_INDEX_FILE = "config/fgg_manifest_indexes.yml"
+
 
 # CGI file types to add to the assembly_files table
 CGI_FILES = {
