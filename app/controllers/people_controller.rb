@@ -77,9 +77,10 @@ class PeopleController < ApplicationController
 
     respond_to do |format|
       if @person.save
-        isb_person_id = "isb_ind_#{@person.id}"
-	@person.isb_person_id = isb_person_id
-	@person.save
+        # moved into an after_save callback 2012/02/07
+        #isb_person_id = "isb_ind_#{@person.id}"
+	#@person.isb_person_id = isb_person_id
+	#@person.save
 
 #	# create memberships
 #	membership = Membership.new
@@ -162,11 +163,22 @@ class PeopleController < ApplicationController
     end
   end
 
+############################################################################################################
+############################################################################################################
+#
+# METHODS FOR HANDLING THE EXCEL/TSV/CSV UPLOAD
+#
+############################################################################################################
+############################################################################################################
   # an empty controller method to just display upload.html.erb
   def upload
   end
 
-  # process the excel file and add data to the database
+############################################################################################################
+############################################################################################################
+############################################################################################################
+
+  # process the file and add temporary data to the database
   def upload_and_validate
     begin
       pedigree = Pedigree.find(params[:pedigree][:id])
@@ -200,18 +212,24 @@ class PeopleController < ApplicationController
     file.write(test_file.read.force_encoding("UTF-8"))
     book = Spreadsheet.open file.path
     sheet1 = book.worksheet 0
-  
+
     if spreadsheet_type == 'cgi manifest' then
-      @people, @samples, @relationships, @memberships, @diagnoses, @errors = process_cgi_manifest(sheet1, pedigree, disease)
+      ret_code, @people, @samples, @relationships, @memberships, @diagnoses, @errors = process_cgi_manifest(sheet1, pedigree, disease)
+    elsif spreadsheet_type == 'fgg manifest' then
+      ret_code, @people, @samples, @relationships, @memberships, @diagnoses, @errors = process_fgg_manifest(sheet1, pedigree, disease)
     elsif spreadsheet_type == 'csv file' then
-      @results, @errors = process_file('csv',sheet1, pedigree, disease)
+      @results, @errors = process_fgg_manifest(sheet1, pedigree, disease)
     elsif spreadsheet_type == 'tsv file' then
-      @results, @errors = process_file('tsv',sheet1, pedigree, disease)
+      @results, @errors = process_file(sheet1, pedigree, disease)
     else
       flash[:error] = "Spreadsheet type not understood. Try this action again."
       render :action => "upload" and return
     end
 
+    if ret_code == 0 then
+      # render should already have been called in the process_XXXX method
+      return
+    end
     
     # need to add people, samples, relationships - don't track errors
     rc = 0
@@ -219,15 +237,19 @@ class PeopleController < ApplicationController
     # temp objects are processed in order, so be careful of what order you write them
 
     # person needs to be written first
-    rc = write_temp_object(@trans_id, "person",@people) unless @people.empty? or @people.nil?
+    rc = write_temp_object(@trans_id, "person",@people) unless @people.nil? or @people.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
-    rc = write_temp_object(@trans_id, "sample",@samples) unless @samples.empty? or @samples.nil?
+
+    # sample must be written next
+    rc = write_temp_object(@trans_id, "sample",@samples) unless @samples.nil? or @samples.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
-    rc = write_temp_object(@trans_id, "relationship",@relationships) unless @relationships.empty? or @relationships.nil?
+
+    # rest are arbitrary
+    rc = write_temp_object(@trans_id, "relationship",@relationships) unless @relationships.nil? or @relationships.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
-    rc = write_temp_object(@trans_id, "membership",@memberships) unless @memberships.empty? or @memberships.nil?
+    rc = write_temp_object(@trans_id, "membership",@memberships) unless @memberships.nil? or @memberships.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
-    rc = write_temp_object(@trans_id, "diagnosis",@diagnoses) unless @diagnoses.empty? or @diagnoses.nil?
+    rc = write_temp_object(@trans_id, "diagnosis",@diagnoses) unless @diagnoses.nil? or @diagnoses.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 
     respond_to do |format|
@@ -236,6 +258,11 @@ class PeopleController < ApplicationController
     end
 
   end # end upload_and_validate
+
+
+############################################################################################################
+############################################################################################################
+############################################################################################################
 
   def write_temp_object(trans_id, obj_type, object)
     to = TempObject.new
@@ -250,6 +277,9 @@ class PeopleController < ApplicationController
     end
   end
 
+############################################################################################################
+############################################################################################################
+############################################################################################################
 
   # this is the method that takes a trans_id in the params and
   # gets all objects of that trans_is and saves them to the db
@@ -269,58 +299,91 @@ class PeopleController < ApplicationController
   	    # this is to deal with Relationship objects because we create a straight array
 	    # for them because we don't know the person.id for the person if it hasn't
   	    # been created already...
-	    parent_collaborator_id = obj[0]
-	    child_collaborator_id = obj[1]
+	    person_collaborator_id = obj[0]
+	    relation_collaborator_id = obj[1]
 	    rel_name = obj[2]
 	    rel_order = obj[3]
 
 	    rel = Relationship.new
-	    parent = Person.find_by_collaborator_id(parent_collaborator_id)
-	    if parent.nil? then
-	      rel.errors.add(:person_id, "not found for #{parent_collaborator_id}")
-	      @errors.push(["relationship", rel.errors])
+	    person = Person.find_by_collaborator_id(person_collaborator_id)
+	    if person.nil? then
+	      rel.errors.add(:person_id, "not found for #{person_collaborator_id}")
+	      @errors.push(["relationship", rel, rel.errors])
 	      next
 	    end
-	    child = Person.find_by_collaborator_id(child_collaborator_id)
-	    if child.nil? then 
-	      rel.errors.add(:person_id, "not found for #{child_collaborator_id}")
-	      @errors.push(["relationship", rel.errors])
+	    relation = Person.find_by_collaborator_id(relation_collaborator_id)
+	    if relation.nil? then 
+	      rel.errors.add(:person_id, "not found for #{relation_collaborator_id}")
+	      @errors.push(["relationship", rel, rel.errors])
 	      next
 	    end
-	    rel.person = parent
-	    rel.relation = child
+	    rel.person = person
+	    rel.relation = relation
+
+	    # rel_name is 'undirected' for spouses but lookup_relationship_type requires 'husband' or 'wife'
+	    # so we need to correct it to the proper name depending on the gender of the person
+	    if rel_name == 'undirected' then
+              if person.gender == "male" then
+	        rel_name = "husband"
+              elsif person.gender == "female" then
+	        rel_name = "wife"
+	      else
+	        rel.errors.add(:person, 'gender not specified correctly')
+		@errors.push(["relationship", rel, rel.errors])
+		next
+              end
+	    end
 	    rel.name = rel_name
 	    rel.relationship_type = rel.lookup_relationship_type(rel_name)
-	    if rel.valid? then
-	      rel.save
+	    rel.relation_order = rel_order unless rel_order.nil?
+	    logger.debug("rel is #{rel.inspect}")
+	    begin
+	      if rel.valid? then
+	        rel.save
 
-	      recip = Relationship.new
-	      recip.person = child
-	      recip.relation = parent
-	      recip.name = rel.reverse_name
-	      recip.relationship_type = recip.lookup_relationship_type(rel.reverse_name)
-	      if recip.valid? then
-	        recip.save
-              else
-	        @errors.push(["relationship",recip.errors])
+	        recip = Relationship.new
+	        recip.person = relation
+	        recip.relation = person
+	        recip.name = rel.reverse_name
+	        recip.relationship_type = recip.lookup_relationship_type(rel.reverse_name)
+	        recip.relation_order = rel_order unless rel_order.nil?
+		begin
+	          if recip.valid? then
+	            recip.save
+                  else
+	            @errors.push(["relationship",recip, recip.errors])
+	          end
+		rescue Exception => e
+	          # we don't want to display RecordNotUnique errors to the user here
+	          unless e.class == ActiveRecord::RecordNotUnique then
+		    recip.errors.add(:relationship,e.message)
+	            @errors.push(["relationship",recip, recip.errors])
+		  end
+	        end
+	      else
+	        @errors.push(["relationship",rel, rel.errors])
+              end
+	    rescue Exception => e
+	      # we don't want to display RecordNotUnique errors to the user here
+	      unless e.class == ActiveRecord::RecordNotUnique then
+	        rel.errors.add(:relationship,e.message)
+	        @errors.push(["relationship",rel, rel.errors])
 	      end
-	    else
-	      @errors.push(["relationship",rel.errors])
-            end
+	    end 
 	  elsif temp_obj.object_type == "Membership" then
 	    ped = Pedigree.find(obj[0])
 	    person = Person.find_by_collaborator_id(obj[1])
   	    m = Membership.new
 	    if person.nil? then
 	      m.errors.add(:person_id,"not found for #{obj[1]}")
-	      @errors.push(["membership",m.errors])
+	      @errors.push(["membership",m, m.errors])
 	    else
 	      m.person_id = person.id
 	      m.pedigree_id = ped.id
 	      if m.valid? then
 	        m.save
 	      else
-	        @errors.push(["membership", m.errors])
+	        @errors.push(["membership", m, m.errors])
 	      end
 	    end
 	  elsif temp_obj.object_type == "Diagnosis" then 
@@ -332,14 +395,14 @@ class PeopleController < ApplicationController
 	    if diagnosis.valid? then
 	      diagnosis.save
 	    else
-	      @errors.push(["diagnosis",diagnosis.errors])
+	      @errors.push(["diagnosis",diagnosis, diagnosis.errors])
 	    end
 	  end
 	else
 	  if obj.valid? then
 	    obj.save
 	  else
-	    @errors.push(["#{temp_obj.object_type}",obj.errors])
+	    @errors.push(["#{temp_obj.object_type}",obj, obj.errors])
 	  end
 	end # end if obj.class = array
       end # end obj_array.each do
@@ -347,16 +410,26 @@ class PeopleController < ApplicationController
       # need to delete the temp_object now that we've added it
       begin
         temp_obj.destroy
-      rescue
+      rescue Exception => exc
         temp_obj.errors.add(:object_type, "could not be destroyed")
         @errors.push(["temp_object", temp_obj.errors])
+	logger.error("temp_object #{temp_obj.inspect} could not be destroyed!!  #{exc.message}")
       end
 
     end # end temp_objects.each do
   end
 
-  def process_cgi_manifest(sheet, pedigree, disease)
+############################################################################################################
+#
+#  ###   ###    ##    ###  ####   ###   ###        ###   ####    ###
+#  #  #  #  #  #  #  #     #     #     #          #      #        #
+#  ###   ###   #  #  #     ####   ###   ###       #      #  ##    #  
+#  #     #  #  #  #  #     #         #     #      #      #   #    #   
+#  #     #  #   ##    ###  ####   ###   ###        ###    ###    ###
+#
+############################################################################################################
 
+  def process_cgi_manifest(sheet, pedigree, disease)
     people = []
     samples = []
     relationships = Array.new
@@ -365,26 +438,66 @@ class PeopleController < ApplicationController
     errors = Hash.new
     counter = 0
     flag = 0
+    headers = nil
+    # there are multiple versions of cgi manifests...
 
-    sheet.each 1 do |row|
+    begin
+      header_file = File.read(EXCEL_CGI_HEADER_INDEX_FILE)
+    rescue
+      if !defined?(EXCEL_CGI_HEADER_INDEX_FILE) then
+        logger.error("EXCEL_CGI_HEADER_INDEX_FILE is not set in the config/environment.rb.  Please set this parameter and restart the application.")
+        flash[:error] = "EXCEL_CGI_HEADER_INDEX_FILE is not set in the config/environment.rb.  Please set this parameter and restart the application."
+        render :action => "upload" and return(0)
+      else
+        logger.error("Could not read #{EXCEL_CGI_HEADER_INDEX_FILE}.  Please check that this file exists and is readable.")
+        flash[:error] = "Could not read #{EXCEL_CGI_HEADER_INDEX_FILE}.  Please check that this file exists and is readable."
+        render :action => "upload" and return(0)
+      end
+    end
+
+    if sheet.name == "Sample Information v3.3" then
+      headers =  YAML.load(header_file)[3.3]
+    elsif sheet.name == "Sample Information v3.4" then
+      headers =  YAML.load(header_file)[3.4]
+    elsif sheet.name == "Sample Information v3.5" then
+      headers =  YAML.load(header_file)[3.5]
+    else
+     logger.error("Unhandled Sample Information version #{sheet.name} for CGI Manifest.  Check to make sure that the spreadsheet you submitted is a CGI Manifest spreadsheet.  If it is, then please add new version to the YAML and re-run.")
+     flash[:error] = "Unhandled Sample Information version #{sheet.name} for CGI Manifest.  Check to make sure that the spreadsheet you submitted is a CGI Manifest spreadsheet.  If it is, then please add new version to the YAML and re-run."
+     render :action => "upload" and return(0)
+    end
+
+    sheet.each do |row|
       if row[0] == "Complete Genomics Sample ID" then
         flag = 1
         next
       end
+
       if flag then
         counter+=1
         next if row[2].nil? # skip empty rows at end of list
         next if row[0] == "A"  # skip header column list
-        next if row[3] == "NA19240" # skip example row
+	if row[headers["Customer Subject ID"]].nil? then
+	  flash[:error] = "Spreadsheet provided is not of the proper type.  Can't find Customer Subject ID column."
+          render :action => "upload" and return(0)
+	end
+
+	if row[headers["Complete Genomics Sample ID"]].nil? then
+	  flash[:error] = "Spreadsheet provided is not a CGI Manifest.  Can't find the Complete Genomics Sample ID column."
+	  render :action => "upload" and return(0)
+	end
+        next if row[headers["Customer Subject ID"]] == "NA19240" # skip example row
+        #next if row[headers["Customer Subject ID"]] == "NA19141" # skip example row
+
 
         # create the person information 
         p = Person.new
-        p.collaborator_id = row[2]  # customer subject ID
-        p.gender = row[5].downcase  # downcase it to make sure Female and FEMALE and female are the same...
+        p.collaborator_id = row[headers["Customer Subject ID"]]  # customer subject ID
+        p.gender = row[headers["Gender"]].downcase  # downcase it to make sure Female and FEMALE and female are the same...
 	if p.gender != "male" and p.gender != "female" then
-	  p.errors.add(:gender,"invalid selection #{row[5]}")
+	  p.errors.add(:gender,"invalid selection #{row[headers["Gender"]]}")
         end
-        p.comments = row[17]
+        p.comments = row[headers["Comments"]]
 	p.planning_on_sequencing = 1
 
         if p.valid?
@@ -404,28 +517,27 @@ class PeopleController < ApplicationController
         end
 
 	# queue up membership information /sigh
-        #p.pedigree = pedigree
         memberships.push([pedigree.id, p.collaborator_id])
 
         # add diagnosis for this person if affected 
-        phenotype = row[16]
+        phenotype = row[headers["Phenotype"]]
         if phenotype.downcase! == "affected" then
 	  diagnoses.push([disease.id, p.collaborator_id])
         end
      
         # queue up the relationship information so that we can add it later after confirmation
-	# the end '' in this array is for 'child_order', which the CGI manifest format doesn't have
-        mother_id = row[13]
-        father_id = row[14]
+	# the end '' in this array is for 'relation_order', which the CGI manifest format doesn't have
+        mother_id = row[headers["Mother's Subject ID"]]
+        father_id = row[headers["Father's Subject ID"]]
 	r = Relationship.new
 	if mother_id == father_id then
-	  unless mother_id.match('NA') or mother_id.nil? then
-          relationships.push([mother_id, row[2], 'mother', ''])
+	  unless mother_id.nil? or mother_id.match('NA') then
+          relationships.push([mother_id, row[headers["Customer Subject ID"]], 'mother', ''])
 	  r.errors.add(:parent_id, "Father ID #{father_id} and mother ID #{mother_id} are the same.  Only entering one relationship.")
 	  end
 	else
-          relationships.push([mother_id, row[2], 'mother', '']) unless mother_id.match('NA') or mother_id.nil?
-          relationships.push([father_id, row[2], 'father', '']) unless father_id.match('NA') or father_id.nil?
+          relationships.push([mother_id, row[headers["Customer Subject ID"]], 'mother', '']) unless mother_id.match('NA') or mother_id.nil?
+          relationships.push([father_id, row[headers["Customer Subject ID"]], 'father', '']) unless father_id.match('NA') or father_id.nil?
         end
 
         if r.errors.size > 0 then 
@@ -435,26 +547,25 @@ class PeopleController < ApplicationController
 
         # create the sample information
         s = Sample.new
-        s.volume = row[6]
-        s.concentration = row[7]
+        s.volume = row[headers["Volume"]]
+        s.concentration = row[headers["Concentration"]]
         #quantity is a formula
-        if row[8].class == Spreadsheet::Formula then
-          s.quantity = row[8].value
+        if row[headers["Quantity"]].class == Spreadsheet::Formula then
+          s.quantity = row[headers["Quantity"]].value
         else
-          s.quantity = row[8]
+          s.quantity = row[headers["Quantity"]]
         end
-        source = row[10]
+        source = row[headers["Sample Source"]]
         sample_type = SampleType.find_by_name(source)
         if sample_type.nil? then
           s.errors.add(:sample_type_id, "Cannot find sample_type for #{source} for sample for person #{p.collaborator_id}.  Add this as a sample type before importing this spreadsheet")
-          next
         end
         s.sample_type_id = sample_type.id
         s.status = 'submitted'
 
-        if row[0].class == Spreadsheet::Formula then
+        if row[headers["Complete Genomics Sample ID"]].class == Spreadsheet::Formula then
           # this is sample.vendor_id
-          vendor_id = row[0].value
+          vendor_id = row[headers["Complete Genomics Sample ID"]].value
           if !vendor_id.match("-DNA_") then
             plate_id,plate_well = vendor_id.split(/_/,2)
             vendor_id = plate_id+"-DNA_"+plate_well
@@ -462,8 +573,7 @@ class PeopleController < ApplicationController
           vendor_id = vendor_id + 'test'
           s.sample_vendor_id = vendor_id
         else
-          s.errors.add("Found strange sample_vendor_id : #{row[0]}, expected formula in CGI Manifest.  Try using TSV type?")
-          next
+          s.errors.add(:sample_vendor_id, "Found strange sample_vendor_id : #{row[headers["Complete Genomics Sample ID"]]}, expected formula in CGI Manifest.  If this is a new version of the Sample Information sheet, then this may be an 'example' ID and should be ignored.")
         end
  
         if s.valid?
@@ -475,8 +585,182 @@ class PeopleController < ApplicationController
 
       end # end if flag
     end # end foreach row in sheet 1
-    flash[:notice] = "CGI Manifests don't contain child order information, so you will have to edit each relationship created in order to add this information."
-    return people, samples, relationships, memberships, diagnoses, errors
+
+    if headers.nil? then
+      logger.error("Error loading header information for FGG Manifest from #{EXCEL_FGG_HEADER_INDEX_FILE}")
+      flash[:error] = "Error loading header information for FGG Manifest."
+      render :action => "upload" and return(0)
+    end
+
+    flash[:notice] = "CGI Manifests don't contain relationship order information, so you will have to edit each relationship created in order to add this information."
+    return 1, people, samples, relationships, memberships, diagnoses, errors
+  end # end process cgi manifest definition
+
+
+############################################################################################################
+#
+#  ###   ###    ##    ###  ####   ###   ###       #####   ####   ####
+#  #  #  #  #  #  #  #     #     #     #          #      #      #
+#  ###   ###   #  #  #     ####   ###   ###       ###    #  ##  #  ##
+#  #     #  #  #  #  #     #         #     #      #      #   #  #   #
+#  #     #  #   ##    ###  ####   ###   ###       #       ###    ###
+#
+############################################################################################################
+
+  def process_fgg_manifest(sheet, pedigree, disease)
+    people = []
+    samples = []
+    relationships = Array.new
+    memberships = Array.new
+    diagnoses = Array.new
+    errors = Hash.new
+    counter = 0
+    flag = 0
+    headers = nil
+
+    begin
+      header_file = File.read(EXCEL_FGG_HEADER_INDEX_FILE)
+    rescue
+      if !defined?(EXCEL_FGG_HEADER_INDEX_FILE) then
+        logger.error("EXCEL_FGG_HEADER_INDEX_FILE is not set in the config/environment.rb.  Please set this parameter and restart the application.")
+        flash[:error] = "EXCEL_FGG_HEADER_INDEX_FILE is not set in the config/environment.rb.  Please set this parameter and restart the application."
+        render :action => "upload" and return(0)
+      else
+        logger.error("Could not read #{EXCEL_FGG_HEADER_INDEX_FILE}.  Please check that this file exists and is readable.")
+        flash[:error] = "Could not read #{EXCEL_FGG_HEADER_INDEX_FILE}.  Please check that this file exists and is readable."
+        render :action => "upload" and return(0)
+      end
+    end
+
+    if sheet.name == "Sample Information v1.0" then
+        headers =  YAML.load(header_file)[1.0]
+	#elsif sheet.name == "Sample Information v3.5" then
+        #  headers =  YAML.load(header_file)[3.5]
+	else
+	  logger.error("Unhandled Sample Information version #{sheet.name} for FGG Manifest.  Check to make sure that the spreadsheet you submitted is a FGG Manifest spreadsheet.  If it is, then please add new version to the YAML and re-run.")
+          flash[:error] = "Unhandled Sample Information version #{sheet.name} for FGG Manifest.  Check to make sure that the spreadsheet you submitted is a FGG Manifest spreadsheet.  If it is, then please add new version to the YAML and re-run."
+          render :action => "upload" and return(0)
+        end
+
+    sheet.each do |row|
+      if row[0] == "Sequencing Sample ID" then
+        flag = 1
+        next
+      end
+      if flag == 1 then
+        counter+=1
+        next if row[2].nil? # skip empty rows at end of list
+        next if row[0] == "A"  # skip header column list
+	if row[headers["Customer Subject ID"]].nil? then
+	  flash[:error] = "Spreadsheet provided is not of the proper type.  Can't find Customer Subject ID column."
+          render :action => "upload" and return(0)
+	end
+	if row[headers["Sequencing Sample ID"]].nil? then
+	  flash[:error] = "Spreadsheet provided is not a FGG Manifest.  Can't find the Sequencing Sample ID column."
+	  render :action => "upload" and return(0)
+	end
+        next if row[headers["Customer Subject ID"]] == "NA19240" # skip example row
+
+        # create the person information 
+        p = Person.new
+        p.collaborator_id = row[headers["Customer Subject ID"]]+'test'  # customer subject ID
+        p.gender = row[headers["Gender"]].downcase  # downcase it to make sure Female and FEMALE and female are the same...
+	if p.gender != "male" and p.gender != "female" then
+	  p.errors.add(:gender,"invalid selection #{row[headers["Gender"]]}")
+        end
+        p.comments = row[headers["Comments"]]
+	p.planning_on_sequencing = 1
+
+        if p.valid?
+          people << p
+        else
+          errors["#{counter}"] = Hash.new
+          errors["#{counter}"]["person"] = p.errors
+          printable_row = Array.new
+          row.each do |cell|
+            if cell.class == Spreadsheet::Formula then
+              printable_row << cell.value
+            else 
+              printable_row << cell
+            end
+          end
+          errors["#{counter}"]["row"] = "<table><tr><td>"+printable_row.join("</td><td>")+"</tr></table>"
+        end
+
+	# queue up membership information /sigh
+        memberships.push([pedigree.id, p.collaborator_id])
+
+        # add diagnosis for this person if affected 
+        phenotype = row[headers["Phenotype"]]
+        if phenotype.downcase! == "affected" then
+	  diagnoses.push([disease.id, p.collaborator_id])
+        end
+     
+        # queue up the relationship information so that we can add it later after confirmation
+        mother_id = row[headers["Mother's Subject ID"]]
+        father_id = row[headers["Father's Subject ID"]]
+	r = Relationship.new
+	if mother_id == father_id then
+	  unless mother_id.nil? or mother_id.match('NA') then
+          relationships.push([mother_id, row[headers["Customer Subject ID"]], 'mother', row[headers["Child Order"]]])
+	  r.errors.add(:parent_id, "Father ID #{father_id} and mother ID #{mother_id} are the same.  Only entering one relationship.")
+	  end
+	else
+          relationships.push([mother_id, row[headers["Customer Subject ID"]], 'mother', row[headers["Child Order"]]]) unless mother_id.nil? or mother_id.match('NA')
+          relationships.push([father_id, row[headers["Customer Subject ID"]], 'father', row[headers["Child Order"]]]) unless father_id.nil? or father_id.match('NA')
+        end
+	spouse_id =  row[headers["Spouse Subject ID"]]
+        logger.debug("row is #{row} and spouse id is #{spouse_id}")
+	unless spouse_id.nil? or spouse_id.match('NA') then
+	  #this person has a spouse and they are the X spouse that they've had
+	  relationships.push([row[headers["Customer Subject ID"]], spouse_id, 'undirected', row[headers["Spouse Order"]]])
+	end
+
+        if r.errors.size > 0 then 
+	  errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
+	  errors["#{counter}"]["relationships"] = r.errors
+	end
+
+        # create the sample information
+        s = Sample.new
+        s.volume = row[headers["Volume"]]
+        s.concentration = row[headers["Concentration"]]
+        s.quantity = row[headers["Quantity"]]
+        source = row[headers["Sample Source"]]
+
+        sample_type = SampleType.find_by_name(source)
+        if sample_type.nil? then
+          s.errors.add(:sample_type_id, "Cannot find sample_type for #{source} for sample for person #{p.collaborator_id}.  Add this as a sample type before importing this spreadsheet")
+        end
+        s.sample_type_id = sample_type.id
+        s.status = 'submitted'
+
+        vendor_id = row[headers["Sequencing Sample ID"]]
+        if !vendor_id.match("-DNA_") then
+          plate_id,plate_well = vendor_id.split(/_/,2)
+          vendor_id = plate_id+"-DNA_"+plate_well
+        end
+        vendor_id = vendor_id + 'test'
+        s.sample_vendor_id = vendor_id
+ 
+        if s.valid?
+          samples << s
+        else
+          errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
+          errors["#{counter}"]["sample"] = s.errors
+        end
+
+      end # end if flag
+
+    end # end foreach row in sheet 1
+
+    if headers.nil? then
+      logger.error("Error loading header information for FGG Manifest from #{EXCEL_FGG_HEADER_INDEX_FILE}")
+      flash[:error] = "Error loading header information for FGG Manifest."
+      render :action => "upload" and return(0)
+    end
+
+    return 1, people, samples, relationships, memberships, diagnoses, errors
   end # end process cgi manifest definition
 
 end
