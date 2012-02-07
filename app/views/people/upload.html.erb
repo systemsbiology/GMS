@@ -18,7 +18,7 @@
 </div>
 <div class="field">
    Type of spreadsheet:<br />
-   <%= collection_select(:spreadsheet, :type, ["CGI Manifest","CSV file", "TSV file"], :downcase, :to_s, options = {:include_blank => "-Select type of spreadsheet"}) %>
+   <%= collection_select(:spreadsheet, :type, ["FGG Manifest", "CGI Manifest","CSV file", "TSV file"], :downcase, :to_s, options = {:include_blank => "-Select type of spreadsheet"}) %>
 </div>
 <div>
 <%= label "person", :excel_file %><br />
