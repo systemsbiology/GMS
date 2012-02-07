@@ -7,8 +7,10 @@
   <p>If you're getting errors about Person not being found then check your identifiers and try to upload again.</p>
   <% @errors.each do |err_array| %>
     <% type = err_array[0] %>
-    <% entry = err_array[1] %>
-    <p><b><%= type %>:</b>
+    <% object = err_array[1] %>
+    <% entry = err_array[2] %>
+    <p><b><%= type %>:</b><br />
+    <%= object.inspect %><br />
     <% entry.full_messages.each do |msg| %>
       <%= msg %><br />
     <% end %>
