@@ -3,7 +3,7 @@
 <p> If it is parsed correctly then hit the Save button at the bottom of the page to enter the data into the database.  If it is not parsed correctly, then hit the BACK button, edit your spreadsheet, and resubmit the form with the new version of the spreadsheet.</p>
 <p><u>There is a time limit on this page.  If you do not press Save within <b>one hour</b>, the temporary objects will be wiped from the system and you will need to press Back and upload the spreadsheet again.</u></p>
 
-<p><b><%= flash[:notice] unless flash[:notice].empty? %></b></p>
+<p><b><%= flash[:notice] unless flash[:notice].nil? or flash[:notice].empty? %></b></p>
 
 <% if @errors.empty? %>
 <h1>Failures</h1>
@@ -34,12 +34,13 @@ Problems in line number <%= error[0] %>:<br/>
 <h1>Successes</h1>
 <% end %>
 <% unless @people.empty? %>
-<table>
-  <tr>
+<h3>People Found</h3>
+<table class="tablesorter">
+  <thead>
     <th>collaborator_id</th>
     <th>gender</th>
     <th>comments</th>
-  </tr>
+  </thead>
 
 <% @people.each do |person| %>
   <tr>
@@ -51,7 +52,8 @@ Problems in line number <%= error[0] %>:<br/>
 </table>
 <% end %>
 <% unless @samples.empty? %>
-<table>
+<h3>Samples Found</h3>
+<table class="tablesorter">
   <thead>
     <th>vendor_id</th>
     <th>sample_type</th>
@@ -71,8 +73,8 @@ Problems in line number <%= error[0] %>:<br/>
 </table>
 <% end %>
 <% unless @diagnoses.empty? %>
-<h1>Diagnoses Found</h1>
-<table>
+<h3>Diagnoses Found</h3>
+<table class="tablesorter">
   <thead>
     <th>disease</th>
     <th>person</th>
@@ -86,8 +88,8 @@ Problems in line number <%= error[0] %>:<br/>
 </table>
 
 <% end %>
-<h1>Memberships Found</h1>
-<table>
+<h3>Memberships Found</h3>
+<table class="tablesorter">
   <thead>
     <th>pedigree</th>
     <th>person</th>
@@ -100,16 +102,20 @@ Problems in line number <%= error[0] %>:<br/>
   <% end %>
 </table>
 <br />
-<h1>Relationships Found</h1>
-<table>
+<h3>Relationships Found</h3>
+<table class="tablesorter">
   <thead>
-    <th>relationship parent</th>
-    <th>relationship child</th>
+    <th>relationship person</th>
+    <th>relationship relation</th>
+    <th>relationship type</th>
+    <th>relationship order</th>
   </thead>
   <% @relationships.each do |rel| %>
   <tr>
     <td><%= rel[0] %></td>
     <td><%= rel[1] %></td>
+    <td><%= rel[2] %></td>
+    <td><%= rel[3] %></td>
   </tr>
   <% end %>
 </table>
