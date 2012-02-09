@@ -3,6 +3,7 @@
   <thead>
   <tr>
     <th class="{sorter: 'digit'}">ISB sample</th>
+    <th>Customer Sample ID</th>
     <th>ISB Person</th>
     <th>Person</th>
     <th>Pedigree</th>
@@ -18,6 +19,7 @@
 <% @samples.each do |sample| %>
   <tr>
     <td><%= link_to sample.isb_sample_id, sample, :id => sample.id %></td>
+    <td><%= sample.customer_sample_id %></td>
     <% if sample.person.nil? then %>
     <td colspan="3">No person information for this sample</td>
     <% else %>
