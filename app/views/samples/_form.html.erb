@@ -9,6 +9,10 @@
     <%= collection_select(:person, :id, Person.all, :id, :full_identifier, options = {:selected => sel_person, :include_blank => "-Select the person this sample belongs to"}) %>
   </div>
   <div class="field">
+    <%= f.label :customer_sample_id %> - The Sample ID if it is different than Subject ID.<br/> 
+    <%= f.text_field :customer_sample_id %>
+  </div>
+  <div class="field">
     <%= f.label :sample_type_id %><br />
     <%= collection_select(:sample_type, :id, SampleType.all, :id, :name, {:prompt => "Select a Type for this sample", :selected => @sample.sample_type_id || ''}) %>
   </div>
