@@ -10,7 +10,7 @@
     <th>Lead&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
     <th>Collaborator&nbsp;&nbsp;&nbsp;&nbsp;</th>
     <th>Collaborating Institution&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-    <th>Description&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+    <th width="100">Description&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
     <th>Contact&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
     <th class="nosort" colspan="3">Controls</th>
   </tr>
@@ -18,13 +18,12 @@
   <tbody>
 <% @studies.each do |study| %>
   <tr>
-    <td><%= study.name %></td>
+    <td><%= link_to study.name, study %></td>
     <td><%= study.lead %></td>
     <td><%= study.collaborator %></td>
     <td><%= study.collaborating_institution %></td>
-    <td><%= study.description %></td>
-    <td><%= study.contact %></td>
-    <td><%= link_to 'Show', study %></td>
+    <td style="white-space: normal;"><%= study.description %></td>
+    <td style="white-space: normal;"><%= study.contact %></td>
     <td><%= link_to 'Edit', edit_study_path(study) %></td>
     <% if false %><td><%= link_to 'Destroy', study, :confirm => 'Are you sure?', :method => :delete %></td><% end %>
   </tr>
