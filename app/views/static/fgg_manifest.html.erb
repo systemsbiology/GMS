@@ -1,0 +1,27 @@
+<h1>FGG Manifest Format Explanation</h1>
+<p><b>Version:</b> v1.0</p>
+
+<p>The FGG Manifest format is designed to enter all relevant data about samples sent to have the whole genome sequenced. Each line is one person's sample and contains information about that person's relationships within the pedigree.  Each FGG Manifest should contain information about only one Pedigree.  You must create the Pedigree and Disease that segregates within that pedigree before uploading the People in that Pedigree.</p>
+<p>Below is an image of the example FGG Manifest that contains information on a husband and wife, their three children, and the wife's mother.</p>
+
+<%= image_tag("fgg_manifest_example.png", :size => "1100x400") %>
+
+<ul>
+  <li><b>Sequencing Sample ID -</b> This is the Sample ID assigned by the vendor.  For Complete Genomics, these IDs start with GSXXXXX-DNA_<well>.  For example, GS10101-DNA_A01.  Illumina IDs using begin with SS and then a series of 7 numbers.  For example, SS6003929.</li>
+  <li><b>Sequencing Technology -</b> This is either 'CGI' or 'Illumina' depending on what vendor processed this sample.</li>
+  <li><b>Customer Sample ID -</b> This is the Customer's Sample ID.  This is the identifier for the sample that was sent to be sequenced.  This field must be unique.  There can be multiple Samples per subject, but the name must be unique.</li>
+  <li><b>Customer Subject ID -</b> This is the Customer's Subject ID.  This is the identifier for the person.</li>
+  <li><b>Gender -</b> The biological gender of the person.</li>
+  <li><b>Volume -</b> The volume of sample sent.</li>
+  <li><b>Concentration -</b> The concentration of DNA in the sample.</li>
+  <li><b>Quantity -</b> The quantity of DNA in the sample.</li>
+  <li><b>Sample Type -</b> This should be the value 'DNA' for almost all entries.</li>
+  <li><b>Sample Source -</b> The type of sample.  This value should be one of the following: saliva, blood, skin, cell line, lymphoblasts, tissue, tumor.  If you have a sample of a different type, then contact the adminstrator to add your sample source.</li>
+  <li><b>Mother's Subject ID -</b> This is the Customer Subject ID for the mother of the person in the current line.  This person can be entered in this spreadsheet, but also can already exist in the database.  If this Customer Subject ID is not found in the database or in the spreadsheet then there will be an error.</li>
+  <li><b>Father's Subject ID -</b> This is the Customer Subject ID for the father of the person in the current line.  This person can be entered in this spreadsheet, but also can already exist in the database.  If this Customer Subject ID is not found in the database or in the spreadsheet then there will be an error.</li>
+  <li><b>Phenotype -</b> This is the status of the individual in the current line with regards to the major disease segregating in this pedigree.  The only values accepted are 'unaffected' and 'affected'.  If there are multiple diseases segregating in this pedigree, pick the one with the most affecteds and enter that data via the spreadsheet, then add other diseases through the Pedigree and Person interface.</li>
+  <li><b>Comments -</b> Comments about this person.</li>
+  <li><b>Spouse Subject ID -</b> The Customer Subject ID of the spouse of the person in the current line, if they have a spouse.</li>
+  <li><b>Spouse Order -</b> Many people have multiple marriages.  This field is to specify the order of the marriage for the person in the current line and the person specified in the Spouse Subject ID field.  The person in the current line is the ____ wife/husband of the person in the Spouse Subject ID field.</li>
+  <li><b>Child Order -</b> Many people have multiple children.  This field is to specify the birth order of the children.  It should be filled out for every person that is a child of another person and therefore has either the Mother's Subject ID or the Father's Subject ID field filled out.  The person in the current line is the _____ child of Mother Subject ID and Father Subject ID.  If these numbers are different - for example, the wife had two children and then remarried and had two additional children, use the numbering for the wife because it is higher than the numbering for the husband.  (ie: child 1, child 2, child 3, child 4 rather than child 1, child 2, child 1, child 2).  Always number from oldest child to youngest child as long as these children share one parent.  After the spreadsheet is processed, you will have to use the Person interface in GMS to edit the relationships between the two men and their children to reflect that the first husband has two children (1 and 2) and the second husband has two children (1 and 2).  So you will end up with 4 relationships from mother to children labeled 1 through 4, two relationships between husband #1 and two of the children labeled 1 and 2, and two relationships between husband #2 and two of the children labeled 1 and 2.  There can be missing numbers if you are missing or not submitting information for one of the children (ie: 1,3,4).</li>
+</ul>
