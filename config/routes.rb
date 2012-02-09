@@ -32,6 +32,8 @@ Gms::Application.routes.draw do
   match "pedigrees/export_madeline_table/(:id)", :to => "pedigrees#export_madeline_table", :as => "export_madeline_table"
   resources :pedigrees
   resources :studies
+  match "/fgg_manifest", :to => "static#fgg_manifest"
+  match "/cgi_manifest", :to => "static#cgi_manifest"
 
   def self.inherited(child)
     child.instance_eval do
