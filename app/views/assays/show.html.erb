@@ -41,7 +41,7 @@
 <% end %>
 <h1>Listing Assemblies</h1>
 <% if @assay.assemblies.size > 0 %>
-<%= render 'assemblies/list', :assemblies => @assay.assemblies %>
+<%= render 'assemblies/list', :assemblies => @assay.assemblies.paginate(:page => params[:page], :per_page => 100) %>
 <% else %>
 <p>No assemblies for this assay.</p>
 <% end %>
