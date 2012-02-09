@@ -217,10 +217,6 @@ class PeopleController < ApplicationController
       ret_code, @people, @samples, @relationships, @memberships, @diagnoses, @errors = process_cgi_manifest(sheet1, pedigree, disease)
     elsif spreadsheet_type == 'fgg manifest' then
       ret_code, @people, @samples, @relationships, @memberships, @diagnoses, @errors = process_fgg_manifest(sheet1, pedigree, disease)
-    elsif spreadsheet_type == 'csv file' then
-      @results, @errors = process_fgg_manifest(sheet1, pedigree, disease)
-    elsif spreadsheet_type == 'tsv file' then
-      @results, @errors = process_file(sheet1, pedigree, disease)
     else
       flash[:error] = "Spreadsheet type not understood. Try this action again."
       render :action => "upload" and return
@@ -632,7 +628,7 @@ class PeopleController < ApplicationController
       end
     end
 
-    if sheet.name == "Sample Information v1.0" then
+    if sheet.name == "FGG Information v1.0" then
         headers =  YAML.load(header_file)[1.0]
 	#elsif sheet.name == "Sample Information v3.5" then
         #  headers =  YAML.load(header_file)[3.5]
@@ -663,7 +659,8 @@ class PeopleController < ApplicationController
 
         # create the person information 
         p = Person.new
-        p.collaborator_id = row[headers["Customer Subject ID"]]+'test'  # customer subject ID
+	customer_subject_id = row[headers["Customer Subject ID"]]+'test'
+        p.collaborator_id = customer_subject_id
         p.gender = row[headers["Gender"]].downcase  # downcase it to make sure Female and FEMALE and female are the same...
 	if p.gender != "male" and p.gender != "female" then
 	  p.errors.add(:gender,"invalid selection #{row[headers["Gender"]]}")
@@ -702,18 +699,18 @@ class PeopleController < ApplicationController
 	r = Relationship.new
 	if mother_id == father_id then
 	  unless mother_id.nil? or mother_id.match('NA') then
-          relationships.push([mother_id, row[headers["Customer Subject ID"]], 'mother', row[headers["Child Order"]]])
+          relationships.push([mother_id, customer_subject_id, 'mother', row[headers["Child Order"]]])
 	  r.errors.add(:parent_id, "Father ID #{father_id} and mother ID #{mother_id} are the same.  Only entering one relationship.")
 	  end
 	else
-          relationships.push([mother_id, row[headers["Customer Subject ID"]], 'mother', row[headers["Child Order"]]]) unless mother_id.nil? or mother_id.match('NA')
-          relationships.push([father_id, row[headers["Customer Subject ID"]], 'father', row[headers["Child Order"]]]) unless father_id.nil? or father_id.match('NA')
+          relationships.push([mother_id, customer_subject_id, 'mother', row[headers["Child Order"]]]) unless mother_id.nil? or mother_id.match('NA')
+          relationships.push([father_id, customer_subject_id, 'father', row[headers["Child Order"]]]) unless father_id.nil? or father_id.match('NA')
         end
 	spouse_id =  row[headers["Spouse Subject ID"]]
         logger.debug("row is #{row} and spouse id is #{spouse_id}")
 	unless spouse_id.nil? or spouse_id.match('NA') then
 	  #this person has a spouse and they are the X spouse that they've had
-	  relationships.push([row[headers["Customer Subject ID"]], spouse_id, 'undirected', row[headers["Spouse Order"]]])
+	  relationships.push([customer_subject_id, spouse_id, 'undirected', row[headers["Spouse Order"]]])
 	end
 
         if r.errors.size > 0 then 
@@ -727,6 +724,11 @@ class PeopleController < ApplicationController
         s.concentration = row[headers["Concentration"]]
         s.quantity = row[headers["Quantity"]]
         source = row[headers["Sample Source"]]
+
+	customer_sample_id = row[headers["Customer Sample ID"]]
+	if customer_sample_id != customer_subject_id then
+	  s.customer_sample_id = customer_sample_id
+	end
 
         sample_type = SampleType.find_by_name(source)
         if sample_type.nil? then
