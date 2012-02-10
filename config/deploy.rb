@@ -12,7 +12,7 @@ set :whenever_identifier, defer { "#{application}_#{environment}" }
 set :rail_env, "production"
 require 'whenever/capistrano'
 set :default_environment, {
-  'PATH' => "/u5/tools/rvm/gems/ruby-1.9.2-p136@rails3/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts",
+  'PATH' => "/u5/tools/rvm/gems/ruby-1.9.2-p136@rails3/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts:/bin/:/tools/bin",
   'RUBY_VERSION' => 'ruby-1.9.2-p136@rails3',
   'GEM_HOME' => '/u5/tools/rvm/gems/ruby-1.9.2-p136@rails3/',
   'GEM_PATH' => '/u5/tools/rvm/gems/ruby-1.9.2-p136@rails3/',
