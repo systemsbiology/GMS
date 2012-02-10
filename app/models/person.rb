@@ -25,7 +25,7 @@ class Person < ActiveRecord::Base
 
   def check_isb_person_id
     if self.isb_person_id.nil? then
-      isb_person_id = 'isb_ind_'+self.id
+      isb_person_id = 'isb_ind_'+ self.id.to_s
       self.update_attributes(:isb_person_id => isb_person_id)
     end
   end
