@@ -10,11 +10,14 @@ set :environment, "production"
 set :whenever_environment, defer { environment }
 set :whenever_identifier, defer { "#{application}_#{environment}" }
 set :rail_env, "production"
-$:.unshift(File.expand_path('./lib',ENV['rvm_path']))
-require 'rvm/capistrano'
-set :rvm_ruby_string, 'ruby-1.9.2-p136@rails3'
-set :rvm_type, :user
 require 'whenever/capistrano'
+set :default_environment, {
+  'PATH' => "/u5/tools/rvm/gems/ruby-1.9.2-p136@rails3/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts",
+  'RUBY_VERSION' => 'ruby-1.9.2-p136@rails3',
+  'GEM_HOME' => '/u5/tools/rvm/gems/ruby-1.9.2-p136@rails3/',
+  'GEM_PATH' => '/u5/tools/rvm/gems/ruby-1.9.2-p136@rails3/',
+  'BUNDLE_PATH' => '/u5/tools/rvm/gems/ruby-1.9.2-p136@rails3/'
+}
 
 #set :scm, :subversion
 # Or: `accurev`, `bzr`, `cvs`, `darcs`, `git`, `mercurial`, `perforce`, `subversion` or `none`
@@ -25,6 +28,7 @@ set :branch, "master"
 set :use_sudo, "false"
 
 server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
+after "deploy", "rvm:trust_rvmrc"
 
 # if you're still using the script/reaper helper you will need
 # these http://github.com/rails/irs_process_scripts
@@ -184,3 +188,8 @@ server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
 
  end # end data
 
+ namespace :rvm do
+   task :trust_rvmrc do
+     run \"rvm rvmrc trust \#\{release_path\}\"
+   end
+ end
