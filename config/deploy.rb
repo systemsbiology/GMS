@@ -5,7 +5,8 @@ set :deploy_to, "/u5/www/software/gms/"
 set :keep_releases, 3
 set :user, "dmauldin"
 set :shared_host, "bobama.systemsbiology.net"
-set :whenever_command, "bundle exec whenever"
+set :whenever_command, "rvm ruby bundle exec whenever --update-crontab"
+set :environment, "production"
 set :whenever_environment, defer { environment }
 set :whenever_identifier, defer { "#{application}_#{environment}" }
 set :rail_env, "production"
