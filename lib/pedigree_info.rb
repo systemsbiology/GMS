@@ -16,25 +16,23 @@ def pedindex(protocol,id_type)
   data_store["pedigree_databases_version"] = Time.now
   data_store["pedigree_databases_last_updated"] = Time.now
   data_store["pedigree_studies_root"] = PEDIGREE_ROOT
-  data_store["study_pedigrees"] = Array.new
+  data_store["pedigree_studies"] = Array.new
   Study.all.each do |study|
-    study_to_ped = study_pedigree_index(study.id)
-    data_store["study_pedigrees"].push(study_to_ped)
-  end
-
-  data_store["pedigree_databases"] = Array.new
-  Pedigree.all.each do |ped|
+    study_hash = Hash.new
+    study_hash["study_id"] = study.id
+    study_hash["study_name"] = study.name
+    study_hash["study_tag"] = study.tag
+    study_hash["study_version"] = 1 # placeholder TODO: make version method
+    study_peds = Array.new
+    study.pedigrees.each do |ped|
       local_hash = Hash.new
-      if id_type == ('TAG') then
-        local_hash["pedigree_id"] = ped.tag
-        local_hash["database_file"] = pedigree_output_filename(ped)
-      elsif id_type == ('ID') then
-        local_hash["pedigree_id"] = ped.id
-	local_hash["pedigree_tag"] = ped.tag
-      else
-        raise ArgumentError "Did not provide a correct value for protocol to pedindex"
-      end
-      data_store["pedigree_databases"].push(local_hash)
+      local_hash["pedigree_id"] = ped.id
+      local_hash["pedigree_tag"] = ped.tag
+      local_hash["database_file"] = pedigree_output_filename(ped)
+      study_peds.push(local_hash)
+    end
+    study_hash["study_pedigrees"] = study_peds
+    data_store["pedigree_studies"].push(study_hash)
   end
 
   return data_store
