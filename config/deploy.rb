@@ -13,6 +13,7 @@ set :rail_env, "production"
 $:.unshift(File.expand_path('./lib',ENV['rvm_path']))
 require 'rvm/capistrano'
 set :rvm_ruby_string, 'ruby-1.9.2-p136@rails3'
+set :rvm_type, :user
 require 'whenever/capistrano'
 
 #set :scm, :subversion
