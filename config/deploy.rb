@@ -5,11 +5,14 @@ set :deploy_to, "/u5/www/software/gms/"
 set :keep_releases, 3
 set :user, "dmauldin"
 set :shared_host, "bobama.systemsbiology.net"
-set :whenever_command, "bundle exec whenever"
+set :whenever_command, "rvm ruby bundle exec whenever"
 set :environment, "production"
 set :whenever_environment, defer { environment }
 set :whenever_identifier, defer { "#{application}_#{environment}" }
 set :rail_env, "production"
+$:.unshift(File.expand_path('./lib',ENV['rvm_path']))
+require 'rvm/capistrano'
+set :rvm_ruby_string, 'ruby-1.9.2-p136@rails3'
 require 'whenever/capistrano'
 
 #set :scm, :subversion
