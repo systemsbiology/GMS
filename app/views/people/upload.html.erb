@@ -18,7 +18,7 @@
 </div>
 <div class="field">
    Type of spreadsheet:<br />
-   <%= collection_select(:spreadsheet, :type, ["FGG Manifest", "CGI Manifest"], :downcase, :to_s, options = {:include_blank => "-Select type of spreadsheet"}) %>
+   <%= collection_select(:spreadsheet, :type, ["FGG Manifest"], :downcase, :to_s, options = {:include_blank => "-Select type of spreadsheet"}) %>
 </div>
 <div>
 <%= label "person", :excel_file %><br />
@@ -32,5 +32,3 @@
 <br />
 <p><b>FGG Manifest Help</b></p>
 <p>For more information about the FGG Manifest format, click <%= link_to 'here', fgg_manifest_path %> or download a sample spreadsheet <%= link_to 'here', '/examples/FGG_manifest_example.xls' %>.</p>
-<p><b>CGI Manifest Help</b></p>
-<p>For more information about the CGI Manifest format, click <%= link_to 'here', cgi_manifest_path %>.  You must request a CGI Manifest from the CGI project manager associated with your study.</p>

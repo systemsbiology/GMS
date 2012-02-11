@@ -4,8 +4,4 @@ class StaticController < ApplicationController
   def fgg_manifest
   end
 
-  #static page that describes the CGI manifest format
-  def cgi_manifest
-  end
-
 end

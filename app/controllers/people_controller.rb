@@ -213,9 +213,7 @@ class PeopleController < ApplicationController
     book = Spreadsheet.open file.path
     sheet1 = book.worksheet 0
 
-    if spreadsheet_type == 'cgi manifest' then
-      ret_code, @people, @samples, @relationships, @memberships, @diagnoses, @errors = process_cgi_manifest(sheet1, pedigree, disease)
-    elsif spreadsheet_type == 'fgg manifest' then
+    if spreadsheet_type == 'fgg manifest' then
       ret_code, @people, @samples, @relationships, @memberships, @diagnoses, @errors = process_fgg_manifest(sheet1, pedigree, disease)
     else
       flash[:error] = "Spreadsheet type not understood. Try this action again."
@@ -417,184 +415,6 @@ class PeopleController < ApplicationController
 
 ############################################################################################################
 #
-#  ###   ###    ##    ###  ####   ###   ###        ###   ####    ###
-#  #  #  #  #  #  #  #     #     #     #          #      #        #
-#  ###   ###   #  #  #     ####   ###   ###       #      #  ##    #  
-#  #     #  #  #  #  #     #         #     #      #      #   #    #   
-#  #     #  #   ##    ###  ####   ###   ###        ###    ###    ###
-#
-############################################################################################################
-
-  def process_cgi_manifest(sheet, pedigree, disease)
-    people = []
-    samples = []
-    relationships = Array.new
-    memberships = Array.new
-    diagnoses = Array.new
-    errors = Hash.new
-    counter = 0
-    flag = 0
-    headers = nil
-    # there are multiple versions of cgi manifests...
-
-    begin
-      header_file = File.read(EXCEL_CGI_HEADER_INDEX_FILE)
-    rescue
-      if !defined?(EXCEL_CGI_HEADER_INDEX_FILE) then
-        logger.error("EXCEL_CGI_HEADER_INDEX_FILE is not set in the config/environment.rb.  Please set this parameter and restart the application.")
-        flash[:error] = "EXCEL_CGI_HEADER_INDEX_FILE is not set in the config/environment.rb.  Please set this parameter and restart the application."
-        render :action => "upload" and return(0)
-      else
-        logger.error("Could not read #{EXCEL_CGI_HEADER_INDEX_FILE}.  Please check that this file exists and is readable.")
-        flash[:error] = "Could not read #{EXCEL_CGI_HEADER_INDEX_FILE}.  Please check that this file exists and is readable."
-        render :action => "upload" and return(0)
-      end
-    end
-
-    if sheet.name == "Sample Information v3.3" then
-      headers =  YAML.load(header_file)[3.3]
-    elsif sheet.name == "Sample Information v3.4" then
-      headers =  YAML.load(header_file)[3.4]
-    elsif sheet.name == "Sample Information v3.5" then
-      headers =  YAML.load(header_file)[3.5]
-    else
-     logger.error("Unhandled Sample Information version #{sheet.name} for CGI Manifest.  Check to make sure that the spreadsheet you submitted is a CGI Manifest spreadsheet.  If it is, then please add new version to the YAML and re-run.")
-     flash[:error] = "Unhandled Sample Information version #{sheet.name} for CGI Manifest.  Check to make sure that the spreadsheet you submitted is a CGI Manifest spreadsheet.  If it is, then please add new version to the YAML and re-run."
-     render :action => "upload" and return(0)
-    end
-
-    sheet.each do |row|
-      if row[0] == "Complete Genomics Sample ID" then
-        flag = 1
-        next
-      end
-
-      if flag then
-        counter+=1
-        next if row[2].nil? # skip empty rows at end of list
-        next if row[0] == "A"  # skip header column list
-	if row[headers["Customer Subject ID"]].nil? then
-	  flash[:error] = "Spreadsheet provided is not of the proper type.  Can't find Customer Subject ID column."
-          render :action => "upload" and return(0)
-	end
-
-	if row[headers["Complete Genomics Sample ID"]].nil? then
-	  flash[:error] = "Spreadsheet provided is not a CGI Manifest.  Can't find the Complete Genomics Sample ID column."
-	  render :action => "upload" and return(0)
-	end
-        next if row[headers["Customer Subject ID"]] == "NA19240" # skip example row
-        #next if row[headers["Customer Subject ID"]] == "NA19141" # skip example row
-
-
-        # create the person information 
-        p = Person.new
-        p.collaborator_id = row[headers["Customer Subject ID"]]  # customer subject ID
-        p.gender = row[headers["Gender"]].downcase  # downcase it to make sure Female and FEMALE and female are the same...
-	if p.gender != "male" and p.gender != "female" then
-	  p.errors.add(:gender,"invalid selection #{row[headers["Gender"]]}")
-        end
-        p.comments = row[headers["Comments"]]
-	p.planning_on_sequencing = 1
-
-        if p.valid?
-          people << p
-        else
-          errors["#{counter}"] = Hash.new
-          errors["#{counter}"]["person"] = p.errors
-          printable_row = Array.new
-          row.each do |cell|
-            if cell.class == Spreadsheet::Formula then
-              printable_row << cell.value
-            else 
-              printable_row << cell
-            end
-          end
-          errors["#{counter}"]["row"] = "<table><tr><td>"+printable_row.join("</td><td>")+"</tr></table>"
-        end
-
-	# queue up membership information /sigh
-        memberships.push([pedigree.id, p.collaborator_id])
-
-        # add diagnosis for this person if affected 
-        phenotype = row[headers["Phenotype"]]
-        if phenotype.downcase! == "affected" then
-	  diagnoses.push([disease.id, p.collaborator_id])
-        end
-     
-        # queue up the relationship information so that we can add it later after confirmation
-	# the end '' in this array is for 'relation_order', which the CGI manifest format doesn't have
-        mother_id = row[headers["Mother's Subject ID"]]
-        father_id = row[headers["Father's Subject ID"]]
-	r = Relationship.new
-	if mother_id == father_id then
-	  unless mother_id.nil? or mother_id.match('NA') then
-          relationships.push([mother_id, row[headers["Customer Subject ID"]], 'mother', ''])
-	  r.errors.add(:parent_id, "Father ID #{father_id} and mother ID #{mother_id} are the same.  Only entering one relationship.")
-	  end
-	else
-          relationships.push([mother_id, row[headers["Customer Subject ID"]], 'mother', '']) unless mother_id.match('NA') or mother_id.nil?
-          relationships.push([father_id, row[headers["Customer Subject ID"]], 'father', '']) unless father_id.match('NA') or father_id.nil?
-        end
-
-        if r.errors.size > 0 then 
-	  errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
-	  errors["#{counter}"]["relationships"] = r.errors
-	end
-
-        # create the sample information
-        s = Sample.new
-        s.volume = row[headers["Volume"]]
-        s.concentration = row[headers["Concentration"]]
-        #quantity is a formula
-        if row[headers["Quantity"]].class == Spreadsheet::Formula then
-          s.quantity = row[headers["Quantity"]].value
-        else
-          s.quantity = row[headers["Quantity"]]
-        end
-        source = row[headers["Sample Source"]]
-        sample_type = SampleType.find_by_name(source)
-        if sample_type.nil? then
-          s.errors.add(:sample_type_id, "Cannot find sample_type for #{source} for sample for person #{p.collaborator_id}.  Add this as a sample type before importing this spreadsheet")
-        end
-        s.sample_type_id = sample_type.id
-        s.status = 'submitted'
-
-        if row[headers["Complete Genomics Sample ID"]].class == Spreadsheet::Formula then
-          # this is sample.vendor_id
-          vendor_id = row[headers["Complete Genomics Sample ID"]].value
-          if !vendor_id.match("-DNA_") then
-            plate_id,plate_well = vendor_id.split(/_/,2)
-            vendor_id = plate_id+"-DNA_"+plate_well
-          end
-          vendor_id = vendor_id + 'test'
-          s.sample_vendor_id = vendor_id
-        else
-          s.errors.add(:sample_vendor_id, "Found strange sample_vendor_id : #{row[headers["Complete Genomics Sample ID"]]}, expected formula in CGI Manifest.  If this is a new version of the Sample Information sheet, then this may be an 'example' ID and should be ignored.")
-        end
- 
-        if s.valid?
-          samples << s
-        else
-          errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
-          errors["#{counter}"]["sample"] = s.errors
-        end
-
-      end # end if flag
-    end # end foreach row in sheet 1
-
-    if headers.nil? then
-      logger.error("Error loading header information for FGG Manifest from #{EXCEL_FGG_HEADER_INDEX_FILE}")
-      flash[:error] = "Error loading header information for FGG Manifest."
-      render :action => "upload" and return(0)
-    end
-
-    flash[:notice] = "CGI Manifests don't contain relationship order information, so you will have to edit each relationship created in order to add this information."
-    return 1, people, samples, relationships, memberships, diagnoses, errors
-  end # end process cgi manifest definition
-
-
-############################################################################################################
-#
 #  ###   ###    ##    ###  ####   ###   ###       #####   ####   ####
 #  #  #  #  #  #  #  #     #     #     #          #      #      #
 #  ###   ###   #  #  #     ####   ###   ###       ###    #  ##  #  ##
@@ -763,6 +583,6 @@ class PeopleController < ApplicationController
     end
 
     return 1, people, samples, relationships, memberships, diagnoses, errors
-  end # end process cgi manifest definition
+  end # end process fgi manifest definition
 
 end
