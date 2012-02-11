@@ -28,7 +28,6 @@ set :branch, "master"
 set :use_sudo, "false"
 
 server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
-after "deploy", "rvm:trust_rvmrc"
 
 # if you're still using the script/reaper helper you will need
 # these http://github.com/rails/irs_process_scripts
@@ -189,8 +188,10 @@ after "deploy", "rvm:trust_rvmrc"
  end # end data
 
  namespace :rvm do
+   desc 'Trust rvmrc file'
    task :trust_rvmrc do
-     puts "running rvmrc trust #{release_path}" 
      run "rvm rvmrc trust #{release_path}"
    end
  end
+
+after "deploy:update_code", "rvm:trust_rvmrc"
