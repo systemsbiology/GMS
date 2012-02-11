@@ -4,15 +4,13 @@
   Customer Sample ID: 2
   Customer Subject ID: 3
   Gender: 4
-  Volume: 5
-  Concentration: 6
-  Quantity: 7
-  Sample Type: 8
-  Sample Source: 9
-  Mother's Subject ID: 10
-  Father's Subject ID: 11
-  Phenotype: 12
-  Comments: 13
-  Spouse Subject ID: 14
-  Spouse Order: 15
-  Child Order: 16
+  Sample Type: 5
+  Sample Source: 6
+  Tumor Status: 7
+  Mother's Subject ID: 8
+  Father's Subject ID: 9
+  Phenotype: 10
+  Comments: 11
+  Spouse Subject ID: 12
+  Spouse Order: 13
+  Child Order: 14
