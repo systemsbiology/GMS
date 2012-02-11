@@ -191,6 +191,6 @@ after "deploy", "rvm:trust_rvmrc"
  namespace :rvm do
    task :trust_rvmrc do
      puts "running rvmrc trust #{release_path}" 
-     run "rvm rvmrc trust \#\{release_path\} --trace --verbose"
+     run "rvm rvmrc trust #{release_path}"
    end
  end
