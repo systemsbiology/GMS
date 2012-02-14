@@ -239,11 +239,11 @@ class PeopleController < ApplicationController
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 
     # rest are arbitrary
-    rc = write_temp_object(@trans_id, "relationship",@relationships) unless @relationships.nil? or @relationships.empty?
-    flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
     rc = write_temp_object(@trans_id, "membership",@memberships) unless @memberships.nil? or @memberships.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
     rc = write_temp_object(@trans_id, "diagnosis",@diagnoses) unless @diagnoses.nil? or @diagnoses.empty?
+    flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
+    rc = write_temp_object(@trans_id, "relationship",@relationships) unless @relationships.nil? or @relationships.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 
     respond_to do |format|
@@ -449,17 +449,25 @@ class PeopleController < ApplicationController
     end
 
     if sheet.name == "FGG Information v1.0" then
-        headers =  YAML.load(header_file)[1.0]
-	#elsif sheet.name == "Sample Information v3.5" then
-        #  headers =  YAML.load(header_file)[3.5]
-	else
-	  logger.error("Unhandled Sample Information version #{sheet.name} for FGG Manifest.  Check to make sure that the spreadsheet you submitted is a FGG Manifest spreadsheet.  If it is, then please add new version to the YAML and re-run.")
-          flash[:error] = "Unhandled Sample Information version #{sheet.name} for FGG Manifest.  Check to make sure that the spreadsheet you submitted is a FGG Manifest spreadsheet.  If it is, then please add new version to the YAML and re-run."
-          render :action => "upload" and return(0)
-        end
+      headers =  YAML.load(header_file)[1.0]
+      #elsif sheet.name == "Sample Information v3.5" then
+      #  headers =  YAML.load(header_file)[3.5]
+    else
+      logger.error("Unhandled Sample Information version #{sheet.name} for FGG Manifest.  Check to make sure that the spreadsheet you submitted is a FGG Manifest spreadsheet.  If it is, then please add new version to the YAML and re-run.")
+      flash[:error] = "Unhandled Sample Information version #{sheet.name} for FGG Manifest.  Check to make sure that the spreadsheet you submitted is a FGG Manifest spreadsheet.  If it is, then please add new version to the YAML and re-run."
+      render :action => "upload" and return(0)
+    end
 
     sheet.each do |row|
       if row[0] == "Sequencing Sample ID" then
+        # check all of the headers exist
+        headers.each do |col, index|
+	  if row[index] != col then
+            flash[:error] = "Spreadsheet provided has an incorrect column.  <b>\"#{row[index]}\"</b> in column number #{index} should be <b>\"#{col}\"</b>.  Please check the format of your spreadsheet."
+	    render :action => "upload" and return(0)
+	  end
+        end
+
         flag = 1
         next
       end
@@ -508,30 +516,42 @@ class PeopleController < ApplicationController
         memberships.push([pedigree.id, p.collaborator_id])
 
         # add diagnosis for this person if affected 
-        phenotype = row[headers["Phenotype"]]
-        if phenotype.downcase! == "affected" then
-	  diagnoses.push([disease.id, p.collaborator_id])
-        end
+        affected_status = row[headers["Affected Status"]]
+	if affected_status.nil? then
+	  diag = Diagnosis.new
+	  diag.errors.add(:disease_id, "could not be set.  No column called Affected Status found in upload spreadsheet.")
+	  errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
+	  errors["#{counter}"]["affected_status"] = diag.errors
+	else
+          if affected_status.downcase! == "affected" then
+	    diagnoses.push([disease.id, p.collaborator_id])
+          end
+	end
      
         # queue up the relationship information so that we can add it later after confirmation
         mother_id = row[headers["Mother's Subject ID"]]
         father_id = row[headers["Father's Subject ID"]]
+	child_order = row[headers["Child Order"]]
+	child_order = '' if child_order.nil? # it's easier to find relationships that have no order value than to find ones that have a 1 value defaultly
 	r = Relationship.new
 	if mother_id == father_id then
 	  unless mother_id.nil? or mother_id.match('NA') then
-          relationships.push([mother_id, customer_subject_id, 'mother', row[headers["Child Order"]]])
-	  r.errors.add(:parent_id, "Father ID #{father_id} and mother ID #{mother_id} are the same.  Only entering one relationship.")
+            relationships.push([mother_id, customer_subject_id, 'mother', child_order])
+	    r.errors.add(:parent_id, "Father ID #{father_id} and mother ID #{mother_id} are the same.  Only entering one relationship.")
 	  end
 	else
-          relationships.push([mother_id, customer_subject_id, 'mother', row[headers["Child Order"]]]) unless mother_id.nil? or mother_id.match('NA')
-          relationships.push([father_id, customer_subject_id, 'father', row[headers["Child Order"]]]) unless father_id.nil? or father_id.match('NA')
+	  unless mother_id.nil? or mother_id.match('NA') then
+            relationships.push([mother_id, customer_subject_id, 'mother', child_order])
+            relationships.push([father_id, customer_subject_id, 'father', child_order]) 
+	  end
         end
+
 	spouse_id =  row[headers["Spouse Subject ID"]]
-        logger.debug("row is #{row} and spouse id is #{spouse_id}")
-	unless spouse_id.nil? or spouse_id.match('NA') then
-	  #this person has a spouse and they are the X spouse that they've had
-	  relationships.push([customer_subject_id, spouse_id, 'undirected', row[headers["Spouse Order"]]])
-	end
+	spouse_order = row[headers["Spouse Order"]]
+	spouse_order = 1 if spouse_order.nil?
+	spouse_order = 1 if spouse_order.match('NA')
+        #this person has a spouse and they are the X spouse that they've had
+	relationships.push([customer_subject_id, spouse_id, 'undirected', spouse_order])
 
         if r.errors.size > 0 then 
 	  errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
@@ -540,9 +560,6 @@ class PeopleController < ApplicationController
 
         # create the sample information
         s = Sample.new
-        s.volume = row[headers["Volume"]]
-        s.concentration = row[headers["Concentration"]]
-        s.quantity = row[headers["Quantity"]]
         source = row[headers["Sample Source"]]
 
 	customer_sample_id = row[headers["Customer Sample ID"]]
@@ -553,9 +570,14 @@ class PeopleController < ApplicationController
         sample_type = SampleType.find_by_name(source)
         if sample_type.nil? then
           s.errors.add(:sample_type_id, "Cannot find sample_type for #{source} for sample for person #{p.collaborator_id}.  Add this as a sample type before importing this spreadsheet")
+          errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
+          errors["#{counter}"]["sample"] = s.errors
+	  next
         end
         s.sample_type_id = sample_type.id
         s.status = 'submitted'
+
+	# need to add sample tumor processing here TODO
 
         vendor_id = row[headers["Sequencing Sample ID"]]
         if !vendor_id.match("-DNA_") then
