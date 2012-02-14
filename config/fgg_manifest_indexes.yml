@@ -1,5 +1,5 @@
 1.0:
-  Sequencing Sample ID:   0
+  Sequencing Sample ID: 0
   Sequencing Technology: 1
   Customer Sample ID: 2
   Customer Subject ID: 3
@@ -9,7 +9,7 @@
   Tumor Status: 7
   Mother's Subject ID: 8
   Father's Subject ID: 9
-  Phenotype: 10
+  Affected Status: 10
   Comments: 11
   Spouse Subject ID: 12
   Spouse Order: 13
