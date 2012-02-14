@@ -7,7 +7,7 @@ class Sample < ActiveRecord::Base
   has_one :person, :through => :acquisition
 
   auto_strip_attributes :sample_vendor_id, :volume, :concentration, :quantity, :protocol, :comments
-  validates_presence_of :sample_type_id, :status, :sample_vendor_id, :volume, :concentration, :quantity
+  validates_presence_of :sample_type_id, :status, :sample_vendor_id #, :volume, :concentration, :quantity
   validates_uniqueness_of :sample_vendor_id
 
   scope :has_pedigree, lambda { |pedigree|
