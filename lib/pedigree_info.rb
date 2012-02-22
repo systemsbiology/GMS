@@ -19,14 +19,14 @@ def pedindex(protocol,id_type)
   data_store["pedigree_studies"] = Array.new
   Study.all.each do |study|
     study_hash = Hash.new
-    study_hash["study_id"] = study.id
+    study_hash["study_id"] = "isb_study_"+study.id.to_s
     study_hash["study_name"] = study.name
     study_hash["study_tag"] = study.tag
     study_hash["study_version"] = 1 # placeholder TODO: make version method
     study_peds = Array.new
     study.pedigrees.each do |ped|
       local_hash = Hash.new
-      local_hash["pedigree_id"] = ped.id
+      local_hash["pedigree_id"] = "isb_ped_"+ped.id.to_s
       local_hash["pedigree_tag"] = ped.tag
       local_hash["database_file"] = pedigree_output_filename(ped)
       study_peds.push(local_hash)
@@ -43,7 +43,7 @@ def study_pedigree_index(study_id)
   peds = study.pedigrees
   ped_array = Array.new
   peds.each do |pedigree|
-    ped_array << pedigree.id
+    ped_array << "isb_ped_"+pedigree.id.to_s
   end
   study_to_peds = Hash.new
   study_to_peds[study_id] = ped_array
@@ -83,7 +83,7 @@ def pedfile(pedigree_id)
   #ped.people.each do |ind|
   ordered_ped.each do |ind|
     person = Hash.new
-    person["id"] = ind.isb_person_id
+    person["person_id"] = ind.isb_person_id
     person["collaborator_id"] = ind.collaborator_id
     aliases = Array.new
     ind.person_aliases.each do |ali|
@@ -95,12 +95,14 @@ def pedfile(pedigree_id)
     person["DOD"] = ind.dod
     person["deceased"] = ind.deceased
     person["phenotype"] = person_traits(ind)
+    person["diseases"] = person_diseases(ind)
     person["comments"] = ind.comments
 
     samples_list = Array.new
     ind.samples.each do |sample|
       ind_sample = Hash.new
       #puts "sample is #{sample.inspect}"
+      # has isb_sample_ in front already
       ind_sample["sample_id"] = sample.isb_sample_id
       if sample.sample_type.nil?
         ind_sample["sample_type"] = 'unknown'
@@ -122,6 +124,7 @@ def pedfile(pedigree_id)
           assay_array.each do |assay|
 	    #puts "assay is #{assay.inspect}"
             assay_info = Hash.new
+	    assay_info["assay_id"] = "isb_asy_"+assay.id.to_s
             assay_info["assay_name"] = assay.name
             assay_info["assay_type"] = assay.assay_type
             assay_info["assay_technology"] = assay.technology
@@ -131,7 +134,8 @@ def pedfile(pedigree_id)
 	    assay.assemblies.each do |assembly|
     	        #puts "assembly #{assembly.inspect}"
                 asm_list = Hash.new
-                asm_list["assembly_id"] = assembly.name
+		asm_list["assembly_id"] = "isb_asm_"+assembly.id.to_s
+                asm_list["assembly_name"] = assembly.name
 	        asm_list["assembly_date"] = assembly.file_date
   	        asm_list["assembler_swversion"] = assembly.software_version
 	        asm_list["assembly_desc"] = assembly.description
@@ -148,7 +152,8 @@ def pedfile(pedigree_id)
                   assembly_file_array.each do |assembly_file|
                     file_info = Hash.new
 	            file_info["file_type"] = assay_key
-                    file_info["file_id"] = assembly_file.name
+		    file_info["file_id"] = "isb_asmfile_"+assembly_file.id.to_s
+                    file_info["file_name"] = assembly_file.name
                     file_info["assembly_date"] = assembly_file.file_date
                     file_info["assembler_swversion"] = assembly_file.software_version
                     file_info["assembly_desc"] = assembly_file.description
@@ -190,12 +195,29 @@ def pedfile(pedigree_id)
 
 end  # end pedigree
 
+def person_diseases(person)
+  diseases = Array.new
+  person.diagnoses.each do |diagnosis|
+    if diagnosis.age_of_onset.nil? or diagnosis.age_of_onset == "" then
+      diseases << diagnosis.disease.name
+    else
+      diseases << diagnosis.disease.name + ": "+diagnosis.age_of_onset
+    end
+  end
+
+  if diseases.size == 0 then
+    return nil
+  else 
+    return diseases
+  end
+end
+
 def person_traits(person)
  
   traits = Array.new
   person.traits.each do |trait|
     pheno = trait.phenotype
-    if trait.trait_information.nil? then
+    if trait.trait_information.nil? or trait.trait_information == "" then
       traits << pheno.name
     else
       traits << pheno.name+": "+trait.trait_information
@@ -249,14 +271,23 @@ def ordered_pedigree(pedigree_id)
 
   madeline_people = Array.new # an ordered array of people to draw
   if Pedigree.find(pedigree_id).tag.downcase.match("unrelateds") then
-    madeline_people = Pedigree.find(pedigree_id).people
+    madeline_people = Pedigree.find(pedigree_id).people.order("isb_person_id")
   else
     root_person = find_root(pedigree_id)
-
+    #logger.debug("root person in ordered_pedigree is #{root_person.inspect}")
     puts "ERROR: no root person!" if root_person.nil?
 
     madeline_people = breadth_traverse(root_person)
   end
+
+  # if this is an unrelateds pedigree then breadth_traverse should return fewer people than
+  # there are total, so we need to catch that and find the rest of the people - not all 
+  # pedigrees are named 'unrelateds' so we need this check here
+  unrelated_check = Pedigree.find(pedigree_id).people.order("isb_person_id")
+  if unrelated_check.size > madeline_people.size then
+    madeline_people = unrelated_check
+  end
+  
 
   return madeline_people
 end
@@ -268,43 +299,57 @@ def breadth_traverse(person)
   current_gen = Array.new
   madeline_people = Array.new
   madeline_people = people.dup
+  #logger.debug("ENTERING LOOP")
   loop {
-
+    #logger.debug("breadth traverse people #{people} and current_gen #{current_gen}")
     unless current_gen.empty? then
+      #logger.debug("breadth traverse up_breadth_branch")
       people, current_gen = up_breadth_branch(people, current_gen)
     end
 
+    #logger.debug("breadth traverse down_breadth_branch")
     people, current_gen = down_breadth_branch(people, current_gen)
+    #logger.debug("back from down_breadth_branch")
+    #logger.debug("current gen is #{current_gen.inspect}")
     break if current_gen.empty?
+    #logger.debug("after break in breadth_traverse")
     madeline_people = madeline_people | current_gen
+    #logger.debug("madeline_people is #{madeline_people}")
     people = current_gen.dup
-    current_gen = Array.new
+#    current_gen = Array.new
   }
 
   return madeline_people
 end
 
 def down_breadth_branch(people, current_gen)
+  #logger.debug("down_breadth_branch called with people #{people.inspect}")
   new_gen = Array.new
   people.each do |person|
+  #  logger.debug("down_breadth_branch loop for person #{person.inspect}")
+    # offspring orders by relation_order
     person.offspring.each do |offspring_rel|
       child = offspring_rel.relation
+  #    logger.debug("down_breadth_branch child is #{child.inspect}")
       if !current_gen.include?(child) and !people.include?(child) then
         new_gen.push(child)
 	current_gen.push(child) unless current_gen.include?(child)
 	new_gen = side_branch(child, current_gen)
+#	logger.debug("down_breadth_branch back from side_branch")
       end
     end
   end
- 
+#  logger.debug("exiting down_breadth_branch") 
   return people, new_gen
 end
 
 def up_breadth_branch(people, current_gen)
+  #logger.debug("up_breadth_branc called")
   new_gen = Array.new
   people.each do |person|
     person.ordered_parents.each do |parent_rel|
       parent = parent_rel.relation
+      #logger.debug("up_breadth_branch parent is #{parent.inspect}")
       if !current_gen.include?(parent) and !people.include?(parent) and !new_gen.include?(parent) then
         new_gen.push(parent)
 	current_gen.push(parent) unless current_gen.include?(parent)
@@ -328,9 +373,11 @@ def depth_traverse(person)
 end
 
 def side_branch(person, previous)
+  #logger.debug("side branch called")
   return previous if person.spouses.size == 0
   person.spouses.each do |spouse_rel|
     spouse = spouse_rel.relation
+    #logger.debug("side_branch found spouse #{spouse.inspect}")
     if !previous.include?(spouse) then
       previous.push(spouse)
     end
@@ -340,10 +387,12 @@ def side_branch(person, previous)
 end
 
 def up_branch(person, previous)
+  #logger.debug("up_branch called")
   # go up parents until you don't find any
   return previous if person.parents.size == 0
   person.ordered_parents.each do |parent_rel|
     parent = parent_rel.relation
+    #logger.debug("up_branch found parent #{parent.inspect}")
     if !previous.include?(parent) then
       previous.push(parent)
       previous = side_branch(parent, previous)
