@@ -28,7 +28,7 @@ class RelationshipsController < ApplicationController
     @relationship = Relationship.new
     # this is related to the filtering that is included at the bottom of the new form
     # and is a duplicate of the index code.  Should probably be refactored into one method
-    @relationships = Relationship.has_pedigree(params[:pedigree_filter]).order_by_pedigree
+    @relationships = Relationship.has_pedigree(params[:pedigree_filter]).order_by_pedigree.paginate :page => params[:page], :per_page => 20
 
 
     respond_to do |format|
