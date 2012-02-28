@@ -190,6 +190,7 @@ server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
  namespace :rvm do
    desc 'Trust rvmrc file'
    task :trust_rvmrc do
+     puts "current release is #{current_release}"
      run "rvm rvmrc trust #{current_release}"
    end
  end
