@@ -193,6 +193,7 @@ server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
      puts "current release is #{current_release} release_path is #{release_path}"
 #     run "rvm rvmrc trust #{current_release}"
      run "rvm rvmrc trust #{current_release}", :shell => "/bin/bash"
+     run "cd #{current_release}"
    end
  end
 
