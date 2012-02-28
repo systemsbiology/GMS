@@ -113,6 +113,8 @@ def pedfile(pedigree_id)
       ind_sample["sample_protocol"] = sample.protocol
       ind_sample["sample_date"] = sample.date_received
       ind_sample["sample_vendor_id"] = sample.sample_vendor_id
+      ind_sample["sample_status"] = sample.status
+      ind_sample["sample_updated"] = sample.updated_at
       #ind_sample["assays"] = Array.new
       #assay_hash = Hash.new
       assays = sample.assays
@@ -129,6 +131,8 @@ def pedfile(pedigree_id)
             assay_info["assay_type"] = assay.assay_type
             assay_info["assay_technology"] = assay.technology
             assay_info["assay_desc"] = assay.description
+	    assay_info["assay_status"] = assay.status
+	    assay_info["assay_updated"] = assay.updated_at
 	    assay_info["assemblies"] = Array.new
 
 	    assay.assemblies.each do |assembly|
@@ -142,6 +146,8 @@ def pedfile(pedigree_id)
 	        asm_list["reference"] = assembly.genome_reference.name
 	        asm_list["assembly_directory"] = assembly.location
 	        asm_list["assembly_current"] = assembly.current
+		asm_list["assembly_status"] = assembly.status
+		asm_list["assembly_updated"] = assembly.updated_at
  
                 af_list = assembly.assembly_files
                 file_list = Array.new
@@ -460,7 +466,7 @@ def find_root(pedigree_id)
    if roots.size > 1
      logger.debug("Error: Found multiple roots for pedigree #{pedigree_id}.")
    elsif roots.size == 1
-     logger.debug("Found one root for pedigree #{pedigree_id}")
+#     logger.debug("Found one root for pedigree #{pedigree_id}")
    else
      logger.debug("Found no root for pedigree #{pedigree_id}")
    end
