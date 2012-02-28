@@ -11,7 +11,7 @@ end
 def madeline_header(pedigree)
   diseases = pedigree.diseases
 
-  header = "FamilyID\tIndividualID\tGender\tFather\tMother\tMZTwin\tDZTwin\tAffected\tSampled\tDeceased\tDOB\tRelationshipEnded"
+  header = "FamilyID\tIndividualID\tGender\tFather\tMother\tMZTwin\tDZTwin\tAffected\tSampled\tDeceased\tDOB\tRelationshipEnded\tSort_Order"
   header << "\t" + diseases.map(&:name).join("\t")
 
   phenotypes = pedigree.phenotypes
@@ -125,6 +125,21 @@ def create_row(person, familyID, diseases, phenotypes, twin_letter)
       current_person.push('.')
     end
 
+    #Sort_Order
+    if person.father.nil? or person.father.empty? then
+      if person.mother.nil? or person.mother.empty? then
+        current_person.push(".")
+      else 
+        #order children by mother
+	rel = Relationship.where(:person_id => person.mother.id, :relation_id => person.id)
+        current_person.push(rel.first.relation_order)
+      end
+    else
+      #order children by father
+      rel = Relationship.where(:person_id => person.father.first.id, :relation_id => person.id)
+      current_person.push(rel.first.relation_order)
+    end
+
     diseases.each do |disease|
       diagnoses = disease.diagnoses.where(:person_id => person.id)
       if diagnoses.nil? or diagnoses.empty? then
@@ -154,6 +169,7 @@ def create_row(person, familyID, diseases, phenotypes, twin_letter)
       current_person.push(value)
     end
 
+
   return current_person, twin_letter
 end
 
@@ -172,6 +188,7 @@ def create_fake(person, familyID, diseases, phenotypes, father_id, mother_id)
     current_person.push('.') # Deceased
     current_person.push('.') # DOB
     current_person.push('.') # RelationshipEnded
+    current_person.push('1') # Sort Order
 
     diseases.each do |disease|
       current_person.push('.')
