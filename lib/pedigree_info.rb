@@ -539,6 +539,129 @@ def prefer_male_children(roots)
      else
        return roots
      end
+
+
 end
 
+############################################################################################################
+############################################################################################################
+#
+#  ######  #####  #   #  ####      #   #  #   #  ####    ###    ###   #####  #####  ####
+#  #         #    ##  #  #   #     #   #  ##  #  #   #  #   #  #   #    #    #      #   #
+#  ####      #    # # #  #   #     #   #  # # #  ####   #   #  #   #    #    ###    #    #
+#  #         #    #  ##  #   #     #   #  #  ##  #  #   #   #  #   #    #    #      #   #
+#  #       #####  #   #  ####       ###   #   #  #   #   ###    ###     #    #####  ####
+#
+############################################################################################################
+############################################################################################################
+def pedigree_founders(pedigree_id)
+  # go through each person in the pedigree and find the relationships
+
+  madeline_people = Array.new # an ordered array of people to draw
+  if Pedigree.find(pedigree_id).tag.downcase.match("unrelateds") then
+    madeline_people = Pedigree.find(pedigree_id).people.order("isb_person_id")
+  else
+    root_person = find_root(pedigree_id)
+    #logger.debug("root person in ordered_pedigree is #{root_person.inspect}")
+    puts "ERROR: no root person!" if root_person.nil?
+
+    madeline_people = breadth_unrooted_traverse(root_person)
+  end
+
+  madeline_people.each do |person|
+    puts "#{person.id} - #{person.collaborator_id}"
+  end
+
+  return madeline_people
+end
+
+
+def breadth_unrooted_traverse(person)
+  people = Array.new
+  people.push(person)
+#  people = side_branch(person, people)  # call side_branch so this person gets added 
+  madeline_people = Array.new
+  madeline_people = people.dup
+  current_gen = side_unrooted_branch(person, [])
+    puts("current_gen after side_unrooted_branch #{current_gen}")
+    people = people | current_gen
+    puts("people after side_unrooted_branch #{people}")
+    madeline_people = madeline_people | people
+  puts("ENTERING LOOP")
+  loop {
+    puts("LOOP START")
+    puts("breadth traverse people #{people}")
+
+    puts("breadth traverse up_breadth_unrooted_branch")
+    people, current_gen = up_breadth_unrooted_branch(people, current_gen)
+
+    puts("breadth traverse down_breadth_unrooted_branch")
+    people, current_gen = down_breadth_unrooted_branch(people, current_gen)
+    puts("back from down_breadth_unrooted_branch")
+    puts("current gen is #{current_gen.inspect}")
+    break if current_gen.empty?
+    puts("after break in breadth_traverse")
+    madeline_people = madeline_people | current_gen
+    puts("madeline_people is #{madeline_people}")
+    people = current_gen.dup
+    puts("LOOP END\n\n\n")
+  }
+
+  return madeline_people
+end
+
+def down_breadth_unrooted_branch(people, current_gen)
+  puts("down_breadth_unrooted_branch called with people #{people.inspect}")
+  new_gen = Array.new
+  people.each do |person|
+    puts("down_breadth_unrooted_branch loop for person #{person.inspect}")
+    # offspring orders by relation_order
+    offspr = person.offspring
+    puts("offspring is #{offspr}")
+    person.offspring.each do |offspring_rel|
+      child = offspring_rel.relation
+      puts("down_breadth_unrooted_branch child is #{child.inspect}")
+      if !current_gen.include?(child) and !people.include?(child) then
+        new_gen.push(child)
+	current_gen.push(child) unless current_gen.include?(child)
+	new_gen = side_unrooted_branch(child, current_gen)
+	puts("down_breadth_unrooted_branch back from side_unrooted_branch")
+      end
+    end
+  end
+  puts("exiting down_breadth_unrooted_branch") 
+  return people, new_gen
+end
+
+def up_breadth_unrooted_branch(people, current_gen)
+  puts("up_breadth_unrooted_branch called")
+  new_gen = Array.new
+  people.each do |person|
+    person.ordered_parents.each do |parent_rel|
+      parent = parent_rel.relation
+      puts("up_breadth_unrooted_branch parent is #{parent.inspect}")
+      if !current_gen.include?(parent) and !people.include?(parent) and !new_gen.include?(parent) then
+        new_gen.push(parent)
+	current_gen.push(parent) unless current_gen.include?(parent)
+	new_gen = side_unrooted_branch(parent, current_gen)
+      end
+    end
+  end
+
+  return people, new_gen
+end
+
+def side_unrooted_branch(person, previous)
+  puts("side_unrooted_branch called")
+  return previous if person.spouses.size == 0
+  person.spouses.each do |spouse_rel|
+    spouse = spouse_rel.relation
+    puts("side_unrooted_branch found spouse #{spouse.inspect}")
+    if !previous.include?(spouse) then
+      previous.push(spouse)
+    end
+  end
+
+  return previous
+end
 
