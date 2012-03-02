@@ -63,7 +63,7 @@
     </tr>
     </thead>
     <tbody>
-    <% @pedigree.people.each do |person| %>
+    <% ordered_pedigree(@pedigree.id).each do |person| %>
       <tr>
         <td><%= link_to person.isb_person_id, person %></td>
         <td><%= person.full_collaborator %></td>
