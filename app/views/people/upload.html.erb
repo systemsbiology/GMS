@@ -14,7 +14,7 @@
 </div>
 <div class="field">
   <%= label "disease", :disease_id %><br />
-  <%= collection_select(:disease, :id, Disease.all, :id, :name, options = {:include_blank => "-Select the disease for this pedigree"}) %>
+  <%= collection_select(:disease, :id, Disease.order(:name), :id, :name, options = {:include_blank => "-Select the disease for this pedigree"}) %>
 </div>
 <div class="field">
    Type of spreadsheet:<br />
