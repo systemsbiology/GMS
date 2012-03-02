@@ -210,7 +210,12 @@ class PeopleController < ApplicationController
     test_file = params[:excel_file]
     file = Tempfile.new(test_file.original_filename)
     file.write(test_file.read.force_encoding("UTF-8"))
+    begin
     book = Spreadsheet.open file.path
+    rescue
+      flash[:error] = "File provided is not a valid Excel spreadsheet (.xls) file. Excel 2007 spreadsheets (.xlsx) files are not supported."
+      render :action => "upload" and return
+    end
     sheet1 = book.worksheet 0
 
     if spreadsheet_type == 'fgg manifest' then
@@ -479,15 +484,15 @@ class PeopleController < ApplicationController
 	  flash[:error] = "Spreadsheet provided is not of the proper type.  Can't find Customer Subject ID column."
           render :action => "upload" and return(0)
 	end
-	if row[headers["Sequencing Sample ID"]].nil? then
-	  flash[:error] = "Spreadsheet provided is not a FGG Manifest.  Can't find the Sequencing Sample ID column."
+	if row[headers["Customer Sample ID"]].nil? then
+	  flash[:error] = "Spreadsheet provided is not a FGG Manifest.  Can't find the Customer Sample ID column."
 	  render :action => "upload" and return(0)
 	end
         next if row[headers["Customer Subject ID"]] == "NA19240" # skip example row
 
         # create the person information 
         p = Person.new
-	customer_subject_id = row[headers["Customer Subject ID"]]+'test'
+	customer_subject_id = row[headers["Customer Subject ID"]]
         p.collaborator_id = customer_subject_id
         p.gender = row[headers["Gender"]].downcase  # downcase it to make sure Female and FEMALE and female are the same...
 	if p.gender != "male" and p.gender != "female" then
@@ -531,7 +536,7 @@ class PeopleController < ApplicationController
         # queue up the relationship information so that we can add it later after confirmation
         mother_id = row[headers["Mother's Subject ID"]]
         father_id = row[headers["Father's Subject ID"]]
-	child_order = row[headers["Child Order"]]
+	child_order = row[headers["Child Order"]].to_i
 	child_order = '' if child_order.nil? # it's easier to find relationships that have no order value than to find ones that have a 1 value defaultly
 	r = Relationship.new
 	if mother_id == father_id then
@@ -547,53 +552,55 @@ class PeopleController < ApplicationController
         end
 
 	spouse_id =  row[headers["Spouse Subject ID"]]
-	spouse_order = row[headers["Spouse Order"]]
-	spouse_order = 1 if spouse_order.nil?
-	spouse_order = 1 if spouse_order.match('NA')
-        #this person has a spouse and they are the X spouse that they've had
-	relationships.push([customer_subject_id, spouse_id, 'undirected', spouse_order])
+	if !spouse_id.nil? or !spouse_id.match('NA') then
+  	  spouse_order = row[headers["Spouse Order"]].to_i
+  	  spouse_order = 1 if spouse_order.nil? or spouse_order.to_s.match('NA')
+          #this person has a spouse and they are the X spouse that they've had
+	  relationships.push([customer_subject_id, spouse_id, 'undirected', spouse_order])
 
-        if r.errors.size > 0 then 
-	  errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
-	  errors["#{counter}"]["relationships"] = r.errors
-	end
-
-        # create the sample information
-        s = Sample.new
-        source = row[headers["Sample Source"]]
-
-	customer_sample_id = row[headers["Customer Sample ID"]]
-	if customer_sample_id != customer_subject_id then
-	  s.customer_sample_id = customer_sample_id
-	end
-
-        sample_type = SampleType.find_by_name(source)
-        if sample_type.nil? then
-          s.errors.add(:sample_type_id, "Cannot find sample_type for #{source} for sample for person #{p.collaborator_id}.  Add this as a sample type before importing this spreadsheet")
-          errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
-          errors["#{counter}"]["sample"] = s.errors
-	  next
+          if r.errors.size > 0 then 
+	    errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
+	    errors["#{counter}"]["relationships"] = r.errors
+	  end
         end
-        s.sample_type_id = sample_type.id
-        s.status = 'submitted'
-
-	# need to add sample tumor processing here TODO
 
         vendor_id = row[headers["Sequencing Sample ID"]]
-        if !vendor_id.match("-DNA_") then
-          plate_id,plate_well = vendor_id.split(/_/,2)
-          vendor_id = plate_id+"-DNA_"+plate_well
-        end
-        vendor_id = vendor_id + 'test'
-        s.sample_vendor_id = vendor_id
- 
-        if s.valid?
-          samples << s
-        else
-          errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
-          errors["#{counter}"]["sample"] = s.errors
-        end
+        if !vendor_id.nil? then  
+          # create the sample information
+          s = Sample.new
+          source = row[headers["Sample Source"]]
 
+  	  customer_sample_id = row[headers["Customer Sample ID"]]
+	  if customer_sample_id != customer_subject_id then
+	    s.customer_sample_id = customer_sample_id
+	  end
+
+          sample_type = SampleType.find_by_name(source)
+          if sample_type.nil? then
+            s.errors.add(:sample_type_id, "Cannot find sample_type for #{source} for sample for person #{p.collaborator_id}.  Add this as a sample type before importing this spreadsheet")
+            errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
+            errors["#{counter}"]["sample"] = s.errors
+	    next
+          end
+          s.sample_type_id = sample_type.id
+          s.status = 'submitted'
+
+	  # need to add sample tumor processing here TODO
+
+          if !vendor_id.match("-DNA_") then
+            plate_id,plate_well = vendor_id.split(/_/,2)
+            vendor_id = plate_id+"-DNA_"+plate_well
+          end
+          vendor_id = vendor_id
+          s.sample_vendor_id = vendor_id
+ 
+          if s.valid?
+            samples << s
+          else
+            errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
+            errors["#{counter}"]["sample"] = s.errors
+          end
+        end # end if !vendor_id.nil?
       end # end if flag
 
     end # end foreach row in sheet 1
