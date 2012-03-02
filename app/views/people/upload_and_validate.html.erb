@@ -57,17 +57,11 @@ Problems in line number <%= error[0] %>:<br/>
   <thead>
     <th>vendor_id</th>
     <th>sample_type</th>
-    <th>volume</th>
-    <th>concentration</th>
-    <th>quantity</th>
   </thead>
   <% @samples.each do |sample| %>
   <tr>
     <td><%= sample.sample_vendor_id %></td>
     <td><%= sample.sample_type.name %></td>
-    <td><%= sample.volume %></td>
-    <td><%= sample.concentration %></td>
-    <td><%= sample.quantity %></td>
   </tr>
   <% end %>
 </table>
