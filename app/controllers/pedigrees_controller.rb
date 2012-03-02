@@ -117,7 +117,6 @@ class PedigreesController < ApplicationController
       if @pedigree.save
         isb_ped_id = "isb_ped_#{@pedigree.id}"
         @pedigree.isb_pedigree_id = isb_ped_id
-
 	@pedigree.version = 1
 	@pedigree.save
 
