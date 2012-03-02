@@ -552,7 +552,7 @@ class PeopleController < ApplicationController
         end
 
 	spouse_id =  row[headers["Spouse Subject ID"]]
-	if !spouse_id.nil? or !spouse_id.to_s.match('NA') then
+	if !spouse_id.nil? and !spouse_id.to_s.match('NA') then
   	  spouse_order = row[headers["Spouse Order"]].to_i
   	  spouse_order = 1 if spouse_order.nil? or spouse_order.to_s.match('NA')
           #this person has a spouse and they are the X spouse that they've had
