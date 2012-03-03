@@ -296,7 +296,6 @@ class PeopleController < ApplicationController
     temp_objects = TempObject.find_all_by_trans_id(trans_id)
     @errors = Array.new
     temp_objects.each do |temp_obj|
-      logger.debug("loading object id #{temp_obj.id} with type #{temp_obj.object_type} and trans_id #{temp_obj.trans_id}")
       obj_array = Marshal.load(temp_obj.object)
       obj_array.each do |obj|
 	if obj.class == Array then
@@ -341,7 +340,6 @@ class PeopleController < ApplicationController
 	    rel.name = rel_name
 	    rel.relationship_type = rel.lookup_relationship_type(rel_name)
 	    rel.relation_order = rel_order unless rel_order.nil?
-	    logger.debug("rel is #{rel.inspect}")
 	    begin
 	      if rel.valid? then
 	        rel.save
@@ -534,9 +532,7 @@ class PeopleController < ApplicationController
 	  errors["#{counter}"]["affected_status"] = diag.errors
 	else
 	  affected_status.downcase!
-	  logger.debug("checking affected status #{affected_status}")
           if affected_status == "affected" then
-	    logger.debug("adding affected status to diagnoses")
 	    diagnoses.push([disease.id, p.collaborator_id])
           end
 	end
