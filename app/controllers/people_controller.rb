@@ -219,7 +219,7 @@ class PeopleController < ApplicationController
     sheet1 = book.worksheet 0
 
     if spreadsheet_type == 'fgg manifest' then
-      ret_code, @people, @samples, @relationships, @memberships, @diagnoses, @errors = process_fgg_manifest(sheet1, pedigree, disease)
+      ret_code, @people, @samples, @relationships, @memberships, @diagnoses, @acquisitions, @errors = process_fgg_manifest(sheet1, pedigree, disease)
     else
       flash[:error] = "Spreadsheet type not understood. Try this action again."
       render :action => "upload" and return
@@ -238,7 +238,7 @@ class PeopleController < ApplicationController
     # person needs to be written first
     rc = write_temp_object(@trans_id, "person",@people) unless @people.nil? or @people.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
-
+    
     # sample must be written next
     rc = write_temp_object(@trans_id, "sample",@samples) unless @samples.nil? or @samples.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
@@ -246,8 +246,13 @@ class PeopleController < ApplicationController
     # rest are arbitrary
     rc = write_temp_object(@trans_id, "membership",@memberships) unless @memberships.nil? or @memberships.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
+
+    rc = write_temp_object(@trans_id, "acquisition",@acquisitions) unless @acquisitions.nil? or @acquisitions.empty?
+    flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
+
     rc = write_temp_object(@trans_id, "diagnosis",@diagnoses) unless @diagnoses.nil? or @diagnoses.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
+
     rc = write_temp_object(@trans_id, "relationship",@relationships) unless @relationships.nil? or @relationships.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 
@@ -291,6 +296,7 @@ class PeopleController < ApplicationController
     temp_objects = TempObject.find_all_by_trans_id(trans_id)
     @errors = Array.new
     temp_objects.each do |temp_obj|
+      logger.debug("loading object id #{temp_obj.id} with type #{temp_obj.object_type} and trans_id #{temp_obj.trans_id}")
       obj_array = Marshal.load(temp_obj.object)
       obj_array.each do |obj|
 	if obj.class == Array then
@@ -385,6 +391,22 @@ class PeopleController < ApplicationController
 	        @errors.push(["membership", m, m.errors])
 	      end
 	    end
+	  elsif temp_obj.object_type == "Acquisition" then
+	    person = Person.find_by_collaborator_id(obj[0])
+	    sample = Sample.find_by_sample_vendor_id(obj[1])
+  	    acq = Acquisition.new
+	    if person.nil? then
+	      acq.errors.add(:person_id,"not found for #{obj[0]}")
+	      @errors.push(["acquisition",acq, acq.errors])
+	    else
+	      acq.person_id = person.id
+	      acq.sample_id = sample.id
+	      if acq.valid? then
+	        acq.save
+	      else
+	        @errors.push(["acquisition", acq, acq.errors])
+	      end
+	    end
 	  elsif temp_obj.object_type == "Diagnosis" then 
 	    disease = Disease.find(obj[0])
 	    person = Person.find_by_collaborator_id(obj[1])
@@ -434,6 +456,7 @@ class PeopleController < ApplicationController
     relationships = Array.new
     memberships = Array.new
     diagnoses = Array.new
+    acquisitions = Array.new
     errors = Hash.new
     counter = 0
     flag = 0
@@ -501,24 +524,6 @@ class PeopleController < ApplicationController
         p.comments = row[headers["Comments"]]
 	p.planning_on_sequencing = 1
 
-        if p.valid?
-          people << p
-        else
-          errors["#{counter}"] = Hash.new
-          errors["#{counter}"]["person"] = p.errors
-          printable_row = Array.new
-          row.each do |cell|
-            if cell.class == Spreadsheet::Formula then
-              printable_row << cell.value
-            else 
-              printable_row << cell
-            end
-          end
-          errors["#{counter}"]["row"] = "<table><tr><td>"+printable_row.join("</td><td>")+"</tr></table>"
-        end
-
-	# queue up membership information /sigh
-        memberships.push([pedigree.id, p.collaborator_id])
 
         # add diagnosis for this person if affected 
         affected_status = row[headers["Affected Status"]]
@@ -528,7 +533,10 @@ class PeopleController < ApplicationController
 	  errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
 	  errors["#{counter}"]["affected_status"] = diag.errors
 	else
-          if affected_status.downcase! == "affected" then
+	  affected_status.downcase!
+	  logger.debug("checking affected status #{affected_status}")
+          if affected_status == "affected" then
+	    logger.debug("adding affected status to diagnoses")
 	    diagnoses.push([disease.id, p.collaborator_id])
           end
 	end
@@ -593,14 +601,37 @@ class PeopleController < ApplicationController
           end
           vendor_id = vendor_id
           s.sample_vendor_id = vendor_id
+
+	  acquisitions.push([customer_subject_id, vendor_id])
  
           if s.valid?
             samples << s
+	    p.planning_on_sequencing = 1
           else
             errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
             errors["#{counter}"]["sample"] = s.errors
           end
         end # end if !vendor_id.nil?
+
+        if p.valid?
+          people << p
+        else
+          errors["#{counter}"] = Hash.new
+          errors["#{counter}"]["person"] = p.errors
+          printable_row = Array.new
+          row.each do |cell|
+            if cell.class == Spreadsheet::Formula then
+              printable_row << cell.value
+            else 
+              printable_row << cell
+            end
+          end
+          errors["#{counter}"]["row"] = "<table><tr><td>"+printable_row.join("</td><td>")+"</tr></table>"
+        end
+
+	# queue up membership information /sigh
+        memberships.push([pedigree.id, p.collaborator_id])
+
       end # end if flag
 
     end # end foreach row in sheet 1
@@ -611,7 +642,7 @@ class PeopleController < ApplicationController
       render :action => "upload" and return(0)
     end
 
-    return 1, people, samples, relationships, memberships, diagnoses, errors
+    return 1, people, samples, relationships, memberships, diagnoses, acquisitions, errors
   end # end process fgi manifest definition
 
 end
