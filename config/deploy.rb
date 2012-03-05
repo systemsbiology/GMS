@@ -145,6 +145,8 @@ server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
       FileUtils.mkdir_p("tmp/data/")
 
       logger.debug "sftping #{prod_dump_file} from #{application}"
+      logger.debug "ls #{prod_dump_file}"
+      run "ls -lah #{current_path}/tmp/#{prod_dump_file}"
 #      system "rsync -lrp #{user}@#{application}:#{current_path}/tmp/#{prod_dump_file} tmp/data"
       get("#{current_path}/tmp/#{prod_dump_file}", "tmp/data/#{prod_dump_file}")
       run "rm #{current_path}/tmp/#{prod_dump_file}"
