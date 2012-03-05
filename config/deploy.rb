@@ -107,6 +107,7 @@ server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
       Load development data to production. Expects data dump already created.
     DESC
     task :deploy_dev_data, :roles => [:db] do
+      run "mkdir -p #{current_path}/tmp"
       upload('config/database.yml', "#{current_path}/tmp/prod.yml")
       config = YAML::load_file("tmp/prod.yml")['production']
       run "mkdir -p #{current_path}/tmp/data"
@@ -128,6 +129,7 @@ server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
     DESC
     task :cache_prod_data, :roles => [:db] do
       on_rollback { run "rm #{current_path}/tmp/#{prod_dump_file}" }
+      run "mkdir -p #{current_path}/tmp"
       get("#{current_path}/config/database.yml", "tmp/prod.yml")
       config = YAML::load_file("tmp/prod.yml")['production']
 
