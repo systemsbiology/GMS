@@ -514,7 +514,11 @@ class PeopleController < ApplicationController
         # create the person information 
         p = Person.new
 	customer_subject_id = row[headers["Customer Subject ID"]]
+	if (customer_subject_id.is_a? Float) then 
+	  customer_subject_id = customer_subject_id.to_i
+	end
         p.collaborator_id = customer_subject_id
+	logger.debug("collaborator_id is #{customer_subject_id}")
         p.gender = row[headers["Gender"]].downcase  # downcase it to make sure Female and FEMALE and female are the same...
 	if p.gender != "male" and p.gender != "female" then
 	  p.errors.add(:gender,"invalid selection #{row[headers["Gender"]]}")
