@@ -283,7 +283,7 @@ def ordered_pedigree(pedigree_id)
     #logger.debug("root person in ordered_pedigree is #{root_person.inspect}")
     puts "ERROR: no root person!" if root_person.nil?
 
-    madeline_people = breadth_traverse(root_person)
+    madeline_people = breadth_unrooted_traverse(root_person)
   end
 
   # if this is an unrelateds pedigree then breadth_traverse should return fewer people than
@@ -291,27 +291,60 @@ def ordered_pedigree(pedigree_id)
   # pedigrees are named 'unrelateds' so we need this check here
   unrelated_check = Pedigree.find(pedigree_id).people.order("isb_person_id")
   if unrelated_check.size > madeline_people.size then
-    madeline_people = unrelated_check
+    # add people that are only in unrelated_check to madeline_people at the end of the array
+    madeline_people.concat(unrelated_check.delete_if { |per| madeline_people.include?(per) })
   end
   
 
   return madeline_people
 end
 
+# aka find founders, simply
+def parentless_people(pedigree_id)
+  ped = Pedigree.find(pedigree_id)
+  founders = Array.new
+  ped.people.each do |person|
+    parents = person.parents
+    if parents.size == 0 then
+      founders.push(person)
+    end
+  end
+
+  return founders
+end
+
+
+
+############################################################################################################
+############################################################################################################
+#
+#   ####   ####   ####   ###   ####   #####  #   #     #####  ####    ###   #   #  #####  ####   ####  ####
+#   #   #  #   #  #     #   #  #   #    #    #   #       #    #   #  #   #  #   #  #      #   #  #     #
+#   ####   ####   ###   #####  #   #    #    #####       #    ####   #####  #   #  ####   ####    ##   ###
+#   #   #  #  #   #     #   #  #   #    #    #   #       #    #  #   #   #   # #   #      #  #      #  #
+#   ####   #   #  ####  #   #  ####     #    #   #       #    #   #  #   #    #    #####  #   #  ###   ####
+#   
+############################################################################################################
+############################################################################################################
+
+
 def breadth_traverse(person)
   people = Array.new
   people.push(person)
-  people = side_branch(person, people)
-  current_gen = Array.new
   madeline_people = Array.new
   madeline_people = people.dup
+  current_gen = side_branch(person, [])
+    #logger.debug("current_gen after side_branch #{current_gen}")
+    people = people | current_gen
+    #logger.debug("people after side_unrooted_branch #{people}")
+    madeline_people = madeline_people | people
   #logger.debug("ENTERING LOOP")
   loop {
-    #logger.debug("breadth traverse people #{people} and current_gen #{current_gen}")
-    unless current_gen.empty? then
-      #logger.debug("breadth traverse up_breadth_branch")
-      people, current_gen = up_breadth_branch(people, current_gen)
-    end
+    #logger.debug("LOOP START")
+    #logger.debug("breadth traverse people #{people}")
+
+    #logger.debug("breadth traverse up_breadth_branch")
+    people, current_gen = up_breadth_branch(people, current_gen)
 
     #logger.debug("breadth traverse down_breadth_branch")
     people, current_gen = down_breadth_branch(people, current_gen)
@@ -322,7 +355,7 @@ def breadth_traverse(person)
     madeline_people = madeline_people | current_gen
     #logger.debug("madeline_people is #{madeline_people}")
     people = current_gen.dup
-#    current_gen = Array.new
+    #logger.debug("LOOP END\n\n\n")
   }
 
   return madeline_people
@@ -332,25 +365,26 @@ def down_breadth_branch(people, current_gen)
   #logger.debug("down_breadth_branch called with people #{people.inspect}")
   new_gen = Array.new
   people.each do |person|
-  #  logger.debug("down_breadth_branch loop for person #{person.inspect}")
+    #logger.debug("down_breadth_branch loop for person #{person.inspect}")
     # offspring orders by relation_order
+    #logger.debug("offspring is #{offspr}")
     person.offspring.each do |offspring_rel|
       child = offspring_rel.relation
-  #    logger.debug("down_breadth_branch child is #{child.inspect}")
+      #logger.debug("down_breadth_branch child is #{child.inspect}")
       if !current_gen.include?(child) and !people.include?(child) then
         new_gen.push(child)
 	current_gen.push(child) unless current_gen.include?(child)
 	new_gen = side_branch(child, current_gen)
-#	logger.debug("down_breadth_branch back from side_branch")
+	#logger.debug("down_breadth_branch back from side_branch")
       end
     end
   end
-#  logger.debug("exiting down_breadth_branch") 
+  #logger.debug("exiting down_breadth_branch") 
   return people, new_gen
 end
 
 def up_breadth_branch(people, current_gen)
-  #logger.debug("up_breadth_branc called")
+  #logger.debug("up_breadth_branch called")
   new_gen = Array.new
   people.each do |person|
     person.ordered_parents.each do |parent_rel|
@@ -367,19 +401,8 @@ def up_breadth_branch(people, current_gen)
   return people, new_gen
 end
 
-
-# DEPTH TRAVERSE
-def depth_traverse(person)
-  people = Array.new
-  people.push(person)
-  people = side_branch(person, people)
-  people = up_branch(person, people)
-  people = down_depth_branch(person, people)
-  return people
-end
-
 def side_branch(person, previous)
-  #logger.debug("side branch called")
+  #logger.debug("side_branch called")
   return previous if person.spouses.size == 0
   person.spouses.each do |spouse_rel|
     spouse = spouse_rel.relation
@@ -390,6 +413,16 @@ def side_branch(person, previous)
   end
 
   return previous
+end
+
+# DEPTH TRAVERSE
+def depth_traverse(person)
+  people = Array.new
+  people.push(person)
+  people = side_branch(person, people)
+  people = up_branch(person, people)
+  people = down_depth_branch(person, people)
+  return people
 end
 
 def up_branch(person, previous)
@@ -543,6 +576,8 @@ def prefer_male_children(roots)
 
 end
 
+
+
 ############################################################################################################
 ############################################################################################################
 #
@@ -554,6 +589,9 @@ end
 #
 ############################################################################################################
 ############################################################################################################
+
+# right now this is just a duplicate of breadth_traverse.  Using the currently more simple parentless_people function
+
 def pedigree_founders(pedigree_id)
   # go through each person in the pedigree and find the relationships
 
@@ -583,15 +621,14 @@ def breadth_unrooted_traverse(person)
   madeline_people = Array.new
   madeline_people = people.dup
   current_gen = side_unrooted_branch(person, [])
-    puts("current_gen after side_unrooted_branch #{current_gen}")
-    people = people | current_gen
-    puts("people after side_unrooted_branch #{people}")
-    madeline_people = madeline_people | people
+  puts("current_gen after side_unrooted_branch #{current_gen}")
+  people = people | current_gen
+  puts("people after side_unrooted_branch #{people}")
+  madeline_people = madeline_people | people
   puts("ENTERING LOOP")
   loop {
     puts("LOOP START")
     puts("breadth traverse people #{people}")
-
     puts("breadth traverse up_breadth_unrooted_branch")
     people, current_gen = up_breadth_unrooted_branch(people, current_gen)
 
