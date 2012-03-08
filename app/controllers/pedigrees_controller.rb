@@ -262,4 +262,22 @@ class PedigreesController < ApplicationController
       format.html { download_zip("#{@pedigree.tag}_madline_table.zip",{ "#{@pedigree.tag}_madeline_table.csv" => csv_file_name}) }
     end
   end
+
+  # give a list of founder isb_person_ids
+  def founders
+    @pedigree = Pedigree.find(params[:id])
+    return nil if @pedigree.nil?
+    @people = parentless_people(@pedigree.id)
+    @founders = Hash.new
+    @people.each do |person|
+      @founders[person.isb_person_id] = person
+    end
+    respond_to do |format|
+      format.html # founders.html.erb
+      format.json  { render :json => @founders }
+    end
+  end
 end
+
+
+
