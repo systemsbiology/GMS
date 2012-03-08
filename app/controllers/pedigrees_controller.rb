@@ -31,7 +31,7 @@ class PedigreesController < ApplicationController
 #    @relation_relationships = Relationship.find_all_by_relation_id(@pedigree.people.map(&:id))
 #    @relationships = @person_relationships + @relation_relationships
 
-    unless @pedigree.tag.match(/unrelateds/) or @pedigree.tag == 'diversity_P1' or @pedigree.people.size <= 2 then
+    unless @pedigree.tag.match(/unrelateds/) or @pedigree.tag == 'diversity_P1' or @pedigree.people.size <= 2 or @pedigree.relationship_count < 2 then
       peddir_exists
       maddir_exists
       # the combination of pedigree name and pedigree id should be unique
