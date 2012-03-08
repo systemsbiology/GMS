@@ -29,6 +29,16 @@ class Pedigree < ActiveRecord::Base
     end
   end
 
+  # count the child and spouse relationships
+  def relationship_count
+    count = 0
+    self.people.each do |person|
+      count += person.offspring.size
+      count += person.spouses.size
+    end
+    return count
+  end
+
   def find_childless_marriages
     ordered_people = ordered_pedigree(self.id)
     cm = Array.new
