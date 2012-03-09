@@ -7,12 +7,20 @@ class AssembliesController < ApplicationController
 #    @assembly = find_all_by_pedigree_id(params[:pedigree_filter][:id]) if (params[:pedigree_filter])
 #    @assembly = @assembly.find(:all, :include => { :assay => { :sample => { :person => :pedigree } } },
 #                                        :conditions => [ 'pedigrees.id = ?', params[:pedigree_filter][:id] ]) if (params[:pedigree_filter])
-    @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).paginate :page => params[:page], :per_page => 100
+    if params[:name] then
+      if params[:name].match(/%/) then
+        @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).where("name like ?", params[:name]).paginate :page => params[:page], :per_page => 100
+      else
+        @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).where(:name => params[:name]).first 
+      end
+    else
+      @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).paginate :page => params[:page], :per_page => 100
+    end
 
     respond_to do |format|
       format.html # index.html.erb
-      format.xml  { render :xml => @assembly }
-      format.json  { render :json => @assembly }
+      format.xml  { render :xml => @assemblies }
+      format.json  { render :json => @assemblies }
       format.js
     end
   end
