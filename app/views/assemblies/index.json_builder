@@ -1,0 +1,21 @@
+@assemblies.each do |assembly|
+  id assembly.id
+  assembly_id assembly.id
+  isb_assembly_id 'isb_asm_'+assembly.id.to_s
+  assay_id assembly.assay_id
+  isb_assay_id 'isb_asy_'+assembly.assay_id.to_s
+  pedigree_id assembly.assay.sample.person.pedigree.id
+  current assembly.current
+  description assembly.description
+  disk_id assembly.disk_id
+  file_date assembly.file_date
+  file_type assembly.file_type
+  genome_reference assembly.genome_reference.name
+  location assembly.location
+  name assembly.name
+  software assembly.software
+  software_version assembly.software_version
+  status assembly.status
+  updated_at assembly.updated_at
+
+end
