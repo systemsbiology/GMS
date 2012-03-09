@@ -1,0 +1,16 @@
+@assays.each do |assay|
+  assay_id assay.id
+  isb_assay_id 'isb_asy_'+assay.id.to_s
+  name assay.name
+  technology assay.technology
+  vendor assay.vendor
+  assay_type assay.assay_type
+  description assay.description
+  current assay.current
+  status assay.status
+  date_received assay.date_received
+  date_transferred assay.date_transferred
+  dated_backup assay.dated_backup
+  qc_pass_date assay.qc_pass_date
+  updated_at assay.updated_at
+end
