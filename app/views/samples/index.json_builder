@@ -3,6 +3,7 @@ array @samples do |sample|
   isb_sample_id sample.isb_sample_id
   sample_vendor_id sample.sample_vendor_id
   pedigree_id sample.person.pedigree.id
+  isb_person_id sample.person.isb_person_id
   study_id sample.person.pedigree.study.id
   study_tag sample.person.pedigree.study.tag
   customer_sample_id sample.customer_sample_id
@@ -11,5 +12,6 @@ array @samples do |sample|
   quantity sample.quantity
   volume sample.volume
   sample_type_id sample.sample_type_id
+  sample_type sample.sample_type.name
   updated_at sample.updated_at
 end
