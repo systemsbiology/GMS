@@ -1,6 +1,7 @@
 require 'utils'
 
 class AssembliesController < ApplicationController
+  respond_to :json
   # GET /assembly
   # GET /assembly.xml
   def index
@@ -11,7 +12,7 @@ class AssembliesController < ApplicationController
       if params[:name].match(/%/) then
         @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).where("name like ?", params[:name]).paginate :page => params[:page], :per_page => 100
       else
-        @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).where(:name => params[:name]).first 
+        @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).where(:name => params[:name])
       end
     else
       @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).paginate :page => params[:page], :per_page => 100
@@ -20,7 +21,7 @@ class AssembliesController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @assemblies }
-      format.json  { render :json => @assemblies }
+      format.json  { respond_with @assemblies }
       format.js
     end
   end
