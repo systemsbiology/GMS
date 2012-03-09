@@ -1,4 +1,5 @@
 class AssaysController < ApplicationController
+  respond_to :json
   # GET /assays
   # GET /assays.xml
   def index
@@ -8,7 +9,7 @@ class AssaysController < ApplicationController
       format.html # index.html.erb
       format.xml  { render :xml => @assays }
       format.js
-      format.json { render :json => @assays.first }  # should this assume first?  could be a bug someday..
+      format.json { respond_with @assays } 
     end
   end
 
