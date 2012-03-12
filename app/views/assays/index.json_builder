@@ -1,6 +1,7 @@
 @assays.each do |assay|
   assay_id assay.id
   isb_assay_id 'isb_asy_'+assay.id.to_s
+  pedigree_id assay.sample.person.pedigree.id
   name assay.name
   technology assay.technology
   vendor assay.vendor
