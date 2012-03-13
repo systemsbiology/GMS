@@ -25,10 +25,11 @@
     <td colspan="4"> <b>Comments:</b> <%= @assembly.comments %> </td>
   </tr>
 </table>
-
-<br /><br />
+<br />
 <%= link_to 'Edit', edit_assembly_path(@assembly) %> |
 <%= link_to 'Back to all assemblies', assemblies_path %> |
 <%= link_to "Back to assay #{@assembly.assay.name}", assay_path(@assembly.assay) %>
+<br />
+<%= link_to "Ensure Files are up to date", ensure_files_up_to_date_path(@assembly) %>
 <br /><br />
 <%= render 'assembly_files/list', :assembly_files => @assembly.assembly_files.paginate(:page => 1,:per_page => 100) %>
