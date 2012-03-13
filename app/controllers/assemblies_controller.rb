@@ -12,7 +12,7 @@ class AssembliesController < ApplicationController
       if params[:name].match(/%/) then
         @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).where("name like ?", params[:name]).paginate :page => params[:page], :per_page => 100
       else
-        @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).where(:name => params[:name])
+        @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).where(:name => params[:name]).paginate :page => params[:page], :per_page => 100
       end
     else
       @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).paginate :page => params[:page], :per_page => 100
@@ -113,9 +113,23 @@ class AssembliesController < ApplicationController
 
   #HELPER METHODS
 
-    def find_all_by_pedigree_id(pedigree_id)
+  def find_all_by_pedigree_id(pedigree_id)
     @assembly = Assembly.find(:all, :include => { :assay => { :sample => { :person => :pedigree } } },
                                         :conditions => [ 'pedigrees.id = ?', pedigree_id ])
   end
+
+  def ensure_files_up_to_date
+    @assemblies = Array.new
+    if params[:id] then
+      @assemblies.push(Assembly.find(params[:id]))
+    else
+      @assemblies = Assembly.all
+    end
+
+    @assemblies.each do |assembly|
+      assembly.ensure_files_up_to_date
+    end
+  end
+
 
 end
