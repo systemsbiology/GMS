@@ -28,15 +28,20 @@ EXCEL_CGI_HEADER_INDEX_FILE = "config/cgi_manifest_indexes.yml"
 EXCEL_FGG_HEADER_INDEX_FILE = "config/fgg_manifest_indexes.yml"
 
 
-# CGI file types to add to the assembly_files table
-CGI_FILES = {
+# file types to add to the assembly_files table
+# don't forget to add these to the file_types table if you add a new one!
+FILE_TYPES = {
+		# CGI FILES
 		'var-' => 'VAR-ANNOTATION',
 		'gene-' => 'GENE-ANNOTATION',
 		'geneVarSummary-' => 'GENE-VAR-SUMMARY-REPORT',
 		'ncRNA-' => 'NCRNA-ANNOTATION',
 		'cnvSegments' => 'CNV-SEGMENTS',
 		'highConfidenceJunctions' => 'JUNCTIONS',
-		'summary-' => 'SUMMARY'
+		'summary-' => 'SUMMARY',
+		# VCF FILES
+		'.snp.filtered.vcf' => 'VCF-SNP-ANNOTATION',
+		'.indel.vcf' => 'VCF-INDEL-ANNOTATION'
             }
 
 
