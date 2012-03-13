@@ -113,13 +113,9 @@ class PedigreesController < ApplicationController
   def create
     @pedigree = Pedigree.new(params[:pedigree])
 
+    @pedigree.version = 1
     respond_to do |format|
-      if @pedigree.save
-        isb_ped_id = "isb_ped_#{@pedigree.id}"
-        @pedigree.isb_pedigree_id = isb_ped_id
-	@pedigree.version = 1
-	@pedigree.save
-
+      if @pedigree.save then
         format.html { redirect_to(@pedigree, :notice => 'Pedigree was successfully created.') }
         format.xml  { render :xml => @pedigree, :status => :created, :location => @pedigree }
         format.json  { render :json => @pedigree, :status => :created, :location => @pedigree }
@@ -277,6 +273,7 @@ class PedigreesController < ApplicationController
       format.json  { render :json => @founders }
     end
   end
+
 end
 
 
