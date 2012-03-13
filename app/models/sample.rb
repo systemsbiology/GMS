@@ -10,6 +10,9 @@ class Sample < ActiveRecord::Base
   validates_presence_of :sample_type_id, :status, :sample_vendor_id #, :volume, :concentration, :quantity
   validates_uniqueness_of :sample_vendor_id
 
+  after_create :check_isb_sample_id
+  after_update :check_isb_sample_id
+
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
       pedigree_id = pedigree[:id]
@@ -26,6 +29,13 @@ class Sample < ActiveRecord::Base
       :include => { :person => :pedigree},
       :order => 'pedigrees.name'
     }
+
+  def check_isb_sample_id
+    if self.isb_sample_id.nil? or !self.isb_sample_id.match(/isb_sample/) then
+      isb_sample_id = "isb_sample_".self.id.to_s
+      self.update_attributes(:isb_sample_id => isb_sample_id)
+    end
+  end
 
   def identifier 
     if self.person.nil? then
