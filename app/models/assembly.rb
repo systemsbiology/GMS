@@ -50,7 +50,7 @@ class Assembly < ActiveRecord::Base
     files = Hash.new
     Find.find(start_dir) do |path|
       filename = File.basename(path).split("/").last
-      CGI_FILES.each { |filepart, filetype| 
+      FILE_TYPES.each { |filepart, filetype| 
         if filename.match(filepart) then 
           files[filetype] = path
         end
@@ -75,7 +75,10 @@ class Assembly < ActiveRecord::Base
       end
 
     end
-
+    if add.size == 0 then
+      logger.debug("check_add_assembly_files did not find any files to add")
+      return []
+    end
     return add
   end
 
@@ -102,6 +105,10 @@ class Assembly < ActiveRecord::Base
   end
 
   def add_assembly_files(files=self.check_add_assembly_files)
+    if files.size == 0 then
+      logger.debug("add_assembly_files didn't get any results from check_add_assembly_files")
+      return 0
+    end
     files.each do |file_path, file_type|
       #puts "file type is #{file_type} and path is #{file_path}"
       #puts FileType.find_by_type_name(file_type).id
