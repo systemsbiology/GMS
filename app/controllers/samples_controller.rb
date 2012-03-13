@@ -1,3 +1,5 @@
+require 'will_paginate/array'
+
 class SamplesController < ApplicationController
   unloadable
   respond_to :json
@@ -9,9 +11,9 @@ class SamplesController < ApplicationController
     @samples = Sample.has_pedigree(params[:pedigree_filter]).order_by_pedigree.paginate :page => params[:page], :per_page => 100
     if params[:sample_vendor_id] then
       if params[:sample_vendor_id].match(/%/) then
-        @samples = Sample.has_pedigree(params[:pedigree_filter]).where("sample_vendor_id like ?", params[:sample_vendor_id]).find(:all, :include => {:person => {:pedigree => :study }}, :order => ['pedigrees.name'])
+        @samples = Sample.has_pedigree(params[:pedigree_filter]).where("sample_vendor_id like ?", params[:sample_vendor_id]).find(:all, :include => {:person => {:pedigree => :study }}, :order => ['pedigrees.name']).paginate :page => params[:page], :per_page => 100
       else
-        @samples = Sample.has_pedigree(params[:pedigree_filter]).where("sample_vendor_id = ?", params[:sample_vendor_id]).find(:all, :include => {:person => { :pedigree => :study} }, :order => ['pedigrees.name'])
+        @samples = Sample.has_pedigree(params[:pedigree_filter]).where("sample_vendor_id = ?", params[:sample_vendor_id]).find(:all, :include => {:person => { :pedigree => :study} }, :order => ['pedigrees.name']).paginate :page => params[:page], :per_page => 100
       end
     end
 
@@ -81,10 +83,6 @@ class SamplesController < ApplicationController
 
     respond_to do |format|
       if @sample.save
-         isb_sample_id = "isb_sample_#{@sample.id}"
-         @sample.isb_sample_id = isb_sample_id
-         @sample.save
-
          #check acquisition
 	 acq_check = Acquisition.find_by_person_id_and_sample_id(params[:person][:id], @sample.id)
 	 if acq_check.nil? then
