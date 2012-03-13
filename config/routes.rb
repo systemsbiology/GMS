@@ -6,6 +6,7 @@ Gms::Application.routes.draw do
   match "terminology" => "terminology#index"
   match '/calendar(/:year(/:month))' => 'calendar#index', :as => :calendar, :constraints => {:year => /\d{4}/, :month => /\d{1,2}/}
   resources :genome_references
+  match "assemblies/ensure_files_up_to_date/(:id)", :to => "assemblies#ensure_files_up_to_date", :as => "ensure_files_up_to_date"
   resources :assemblies
   resources :assembly_files
   match "assays/summary_report/(:id)", :to =>  "assays#summary_report", :as => "summary_report"
