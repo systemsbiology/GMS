@@ -10,8 +10,8 @@ class Pedigree < ActiveRecord::Base
   validates_presence_of :name, :tag, :study_id
   validates_uniqueness_of :name, :tag
 
-  after_save :check_pedigree_tag
-  after_update :check_pedigree_tag
+  after_save :check_pedigree_tag, :check_isb_pedigree_id
+  after_update :check_pedigree_tag, :check_isb_pedigree_id
 
   def phenotypes
     self.people.map(&:phenotypes).flatten.uniq
@@ -59,6 +59,13 @@ class Pedigree < ActiveRecord::Base
     if self.tag.match(/ /) then
       tag = self.tag.gsub!(/ /, "_")
       self.update_attributes(:tag => tag)
+    end
+  end
+
+  def check_isb_pedigree_id
+    if self.isb_pedigree_id.nil? then
+      isb_ped = 'isb_ped_'+self.id.to_s
+      self.update_attributes(:isb_pedigree_id => isb_ped)
     end
   end
 
