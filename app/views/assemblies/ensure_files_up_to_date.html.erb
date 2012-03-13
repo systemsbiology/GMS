@@ -1,0 +1,10 @@
+<% if params[:id] then %>
+  <p> Processing files for assembly <%= @assemblies.first.name %></p>
+<% else %>
+  <p>Processing all files for all assemblies.  This will take several minutes.</p>
+  <ul>
+  <%= @assemblies.each do |assembly| %>
+    <li><%= assembly.name %></li>
+  <% end %>
+  </ul>
+<% end %>
