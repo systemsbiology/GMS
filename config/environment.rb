@@ -23,6 +23,11 @@ CGI_SOFTWARE_VERSION = "SOFTWARE_VERSION"
 CGI_FORMAT_VERSION = "FORMAT_VERSION"
 CGI_FILE_TYPE = "TYPE"
 
+# VCF header keys
+VCF_SOURCE = "source" # only in snp files
+VCF_FILEFORMAT = "fileformat"
+VCF_GENOME_REFERENCE = "reference"
+
 # where to find the header file for the Excel spreadsheet uploads
 EXCEL_CGI_HEADER_INDEX_FILE = "config/cgi_manifest_indexes.yml"
 EXCEL_FGG_HEADER_INDEX_FILE = "config/fgg_manifest_indexes.yml"
@@ -32,16 +37,16 @@ EXCEL_FGG_HEADER_INDEX_FILE = "config/fgg_manifest_indexes.yml"
 # don't forget to add these to the file_types table if you add a new one!
 FILE_TYPES = {
 		# CGI FILES
-		'var-' => 'VAR-ANNOTATION',
-		'gene-' => 'GENE-ANNOTATION',
-		'geneVarSummary-' => 'GENE-VAR-SUMMARY-REPORT',
-		'ncRNA-' => 'NCRNA-ANNOTATION',
-		'cnvSegments' => 'CNV-SEGMENTS',
-		'highConfidenceJunctions' => 'JUNCTIONS',
-		'summary-' => 'SUMMARY',
+		'var-' =>  { 'type' => 'VAR-ANNOTATION', 'vendor' => 'CGI' },
+		'gene-' => { 'type' => 'GENE-ANNOTATION', 'vendor' => 'CGI' },
+		'geneVarSummary-' => { 'type' => 'GENE-VAR-SUMMARY-REPORT', 'vendor' => 'CGI'},
+		'ncRNA-' => {'type' => 'NCRNA-ANNOTATION', 'vendor' => 'CGI' },
+		'cnvSegments' => { 'type' => 'CNV-SEGMENTS', 'vendor' => 'CGI' },
+		'highConfidenceJunctions' => { 'type' => 'JUNCTIONS', 'vendor' => 'CGI' },
+		'summary-' => { 'type' => 'SUMMARY', 'vendor' => 'CGI'},
 		# VCF FILES
-		'.snp.filtered.vcf' => 'VCF-SNP-ANNOTATION',
-		'.indel.vcf' => 'VCF-INDEL-ANNOTATION'
+		'.snp.filtered.vcf' => { 'type' => 'VCF-SNP-ANNOTATION', 'vendor' => 'VCF' },
+		'.indel.vcf' => { 'type' => 'VCF-INDEL-ANNOTATION', 'vendor' => 'VCF' }
             }
 
 
