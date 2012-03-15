@@ -24,7 +24,7 @@ def creation_time(file)
 end
 
 # open up a file and parse the # comments into a hash.  Use bzcat if bzip'd or gunzip -c for gzip'd
-def file_header(file)
+def file_header(file, file_type)
   cmd = Array.new
   if file.match(/\.bz2\z/) then
     cmd = [ 'bzcat', file ]
@@ -37,13 +37,40 @@ def file_header(file)
   header = Hash.new
   Open3.popen3(*cmd) do |stdin, stdout, stderr|
     stdout.each do |line|
-      if line.match('^#') then
-        line.gsub!(/#/, '')
-	line.strip! # remove newline at the end
-        (key,value) = line.split(/\t/)
-        header[key] = value
-      else
-        break
+      if file_type == "CGI" then
+        if line.match('^#') then
+          line.gsub!(/#/, '')
+   	  line.strip! # remove newline at the end
+          (key,value) = line.split(/\t/)
+          header[key] = value
+        else
+          break
+        end
+      elsif file_type == "VCF" then
+	if line.match(/^##/) then
+          line.gsub!(/#/, '')
+   	  line.strip! # remove newline at the end
+	  if line.match(/=</) then
+            (key,value) = line.split(/=</)
+	  else 
+	    (key, value) = line.split(/=/)
+	  end
+	  value.gsub!(/>$/,'') unless value.nil?
+	  if header[key].nil? then
+            header[key] = value 
+	  else
+	    if header[key].is_a? Array then
+	      header[key].push(value)
+	    else
+	      old = header[key]
+	      header[key] = Array.new
+	      header[key].push(old)
+	      header[key].push(value)
+	    end
+          end
+	else
+	  break
+	end
       end
     end
   end
