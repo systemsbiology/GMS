@@ -3,8 +3,20 @@
 <% else %>
   <p>Processing all files for all assemblies.  This will take several minutes.</p>
   <ul>
-  <%= @assemblies.each do |assembly| %>
+  <% @assemblies.each do |assembly| %>
     <li><%= assembly.name %></li>
   <% end %>
   </ul>
+<% end %>
+<% if @errors.size > 0 %>
+<p>Errors processing files:</p>
+<ul>
+<% @errors.each do |error| %>
+  <li><%= error %></li>
+<% end %>
+</ul>
+<% end %>
+
+<% if params[:id] %>
+<%= link_to 'Back to assembly', assembly_path(params[:id]) %>
 <% end %>
