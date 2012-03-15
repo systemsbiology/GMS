@@ -127,7 +127,12 @@ class AssembliesController < ApplicationController
     end
 
     @assemblies.each do |assembly|
-      assembly.ensure_files_up_to_date
+      @errors = assembly.ensure_files_up_to_date
+    end
+
+    respond_to do |format|
+      format.html 
+      format.xml  { head :ok }
     end
   end
 
