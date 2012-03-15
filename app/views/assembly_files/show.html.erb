@@ -1,6 +1,6 @@
 <p id="notice"><%= notice %></td>
 
-<table class="tablesorter">
+<table class="tablesorter" style="width: 500px;">
   <tr>
     <td><b>Name:</b><%= @assembly_file.name %></td>
     <td><b>Genome reference:</b> <%= @assembly_file.genome_reference.name %> </td>
@@ -16,7 +16,7 @@
     <td colspan="4"> <b>Location:</b> <%= @assembly_file.location %> </td>
   </tr>
   <tr>
-    <td colspan="4"> <b>Metadata:</b> <%= @assembly_file.metadata %> </td>
+    <td colspan="4"> <b>Metadata:</b><span style="word-wrap: break-word;"><pre> <%= @assembly_file.metadata %></pre> </span></td>
   </tr>
   <tr>
     <td colspan="4"> <b>Description:</b> <%= @assembly_file.description %> </td>
