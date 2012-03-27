@@ -524,7 +524,6 @@ class PeopleController < ApplicationController
 	  p.errors.add(:gender,"invalid selection #{row[headers["Gender"]]}")
         end
         p.comments = row[headers["Comments"]]
-	p.planning_on_sequencing = 1
 
         # add diagnosis for this person if affected 
         affected_status = row[headers["Affected Status"]]
