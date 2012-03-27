@@ -543,23 +543,26 @@ class PeopleController < ApplicationController
      
         # queue up the relationship information so that we can add it later after confirmation
         mother_id = row[headers["Mother's Subject ID"]]
-        father_id = row[headers["Father's Subject ID"]]
+	mother_id = mother_id.to_i if (mother_id.is_a? Float)
+        father_id = row[headers["Father's Subject ID"]].to_s
+	father_id = father_id.to_i if (father_id.is_a? Float)
 	child_order = row[headers["Child Order"]].to_i
 	child_order = '' if child_order.nil? # it's easier to find relationships that have no order value than to find ones that have a 1 value defaultly
 	r = Relationship.new
 	if mother_id == father_id then
-	  unless mother_id.nil? or mother_id.match('NA') then
+	  unless mother_id.nil? or mother_id.to_s.match('NA') or mother_id.to_s.empty? then
             relationships.push([mother_id, customer_subject_id, 'mother', child_order])
-	    r.errors.add(:parent_id, "Father ID #{father_id} and mother ID #{mother_id} are the same.  Only entering one relationship.")
+	    r.errors.add(:parent_id, "Father ID '#{father_id}' and mother ID '#{mother_id}' are the same.  Only entering one relationship.")
 	  end
 	else
-	  unless mother_id.nil? or mother_id.match('NA') then
+	  unless mother_id.nil? or mother_id.to_s.match('NA') or mother_id.to_s.empty? then
             relationships.push([mother_id, customer_subject_id, 'mother', child_order])
             relationships.push([father_id, customer_subject_id, 'father', child_order]) 
 	  end
         end
 
 	spouse_id =  row[headers["Spouse Subject ID"]]
+	spouse_id = spouse_id.to_i if (spouse_id.is_a? Float)
 	if !spouse_id.nil? and !spouse_id.to_s.match('NA') then
   	  spouse_order = row[headers["Spouse Order"]].to_i
   	  spouse_order = 1 if spouse_order.nil? or spouse_order.to_s.match('NA')
