@@ -520,12 +520,11 @@ class PeopleController < ApplicationController
         p.collaborator_id = customer_subject_id
 	logger.debug("collaborator_id is #{customer_subject_id}")
         p.gender = row[headers["Gender"]].downcase  # downcase it to make sure Female and FEMALE and female are the same...
-	if p.gender != "male" and p.gender != "female" then
+	if p.gender != "male" and p.gender != "female" and p.gender != "unknown" then
 	  p.errors.add(:gender,"invalid selection #{row[headers["Gender"]]}")
         end
         p.comments = row[headers["Comments"]]
 	p.planning_on_sequencing = 1
-
 
         # add diagnosis for this person if affected 
         affected_status = row[headers["Affected Status"]]
@@ -544,7 +543,7 @@ class PeopleController < ApplicationController
         # queue up the relationship information so that we can add it later after confirmation
         mother_id = row[headers["Mother's Subject ID"]]
 	mother_id = mother_id.to_i if (mother_id.is_a? Float)
-        father_id = row[headers["Father's Subject ID"]].to_s
+        father_id = row[headers["Father's Subject ID"]]
 	father_id = father_id.to_i if (father_id.is_a? Float)
 	child_order = row[headers["Child Order"]].to_i
 	child_order = '' if child_order.nil? # it's easier to find relationships that have no order value than to find ones that have a 1 value defaultly
