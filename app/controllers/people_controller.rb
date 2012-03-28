@@ -337,6 +337,11 @@ class PeopleController < ApplicationController
 		next
               end
 	    end
+
+	    if rel_name == 'monozygotic twin' then
+	      rel_name = 'monozygotic twin'
+	    end
+
 	    rel.name = rel_name
 	    rel.relationship_type = rel.lookup_relationship_type(rel_name)
 	    rel.relation_order = rel_order unless rel_order.nil?
@@ -534,6 +539,8 @@ class PeopleController < ApplicationController
 	  errors["#{counter}"]["affected_status"] = diag.errors
 	else
 	  affected_status.downcase!
+	  # other statuses are unaffected and unknown but those aren't handled right now...
+	  # don't really have a way to indicate in the database that the person is known unaffected versus unknown
           if affected_status == "affected" then
 	    diagnoses.push([disease.id, p.collaborator_id])
           end
@@ -557,6 +564,12 @@ class PeopleController < ApplicationController
             relationships.push([mother_id, customer_subject_id, 'mother', child_order])
             relationships.push([father_id, customer_subject_id, 'father', child_order]) 
 	  end
+        end
+
+	mz_twin_id = row[headers["Monozygotic Twin Subject ID"]]
+	mz_twin_id = mz_twin_id.to_i if (mz_twin_id.is_a? Float)
+	if (!mz_twin_id.nil? and !mz_twin_id.empty? and !mz_twin_id.to_s.match('NA')) then
+          relationships.push([customer_subject_id, mz_twin_id, 'monozygotic twin','1'])
         end
 
 	spouse_id =  row[headers["Spouse Subject ID"]]
