@@ -5,6 +5,8 @@ class Study < ActiveRecord::Base
   validates_uniqueness_of :name, :tag
 
   after_save :check_study_tag
+  after_update :check_study_tag
+  after_create :check_study_tag
 
   def check_study_tag
     if !self.tag.nil? and self.tag.match(/ /) then
