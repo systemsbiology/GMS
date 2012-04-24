@@ -6,7 +6,8 @@
 <p>This form should be used to enter as much information about a pedigree as possible, including individuals who are not being sequenced.  Pedigrees should always start with one root couple if possible.</p>
 <p>Below is an image of the example FGG Manifest that contains information on a husband and wife, their three children, and the wife's mother.</p>
 
-<%= image_tag("fgg_manifest_example.png", :size => "1150x420") %>
+<%= image_tag("fgg_manifest_example.png") %>
+<%= image_tag("fgg_manifest_example_pt2.png") %>
 
 <ul>
   <li><b>Sequencing Sample ID -</b> This is the Sample ID assigned by the vendor.  For Complete Genomics, these IDs start with GSXXXXX-DNA_<well>.  For example, GS10101-DNA_A01.  Illumina IDs begin with SS and then a series of 7 numbers.  For example, SS6003929.</li>
@@ -25,4 +26,8 @@
   <li><b>Spouse Subject ID -</b> The Customer Subject ID of the spouse of the person in the current line, if they have a spouse.</li>
   <li><b>Spouse Order -</b> Many people have multiple marriages.  This field is to specify the order of the marriage for the person in the current line and the person specified in the Spouse Subject ID field.  The person in the current line is the ____ wife/husband of the person in the Spouse Subject ID field.  If this value is not filled in the software assumes that it is the first marriage (with children) for each spouse.</li>
   <li><b>Child Order -</b> Many people have multiple children.  This field is to specify the birth order of the children.  The purpose of this field is primarily to order the pedigree output drawings from Madeline, though it also serves to order the people in a pedigree in computational output.  Therefore, children should be numbered from left to right across the family tree.  It should be filled out for every person that is a child of another person and therefore has either the Mother's Subject ID or the Father's Subject ID field filled out.  The person in the current line is the _____ child of Mother Subject ID and Father Subject ID.  If these numbers are different - for example, the wife had two children and then remarried and had two additional children, use the numbering for the wife because it is higher than the numbering for the husband.  (ie: child 1, child 2, child 3, child 4 rather than child 1, child 2, child 1, child 2).  Always number from oldest child to youngest child as long as these children share one parent.  After the spreadsheet is processed, you will have to use the Person interface in GMS to edit the relationships between the two men and their children to reflect that the first husband has two children (1 and 2) and the second husband has two children (1 and 2).  So you will end up with 4 relationships from mother to children labeled 1 through 4, two relationships between husband #1 and two of the children labeled 1 and 2, and two relationships between husband #2 and two of the children labeled 1 and 2.  There can be missing numbers if you are missing or not submitting information for one of the children (ie: 1,3,4).</li>
+    <li><b>Volume -</b> Amount of sample as measured by CGI in their quality control worksheet.</li>
+    <li><b>Concentration -</b> Abundance of DNA in the sample as measured by CGI in their quality control worksheet.</li>
+    <li><b>Sample Status -</b> What stage the sample is currently in.  Current statuses are: submitted, sequenced, or failed.</li>
 </ul>
+<br /><br />
