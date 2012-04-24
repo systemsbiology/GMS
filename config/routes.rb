@@ -31,7 +31,9 @@ Gms::Application.routes.draw do
   match "pedigrees/all_pedigree_files", :to => "pedigrees#all_pedigree_files", :as => "all_pedigree_files"
   match "pedigrees/pedigree_datastore", :to => "pedigrees#pedigree_datastore", :as => "pedigree_datastore"
   match "pedigrees/export_madeline_table/(:id)", :to => "pedigrees#export_madeline_table", :as => "export_madeline_table"
+  match "pedigrees/export_madeline_pdf", :to => "pedigrees#export_madeline_pdf", :as => "export_madeline_pdf"
   match "pedigrees/founders/(:id)", :to => "pedigrees#founders", :as => "founders"
+  match "pedigrees/kwanzaa/(:id)", :to => "pedigrees#kwanzaa", :as => "kwanzaa"
   resources :pedigrees
   resources :studies
   match "/fgg_manifest", :to => "static#fgg_manifest"
