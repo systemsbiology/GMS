@@ -131,7 +131,7 @@ def create_row(person, familyID, diseases, phenotypes, twin_letter)
         current_person.push(".")
       else 
         #order children by mother
-	rel = Relationship.where(:person_id => person.mother.id, :relation_id => person.id)
+	rel = Relationship.where(:person_id => person.mother.first.id, :relation_id => person.id)
         current_person.push(rel.first.relation_order)
       end
     else
