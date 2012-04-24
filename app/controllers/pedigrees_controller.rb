@@ -32,52 +32,9 @@ class PedigreesController < ApplicationController
 #    @relationships = @person_relationships + @relation_relationships
 
     unless @pedigree.tag.match(/unrelateds/) or @pedigree.tag == 'diversity_P1' or @pedigree.people.size <= 2 or @pedigree.relationship_count < 2 then
-      peddir_exists
-      maddir_exists
-      # the combination of pedigree name and pedigree id should be unique
-      madeline_name = madeline_file(@pedigree)
-      madeline_file = MADELINE_DIR + "#{madeline_name}"
-
-      ordered_ped = ordered_pedigree(@pedigree.id)
-      madeline_array = to_madeline(@pedigree,ordered_ped)
-      @filename = madeline_file
-
-      labels = Array.new
-      labels.push("IndividualID")
-      labels << @pedigree.diseases.map{|d| d.name.gsub!(/ /, '_')}
-      labels << @pedigree.phenotypes.map{|p| p.name.gsub!(/ /,'_')}
-
-      madeline_info = Array.new
-      madeline_array.each do |line|
-        line = line.join("\t")
-        madeline_info.push(line)
-      end
-
-      infile = Tempfile.new('madeline_input')
-      header = madeline_header(@pedigree)
-      infile.print(header)
-      infile.print("\n")
-      infile.print(madeline_info.join("\n"))
-      infile.flush
-      infile.close
-
-      @madeline_table = array_to_html_table(header.split(/\t/), madeline_array)
-      @madeline_table.gsub!(/table/, "table border=\"1\" cellspacing=\"0\"") #dunno how to get XMLBuilder to return a border
-      # we want to regenerate the file every time because something may have changed.
-      begin
-        tmpfile, warnings = Madeline::Interface.new(:embedded => true, :L => labels, "font-size"=> "10", "nolabeltruncation" => true, "sort" => "Sort_Order").draw(File.open(infile,'r'))
-      rescue Exception => e
-	msg = e.message.gsub(/\e\[(\d+)m/, '')
-	msg.gsub!(/\n/, '<br />')
-	msg.gsub!(/[^0-9A-Za-z \/<>-]/, '')
-	msg.gsub!(/131m/,'')
-        flash[:error] = "#{msg}" 
-      else
-        FileUtils.copy(tmpfile,madeline_file)
-      end
-
+      madeline_file = madeline_image(@pedigree)
       if File.exists?(madeline_file) then
-        @madeline = File.read(madeline_file) if @pedigree.people.size > 0
+        @madeline = File.read(madeline_file)
       end
     end
 
@@ -239,6 +196,54 @@ class PedigreesController < ApplicationController
     end
   end
 
+  def madeline_image(pedigree)
+      peddir_exists
+      maddir_exists
+      # the combination of pedigree name and pedigree id should be unique
+      madeline_name = madeline_file(pedigree)
+      madeline_file = MADELINE_DIR + "#{madeline_name}"
+
+      ordered_ped = ordered_pedigree(pedigree.id)
+      madeline_array = to_madeline(pedigree,ordered_ped)
+      @filename = madeline_file
+
+      labels = Array.new
+      labels.push("IndividualID")
+      labels << pedigree.diseases.map{|d| d.name.gsub!(/ /, '_')}
+      labels << pedigree.phenotypes.map{|p| p.name.gsub!(/ /,'_')}
+
+      madeline_info = Array.new
+      madeline_array.each do |line|
+        line = line.join("\t")
+        madeline_info.push(line)
+      end
+
+      infile = Tempfile.new('madeline_input')
+      header = madeline_header(pedigree)
+      infile.print(header)
+      infile.print("\n")
+      infile.print(madeline_info.join("\n"))
+      infile.flush
+      infile.close
+
+      madeline_table = array_to_html_table(header.split(/\t/), madeline_array)
+      madeline_table.gsub!(/table/, "table border=\"1\" cellspacing=\"0\"") #dunno how to get XMLBuilder to return a border
+      # we want to regenerate the file every time because something may have changed.
+      begin
+        tmpfile, warnings = Madeline::Interface.new(:embedded => true, :L => labels, "font-size"=> "10", "nolabeltruncation" => true, "sort" => "Sort_Order").draw(File.open(infile,'r'))
+      rescue Exception => e
+	msg = e.message.gsub(/\e\[(\d+)m/, '')
+	msg.gsub!(/\n/, '<br />')
+	msg.gsub!(/[^0-9A-Za-z \/<>-]/, '')
+	msg.gsub!(/131m/,'')
+        flash[:error] = "#{msg}" 
+      else
+        FileUtils.copy(tmpfile,madeline_file)
+      end
+
+      return madeline_file
+  end
+
   def export_madeline_table
     @pedigree = Pedigree.find(params[:id])
     ordered_ped = ordered_pedigree(@pedigree.id)
@@ -259,6 +264,24 @@ class PedigreesController < ApplicationController
     end
   end
 
+  # this outputs a PDF of Madeline drawings for every pedigree
+  def export_madeline_pdf
+    @pedigrees = Pedigree.all
+    pdf_name = MADELINE_DIR + "pedigrees.pdf"
+    @pedigrees.each do |pedigree|
+      madeline_name = madeline_file(pedigree)
+      madeline_file = MADELINE_DIR + "#{madeline_name}"
+      madeline_file = madeline_image(pedigree) unless File.exists?(madeline_file)
+       
+    end
+
+    respond_to do |format|
+      format.pdf do 
+        render :pdf => "#{pdf_name}", :stylesheets => ["application","prince"], :layout => "pdf"
+      end
+    end
+  end
+
   # give a list of founder isb_person_ids
   def founders
     @pedigree = Pedigree.find(params[:id])
@@ -272,6 +295,13 @@ class PedigreesController < ApplicationController
       format.html # founders.html.erb
       format.json  { render :json => @founders }
     end
+  end
+
+  def kwanzaa
+    @pedigree = Pedigree.find(params[:id])
+    outfile_name = "Kwanzaa_"+@pedigree.tag # needs a quartet identifier somehow
+    # genotype.csv outfilename outfile path
+    rc = `lib/genomeMapVariable.pl KWANZAA_DIR`
   end
 
 end
