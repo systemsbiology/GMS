@@ -6,6 +6,7 @@ PEDIGREES_DIR = Rails.root.join('public/pedigrees')
 MADELINE_DIR = Rails.root.join('public/pedigrees/madeline')
 PEDIGREE_ROOT = "/proj/famgen/studies"
 PEDFILES_DIR = Rails.root.join('public/pedigrees/pedFiles')
+KWANZAA_DIR = Rails.root.join('public/pedigrees/kwanzaa')
 CSVDIR = Rails.root.join('tmp/csv')
 
 # filename of the pedigree data store
