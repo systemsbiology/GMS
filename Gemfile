@@ -34,10 +34,11 @@ gem 'cancan'
 
 gem 'paperclip'
 gem 'spreadsheet'
+gem 'princely'
 
-gem 'ancestry'
-gem 'awesome_nested_set'
-gem 'acts_as_audited'
+#gem 'ancestry'
+#gem 'awesome_nested_set'
+#gem 'acts_as_audited'
 #, "2.0.0.rc7"
 
 gem 'rspec-rails'
