@@ -517,11 +517,12 @@ class PeopleController < ApplicationController
         next if row[headers["Customer Subject ID"]] == "NA19240" # skip example row
 
         # create the person information 
-        p = Person.new
 	customer_subject_id = row[headers["Customer Subject ID"]]
 	if (customer_subject_id.is_a? Float) then 
 	  customer_subject_id = customer_subject_id.to_i
 	end
+
+        p = Person.find_by_collaborator_id(customer_subject_id) || Person.new
         p.collaborator_id = customer_subject_id
 	logger.debug("collaborator_id is #{customer_subject_id}")
         p.gender = row[headers["Gender"]].downcase  # downcase it to make sure Female and FEMALE and female are the same...
@@ -562,6 +563,8 @@ class PeopleController < ApplicationController
 	else
 	  unless mother_id.nil? or mother_id.to_s.match('NA') or mother_id.to_s.empty? then
             relationships.push([mother_id, customer_subject_id, 'mother', child_order])
+	  end
+	  unless father_id.nil? or father_id.to_s.match('NA') or father_id.to_s.empty? then
             relationships.push([father_id, customer_subject_id, 'father', child_order]) 
 	  end
         end
@@ -589,7 +592,7 @@ class PeopleController < ApplicationController
         vendor_id = row[headers["Sequencing Sample ID"]]
         if !vendor_id.nil? then  
           # create the sample information
-          s = Sample.new
+	  s = Sample.find_by_sample_vendor_id(vendor_id) || Sample.new
           source = row[headers["Sample Source"]]
 
   	  customer_sample_id = row[headers["Customer Sample ID"]]
@@ -605,7 +608,6 @@ class PeopleController < ApplicationController
 	    next
           end
           s.sample_type_id = sample_type.id
-          s.status = 'submitted'
 
 	  # need to add sample tumor processing here TODO
 
@@ -618,10 +620,27 @@ class PeopleController < ApplicationController
 
 	  acquisitions.push([customer_subject_id, vendor_id])
  
+	  # handle volume, concentration, quantity
+          volume = row[headers["Volume"]]
+	  concentration = row[headers["Concentration"]]
+	  quantity = row[headers["Quantity"]]
+	  s.volume = volume unless volume.nil? or volume.blank?
+	  s.concentration = concentration unless concentration.nil? or concentration.blank?
+	  s.quantity = quantity unless quantity.nil? or quantity.blank?
+
+	  # handle sample status
+          status = row[headers["Sample Status"]]
+	  if status.nil? or status.blank? then
+            s.status = 'submitted'
+	  else 
+	    s.status = status
+	  end
+
           if s.valid?
             samples << s
 	    p.planning_on_sequencing = 1
           else
+	    p.planning_on_sequencing = 0
             errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
             errors["#{counter}"]["sample"] = s.errors
           end
@@ -645,6 +664,9 @@ class PeopleController < ApplicationController
 
 	# queue up membership information /sigh
         memberships.push([pedigree.id, p.collaborator_id])
+
+
+
 
       end # end if flag
 
