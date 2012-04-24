@@ -69,4 +69,27 @@ class Pedigree < ActiveRecord::Base
     end
   end
 
+  # take a pedigree id in and give back an array of hashes of all of the quartets in the pedigree
+  def quartets
+    quartets = Array.new
+    peopleByFamily = Hash.new
+    self.people.each do |person|
+      (father_rel, mother_rel) = person.parents
+       next if father_rel.nil? and mother_rel.nil?
+       father = father_rel.relation # person is the child
+       mother = mother_rel.relation
+       peopleByFamily[father] = Hash.new if peopleByFamily[father].nil?
+       peopleByFamily[father][mother] = Array.new if peopleByFamily[father][mother].nil?
+       peopleByFamily[father][mother].push(person)
+    end
+    family_size = 2
+    peopleByFamily.each do |father, inner|
+      inner.each do |mother, children|
+        childrenCombos = children.combination(family_size).to_a
+	quartets.push([father, mother, childrenCombos])
+      end
+    end
+    
+    return quartets
+  end
 end
