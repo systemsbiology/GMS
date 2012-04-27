@@ -29,7 +29,7 @@
           <td>NA</td>
           <td><%= link_to person.isb_person_id, person %></td>
           <td><%= person.full_collaborator %></td>
-	  <td><%= link_to person.pedigree.name, person.pedigree %></td>
+	  <td><%= link_to person.pedigree.name, person.pedigree unless person.pedigree.nil? %></td>
           <td>NA</td>
           <td>NA</td>
           <td>NA</td>
