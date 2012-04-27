@@ -15,6 +15,8 @@ class SamplesController < ApplicationController
       else
         @samples = Sample.has_pedigree(params[:pedigree_filter]).where("sample_vendor_id = ?", params[:sample_vendor_id]).find(:all, :include => {:person => { :pedigree => :study} }, :order => ['pedigrees.name']).paginate :page => params[:page], :per_page => 100
       end
+    elsif params[:person] then
+      @samples = Sample.has_pedigree(params[:pedigree_filter]).has_person(params[:person]).order_by_pedigree.paginate :page => params[:page], :per_page => 100
     end
 
     respond_to do |format|
