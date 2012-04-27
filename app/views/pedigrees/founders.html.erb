@@ -1,0 +1,40 @@
+<% if params[:id] then %>
+  <% cur_pedigree_id = params[:id] %>
+<% elsif params[:pedigree_filter] && params[:pedigree_filter][:id] and !params[:pedigree_filter][:id].blank? then %>
+  <% cur_pedigree_id = params[:pedigree_filter][:id].to_i %>
+<% else %>
+  <% cur_pedigree_id = nil %>
+<% end %>
+<h1>Founders<% if cur_pedigree_id then %> for pedigree <%= Pedigree.find(cur_pedigree_id).name %><% end %></h1>
+
+<% if @founders.size == 0 %>
+  <p>No founders found</p>
+<% else %>
+<%= @founders.count %> founders <br /><br />
+<%= form_tag("#", :method => "get") do %>
+  <%= collection_select(:pedigree_filter, :id, Pedigree.order(:name), :id, :name, options = {:include_blank => '-Select a pedigree to filter by', :selected => cur_pedigree_id}, :class => "pedigree_select") %>
+<%= submit_tag("Filter") %>
+<% end %>
+
+<table class="tablesorter">
+  <thead>
+  <tr>
+    <th>ISB Person ID</th>
+    <th>Collaborator ID</th>
+    <th>Pedigree</th>
+  </tr>
+  </thead>
+  <tbody>
+<% @founders.each do |id, person| %>
+  <tr>
+    <td style="width: 100px;"><%= link_to person.isb_person_id, person %></td>
+    <td><%= link_to person.full_collaborator, person_path(person) %></td>
+    <td><%= link_to person.pedigree.name, pedigree_path(person.pedigree) if person.pedigree %></td>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<% end %>
+
+<br />
+<br />
