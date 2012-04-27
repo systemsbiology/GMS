@@ -11,6 +11,7 @@
 	    <br />
             <li><%= link_to("Receiving Log", url_for(:controller => 'people', :action => 'receiving_report'), :method => "get") %></li>
             <li><%= link_to("Sequencing Summary", url_for(:controller => 'assays', :action => 'summary_report'), :method => "get") %></li>
+            <li><%= link_to("Founders", url_for(:controller => 'pedigrees', :action => 'founders'), :method => "get") %></li>
 	    <br />
 	    <li><%= link_to("Diseases", diseases_path) %></li>
 	    <li><%= link_to("Phenotypes", phenotypes_path) %></li>
