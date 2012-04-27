@@ -161,4 +161,12 @@ class Person < ActiveRecord::Base
     end
   end
 
+  def complete
+    self.samples.each do |sample|
+      return true if sample.complete 
+    end
+
+    return false
+  end
+
 end

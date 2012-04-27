@@ -143,7 +143,7 @@ class Assembly < ActiveRecord::Base
         check = check_cgi_header(header, file_type, file_path)
 	software = header[CGI_SOFTWARE_PROGRAM]
 	software_version = header[CGI_SOFTWARE_VERSION]
-      elsif file_vendor = "VCF" then
+      elsif file_vendor == "VCF" then
         check = check_vcf_header(header, file_type, file_path)
 	if file_type == "VCF-INDEL-ANNOTATION" then
 	  software = header[VCF_SOURCE]
@@ -214,7 +214,7 @@ class Assembly < ActiveRecord::Base
         check = check_cgi_header(header, file_type, file_path)
 	software = header[CGI_SOFTWARE_PROGRAM]
 	software_version = header[CGI_SOFTWARE_VERSION]
-      elsif file_vendor = "VCF" then
+      elsif file_vendor == "VCF" then
         check = check_vcf_header(header, file_type, file_path)
 	if file_type == "VCF-INDEL-ANNOTATION" then
 	  software = header[VCF_SOURCE]
@@ -312,5 +312,15 @@ class Assembly < ActiveRecord::Base
     end
 
     return 1
+  end
+
+  def complete
+    # TODO: there should be a better way to do this other than to hardcode the file_type_id
+    var_file_count = self.assembly_files.where(["file_type_id = ?", 1]).count
+    vcf_file_count = self.assembly_files.where(["file_type_id = ?", 8]).count    
+    if var_file_count > 0 || vcf_file_count > 0 then
+      return true
+    end
+    return false
   end
 end

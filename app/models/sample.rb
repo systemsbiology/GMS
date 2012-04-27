@@ -24,6 +24,16 @@ class Sample < ActiveRecord::Base
     end
   }
 
+  scope :has_person, lambda { |person|
+    unless person.blank? or person[:id].nil?
+      person_id = person[:id]
+      unless person_id.blank?
+        { :include => :person,
+	:conditions => ['people.id = ?', person_id] }
+      end
+    end
+  }
+
   scope :order_by_pedigree 
     {
       :include => { :person => :pedigree},
@@ -43,6 +53,18 @@ class Sample < ActiveRecord::Base
     else 
       return "#{isb_sample_id} - #{sample_vendor_id} - #{self.person.identifier}"
     end
+  end
+
+  # return true if it has a VAR-ANNOTATION or a VCF-SNP-ANNOTATION
+  def complete
+    self.assays.each do |assay|
+      assay.assemblies.each do |assembly|
+        if assembly.complete then
+	  return true
+	end
+      end
+    end
+    return false
   end
 
 end
