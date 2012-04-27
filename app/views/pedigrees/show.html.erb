@@ -34,6 +34,7 @@
   <%= @pedigree.description %>
 </td>
 </tr>
+<tr><td colspan="3"><b>Pedigree Status:</b> <% if @pedigree.complete then %><span style="background-color:green;">&nbsp;&nbsp;</span>Complete<% else %><span style="background-color:red;">&nbsp;&nbsp;</span>Incomplete<% end %></td></tr>
 </table>
 <br />
 <%= button_to "Download Pedigree File", pedigree_file_path(@pedigree) %>
@@ -65,12 +66,12 @@
     <tbody>
     <% ordered_pedigree(@pedigree.id).each do |person| %>
       <tr>
-        <td><%= link_to person.isb_person_id, person %></td>
+        <td><% if person.planning_on_sequencing %><span style="background-color:<% if person.complete then %>green<% else %>red<% end %>">&nbsp;&nbsp;</span><% else %>&nbsp;&nbsp;<% end %> <%= link_to person.isb_person_id, person %></td>
         <td><%= person.full_collaborator %></td>
         <td><%= person.gender %></td>
         <td><%= person.dob %></td>
         <td><%= person.dod %></td>
-	<td><% if person.sequenced? and person.samples.count > 0 %><%= link_to person.samples.count, person unless person.samples.nil? %><% else %>NA<% end %></td>
+	<td><% if person.sequenced? and person.samples.count > 0 %><%= link_to person.samples.count, samples_path(:person => {:id => person}) unless person.samples.nil? %><% else %>NA<% end %></td>
 	<td><%= person.phenotypes.count > 0 ? link_to(person.phenotypes.count, traits_path(:person => person)) : person.phenotypes.count  %></td>
 	<td><%= person.diseases.count > 0 ? link_to(person.diseases.count, person_path(person)) : person.diseases.count %></td>
       </tr>
