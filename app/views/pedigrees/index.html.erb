@@ -9,6 +9,7 @@
 <table class="tablesorter">
   <thead>
   <tr>
+    <th>Status&nbsp;&nbsp;&nbsp;&nbsp;</th>
     <th>Name</th>
     <th>Tag&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
     <th>Study</th>
@@ -19,6 +20,11 @@
   <tbody>
   <% @pedigrees.each do |pedigree| %>
     <tr>
+      <% if pedigree.complete then %>
+        <td style="background-color:green"><span style="color: green;">C</span></td>
+      <% else %>
+        <td style="background-color:red"><span style="color: red;">I</span></td>
+      <% end %>
       <td><%= link_to pedigree.name, pedigree %></td>
       <td><%= pedigree.tag %></td>
       <td><%= pedigree.study.name if pedigree.study %></td>
