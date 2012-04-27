@@ -92,7 +92,7 @@ class AssaysController < ApplicationController
   end
 
   def summary_report
-    @counts = Assay.include_pedigree.group('pedigrees.id').has_reference(params[:reference], 'ASSEMBLY').count
+    @counts = Assay.include_pedigree.has_reference(params[:reference], 'ASSEMBLY').group('pedigrees.id').count
     @pedigrees = Pedigree.order("name")
 
 
