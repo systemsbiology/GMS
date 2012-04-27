@@ -34,7 +34,7 @@ gem 'cancan'
 
 gem 'paperclip'
 gem 'spreadsheet'
-gem 'princely'
+#gem 'princely'
 
 gem 'ancestry'
 #gem 'awesome_nested_set'
