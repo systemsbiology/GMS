@@ -65,6 +65,12 @@ def pedfile(pedigree_id)
   output_pedigree["pedigree_desc"] = ped.description
   output_pedigree["pedigree_version"] = ped.version
   output_pedigree["pedigree_subDir"] = ped.directory
+  output_pedigree["pedigree_complete"] = ped.complete
+  founders = Array.new
+  parentless_people(pedigree_id).each do |person|  # PARENTLESS PEOPLE IS A SIMPLE WAY OF FINDING FOUNDERS
+    founders.push(person.isb_person_id)
+  end
+  output_pedigree["pedigree_founders"] = founders
 
   check = ped.people.count
   if check <= 0 then
@@ -97,6 +103,11 @@ def pedfile(pedigree_id)
     person["phenotype"] = person_traits(ind)
     person["diseases"] = person_diseases(ind)
     person["comments"] = ind.comments
+    if founders.include? ind.isb_person_id then
+      person["founder"] = true
+    else
+      person["founder"] = false
+    end
 
     samples_list = Array.new
     ind.samples.each do |sample|
