@@ -284,12 +284,23 @@ class PedigreesController < ApplicationController
 
   # give a list of founder isb_person_ids
   def founders
-    @pedigree = Pedigree.find(params[:id])
-    return nil if @pedigree.nil?
-    @people = parentless_people(@pedigree.id)
     @founders = Hash.new
-    @people.each do |person|
-      @founders[person.isb_person_id] = person
+    if params[:id] || (params[:pedigree_filter] && !params[:pedigree_filter][:id].blank?) then
+      cur_ped_id = params[:id] if params[:id]
+      cur_ped_id = params[:pedigree_filter][:id] if params[:pedigree_filter]
+      @pedigree = Pedigree.find(cur_ped_id)
+      return nil if @pedigree.nil?
+      @people = parentless_people(@pedigree.id)
+      @people.each do |person|
+        @founders[person.isb_person_id] = person
+      end
+    else
+      Pedigree.all.each do |pedigree|
+        ped_people = parentless_people(pedigree.id)
+	ped_people.each do |person|
+	  @founders[person.isb_person_id] = person
+	end
+      end
     end
     respond_to do |format|
       format.html # founders.html.erb
