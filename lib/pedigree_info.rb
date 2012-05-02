@@ -103,7 +103,7 @@ def pedfile(pedigree_id)
     person["phenotype"] = person_traits(ind)
     person["diseases"] = person_diseases(ind)
     person["comments"] = ind.comments
-    person["to_be_sequenced"] = ind.planning_on_sequencing
+    person["planning_on_sequencing"] = ind.planning_on_sequencing
     if founders.include? ind.isb_person_id then
       person["founder"] = true
     else
