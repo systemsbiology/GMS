@@ -51,7 +51,9 @@ Problems in line number <%= error[0] %>:<br/>
 <% end %>
 </table>
 <% end %>
-<% unless @samples.empty? %>
+<% if @samples.empty? %>
+<p><b>No Samples Found</b>.  If you were expecting there to be samples, then this is an error!</p>
+<% else %>
 <h3>Samples Found</h3>
 <table class="tablesorter">
   <thead>
