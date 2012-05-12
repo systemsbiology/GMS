@@ -502,8 +502,24 @@ class PeopleController < ApplicationController
         flag = 1
         next
       end
+
       if flag == 1 then
         counter+=1
+	if row[2].nil? and ! row[3].nil? then
+		p = Person.new
+		p.errors.add(:customer_sample_id, "cannot be blank.")
+	          errors["#{counter}"] = Hash.new
+        	  errors["#{counter}"]["person"] = p.errors
+	          printable_row = Array.new
+        	  row.each do |cell|
+	            if cell.class == Spreadsheet::Formula then
+        	      printable_row << cell.value
+	            else 
+        	      printable_row << cell
+	            end
+        	  end
+	          errors["#{counter}"]["row"] = "<table><tr><td>"+printable_row.join("</td><td>")+"</tr></table>"
+	end
         next if row[2].nil? # skip empty rows at end of list
         next if row[0] == "A"  # skip header column list
 	if row[headers["Customer Subject ID"]].nil? then
@@ -535,7 +551,7 @@ class PeopleController < ApplicationController
         affected_status = row[headers["Affected Status"]]
 	if affected_status.nil? then
 	  diag = Diagnosis.new
-	  diag.errors.add(:disease_id, "could not be set.  No column called Affected Status found in upload spreadsheet.")
+	  diag.errors.add(:disease_id, "could not be set.  No value for Affected Status found in upload spreadsheet.")
 	  errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
 	  errors["#{counter}"]["affected_status"] = diag.errors
 	else
@@ -544,6 +560,13 @@ class PeopleController < ApplicationController
 	  # don't really have a way to indicate in the database that the person is known unaffected versus unknown
           if affected_status == "affected" then
 	    diagnoses.push([disease.id, p.collaborator_id])
+	  elsif affected_status == "unknown" or affected_status == "unaffected" then
+	    # do nothing - these are valid statuses but not stored in db
+	  else
+	    errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
+	    tp = Person.new
+	    tp.errors.add(:affected_status, "value provided not recognized - '#{affected_status}'. Should be 'affected' in order to set status correctly.")
+	    errors["#{counter}"]["affected_status"] = tp.errors
           end
 	end
      
