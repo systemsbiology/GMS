@@ -634,7 +634,7 @@ class PeopleController < ApplicationController
 
 	  # need to add sample tumor processing here TODO
 
-          if !vendor_id.match("-DNA_") then
+          if (!vendor_id.match("-DNA_") and vendor_id.match("GS")) then
             plate_id,plate_well = vendor_id.split(/_/,2)
             vendor_id = plate_id+"-DNA_"+plate_well
           end
