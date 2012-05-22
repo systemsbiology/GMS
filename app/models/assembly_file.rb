@@ -7,6 +7,7 @@ class AssemblyFile < ActiveRecord::Base
   auto_strip_attributes :name, :description, :location, :metadata, :software, :software_version, :comments
   validates_presence_of :name, :genome_reference_id, :assembly, :location, :software, :software_version, :file_date
   validates_uniqueness_of :name, :location
+  after_save :update_completeness
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
@@ -34,6 +35,15 @@ class AssemblyFile < ActiveRecord::Base
 
   def identifier
     "#{name} - #{vendor} - #{self.file_type.type_name}"
+  end
+
+  def update_completeness
+    if self.file_type_id == 1 or self.file_type_id == 8 then
+      person = self.assembly.assay.sample.person
+      logger.debug("setting person #{person.inspect} to complete")
+      person.update_attributes(:complete => true)
+      person.save
+    end
   end
 
 end
