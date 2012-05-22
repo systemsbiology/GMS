@@ -40,12 +40,4 @@ class Assay < ActiveRecord::Base
     "#{name} - #{vendor} - #{assay_type}"
   end
 
-  def complete
-    self.assemblies.each do |assembly|
-      if assembly.complete then
-        return true
-      end
-    end
-    return false
-  end
 end
