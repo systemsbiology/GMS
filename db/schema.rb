@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.string  "method"
   end
 
+  add_index "acquisitions", ["person_id", "sample_id"], :name => "person_id", :unique => true
   add_index "acquisitions", ["person_id"], :name => "acquisitions_person"
   add_index "acquisitions", ["sample_id"], :name => "acquisitions_sample"
 
@@ -112,6 +113,8 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.date    "updated_at"
   end
 
+  add_index "diagnoses", ["person_id", "disease_id"], :name => "person_id", :unique => true
+
   create_table "diseases", :force => true do |t|
     t.string   "name"
     t.string   "omim_id"
@@ -143,6 +146,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.string  "draw_duplicate"
   end
 
+  add_index "memberships", ["pedigree_id", "person_id"], :name => "pedigree_id", :unique => true
   add_index "memberships", ["pedigree_id"], :name => "membership_pedigree"
   add_index "memberships", ["person_id"], :name => "membership_person"
 
@@ -169,6 +173,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.date     "dod"
     t.boolean  "deceased",               :default => false, :null => false
     t.boolean  "planning_on_sequencing", :default => false
+    t.boolean  "complete"
     t.boolean  "root"
     t.text     "comments"
     t.datetime "created_at"
@@ -208,6 +213,8 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.datetime "updated_at"
   end
 
+  add_index "relationships", ["person_id", "relation_id", "relationship_type"], :name => "person_id", :unique => true
+
   create_table "report_types", :force => true do |t|
     t.string "name"
   end
@@ -228,6 +235,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
   end
 
   add_index "sample_assays", ["assay_id"], :name => "sample_assays_assay"
+  add_index "sample_assays", ["sample_id", "assay_id"], :name => "sample_id", :unique => true
   add_index "sample_assays", ["sample_id"], :name => "sample_assays_sample"
 
   create_table "sample_types", :force => true do |t|
@@ -240,14 +248,15 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
 
   create_table "samples", :force => true do |t|
     t.string   "isb_sample_id"
+    t.string   "customer_sample_id"
     t.integer  "sample_type_id"
     t.string   "sample_vendor_id"
     t.string   "status"
     t.date     "date_submitted"
     t.string   "protocol"
-    t.string   "volume",           :limit => 25
-    t.string   "concentration",    :limit => 25
-    t.string   "quantity",         :limit => 25
+    t.string   "volume",             :limit => 25
+    t.string   "concentration",      :limit => 25
+    t.string   "quantity",           :limit => 25
     t.date     "date_received"
     t.text     "description"
     t.text     "comments"
@@ -269,11 +278,22 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.datetime "updated_at"
   end
 
+  create_table "temp_objects", :force => true do |t|
+    t.integer   "trans_id"
+    t.string    "object_type"
+    t.text      "object"
+    t.timestamp "added",       :null => false
+    t.datetime  "created_at"
+    t.datetime  "updated_at"
+  end
+
   create_table "traits", :force => true do |t|
     t.integer "person_id"
     t.integer "phenotype_id"
     t.string  "trait_information"
     t.string  "output_order"
   end
+
+  add_index "traits", ["person_id", "phenotype_id"], :name => "person_id", :unique => true
 
 end
