@@ -55,16 +55,4 @@ class Sample < ActiveRecord::Base
     end
   end
 
-  # return true if it has a VAR-ANNOTATION or a VCF-SNP-ANNOTATION
-  def complete
-    self.assays.each do |assay|
-      assay.assemblies.each do |assembly|
-        if assembly.complete then
-	  return true
-	end
-      end
-    end
-    return false
-  end
-
 end
