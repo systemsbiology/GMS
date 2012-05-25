@@ -1,11 +1,11 @@
 @assays.each do |assay|
-  assay_id assay.id
   isb_assay_id 'isb_asy_'+assay.id.to_s
   pedigree_id assay.sample.person.pedigree.id
+  id assay.id
   name assay.name
   technology assay.technology
   vendor assay.vendor
-  assay_type assay.assay_type
+  type assay.assay_type
   description assay.description
   current assay.current
   status assay.status
@@ -14,4 +14,6 @@
   dated_backup assay.dated_backup
   qc_pass_date assay.qc_pass_date
   updated_at assay.updated_at
+  assay_id assay.id
+  assay_type assay.assay_type
 end

@@ -1,6 +1,7 @@
 array @samples do |sample|
   id sample.id
   isb_sample_id sample.isb_sample_id
+  name sample.sample_vendor_id
   sample_vendor_id sample.sample_vendor_id
   pedigree_id sample.person.pedigree.id
   isb_person_id sample.person.isb_person_id

@@ -3,7 +3,11 @@ class AssaysController < ApplicationController
   # GET /assays
   # GET /assays.xml
   def index
-    @assays = Assay.has_pedigree(params[:pedigree_filter]).has_name(params[:assay_name]).paginate(:page => params[:page], :per_page => 100)
+    if params[:name] then
+      @assays = Assay.has_pedigree(params[:pedigree_filter]).has_name(params[:assay_name]).paginate(:page => params[:page], :per_page => 100)
+    elsif params[:id]
+        @assays = Assay.has_pedigree(params[:pedigree_filter]).where("assays.id = ?", params[:id]).paginate :page => params[:page], :per_page => 100
+    end
 
     respond_to do |format|
       format.html # index.html.erb

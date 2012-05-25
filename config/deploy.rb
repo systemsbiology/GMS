@@ -3,7 +3,7 @@ require 'fileutils.rb'
 set :application, "GMS"
 set :deploy_to, "/u5/www/software/gms/"
 set :keep_releases, 3
-set :user, "dmauldin"
+set :user, "smontsar"
 set :shared_host, "bobama.systemsbiology.net"
 set :whenever_command, "bundle exec whenever"
 set :environment, "production"
