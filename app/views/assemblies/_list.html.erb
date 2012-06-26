@@ -4,10 +4,10 @@
 <table class="tablesorter">
   <thead>
   <tr>
-    <th>Sample ID</th>
+    <th>Assembly Name</th>
     <th>Pedigree</th>
     <th>Genome reference&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-    <th>Assembly Name</th>
+    <th>Sample ID</th>
     <th>File type</th>
     <th>Software&nbsp;&nbsp;</th>
     <th>Software version</th>
@@ -17,10 +17,10 @@
   <tbody>
 <% assemblies.each do |assembly| %>
   <tr>
-    <td><%= image_tag('file_location.png', :size => "20x20", :onmouseover => "$('#assembly_loc_#{assembly.id}').poshytip('show')", :onmouseout => "$('#assembly_loc_#{assembly.id}').poshytip('hide')", :id => "assembly_loc_#{assembly.id}") %><%= link_to assembly.assay.sample.sample_vendor_id, assembly.assay.sample %></td>
+    <td><%= image_tag('file_location.png', :size => "20x20", :onmouseover => "$('#assembly_loc_#{assembly.id}').poshytip('show')", :onmouseout => "$('#assembly_loc_#{assembly.id}').poshytip('hide')", :id => "assembly_loc_#{assembly.id}") %> <%= link_to assembly.name, assembly %></td>
     <td><%= assembly.assay.sample.nil? ? '' : assembly.assay.sample.person.nil? ? '' : link_to(assembly.assay.sample.person.pedigree.name, assembly.assay.sample.person.pedigree) %></td>
     <td><%= assembly.genome_reference.name %></td>
-    <td><%= link_to assembly.name, assembly %></td>
+    <td><%= link_to assembly.assay.sample.sample_vendor_id, assembly.assay.sample %></td>
     <td><%= assembly.file_type %></td>
     <td><%= assembly.software %></td>
     <td><%= assembly.software_version %></td>
