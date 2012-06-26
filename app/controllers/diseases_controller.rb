@@ -1,7 +1,3 @@
-require 'will_paginate'
-require 'will_paginate/array'
-
-
 class DiseasesController < ApplicationController
   # GET /diseases
   # GET /diseases.xml
