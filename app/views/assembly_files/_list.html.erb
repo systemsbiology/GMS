@@ -1,33 +1,30 @@
-<% logger.debug("assembly_files in list #{assembly_files.inspect}") %>
 <% if assembly_files.size == 0 %>
   <p>No files fulfill these conditions.</p>
 <% else %>
 <table class="tablesorter">
   <thead>
   <tr>
+    <th>Name</th>
+    <th>File type</th>
     <th>Sample ID</th>
     <th>Assembly</th>
     <th>Pedigree</th>
     <th>Genome reference&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-    <th>Name</th>
-    <th>File type</th>
     <th>Software&nbsp;&nbsp;</th>
     <th>Software version</th>
-    <th class="nosort">Controls</th>
   </tr>
   </thead>
   <tbody>
 <% assembly_files.each do |assembly_file| %>
   <tr>
-    <td><%= image_tag('file_location.png', :size => "20x20", :onmouseover => "$('#assembly_file_loc_#{assembly_file.id}').poshytip('show')", :onmouseout => "$('#assembly_file_loc_#{assembly_file.id}').poshytip('hide')", :id => "assembly_file_loc_#{assembly_file.id}") %><%= link_to assembly_file.assembly.assay.sample.sample_vendor_id, sample_path(assembly_file.assembly.assay.sample) %></td>
+    <td> <%= image_tag('file_location.png', :size => "20x20", :onmouseover => "$('#assembly_file_loc_#{assembly_file.id}').poshytip('show')", :onmouseout => "$('#assembly_file_loc_#{assembly_file.id}').poshytip('hide')", :id => "assembly_file_loc_#{assembly_file.id}") %> <%= link_to assembly_file.name, assembly_file %></td>
+    <td><%= assembly_file.file_type.type_name %></td>
+    <td> <%= link_to assembly_file.assembly.assay.sample.sample_vendor_id, sample_path(assembly_file.assembly.assay.sample) %></td>
     <td><%= link_to assembly_file.assembly.name, assembly_path(assembly_file.assembly) %></td>
     <td><%= assembly_file.assembly.assay.sample.nil? ? '' : assembly_file.assembly.assay.sample.person.nil? ? '' : assembly_file.assembly.assay.sample.person.pedigree.name %></td>
     <td><%= assembly_file.genome_reference.name %></td>
-    <td><%= assembly_file.name %></td>
-    <td><%= assembly_file.file_type.type_name %></td>
     <td><%= assembly_file.software %></td>
     <td><%= assembly_file.software_version %></td>
-    <td><%= link_to 'Show', assembly_file %></td>
   </tr>
   <script>
   $("#assembly_file_loc_<%= assembly_file.id %>").poshytip({
