@@ -11,7 +11,7 @@ end
 def madeline_header(pedigree)
   diseases = pedigree.diseases
 
-  header = "FamilyID\tIndividualID\tGender\tFather\tMother\tMZTwin\tDZTwin\tAffected\tSampled\tDeceased\tDOB\tRelationshipEnded\tSort_Order"
+  header = "FamilyID\tIndividualID\tGender\tFather\tMother\tMZTwin\tDZTwin\tAffected\tSampled\tDeceased\tDOB\tRelationshipEnded\tSortOrder"
   header << "\t" + diseases.map(&:name).join("\t")
 
   phenotypes = pedigree.phenotypes
@@ -30,8 +30,17 @@ def to_madeline(pedigree, people)
   phenotypes = pedigree.phenotypes
 
   twin_letter = 'A'
+  twin_count = 0
   people.each do |person|
-    cp, twin_letter = create_row(person, familyID, diseases, phenotypes, twin_letter)
+  blah = twin_count % 2 
+    if (((twin_count % 2) == 0) and twin_count > 0) then
+      # in order for the letter to not be the same, we need to create a new object.
+      #tl = twin_letter.dup
+      #tl.next!
+      #twin_letter = tl
+      twin_count = 0
+    end
+    cp, twin_count = create_row(person, familyID, diseases, phenotypes, twin_letter, twin_count)
     results.push(cp)
   end # end people.each
 
@@ -50,7 +59,7 @@ def to_madeline(pedigree, people)
 
 end
 
-def create_row(person, familyID, diseases, phenotypes, twin_letter)
+def create_row(person, familyID, diseases, phenotypes, twin_letter, twin_count)
     current_person = Array.new
     current_person.push(familyID)
     current_person.push(person.madeline_identifier) # isb_person_id - collaborator_ids
@@ -68,9 +77,7 @@ def create_row(person, familyID, diseases, phenotypes, twin_letter)
     mztwin = person.twins.where(:name => "monozygotic twin")
     if (mztwin.size > 0) then
       current_person.push(twin_letter)
-      # this increments once per person rather than once per set of twins... need to add checks and lookups 
-      #twin_letter = twin_letter.next
-
+      twin_count = twin_count + 1
     else
       current_person.push('.')
     end
@@ -78,7 +85,7 @@ def create_row(person, familyID, diseases, phenotypes, twin_letter)
     dztwin = person.twins.where(:name => "dizygotic twin")
     if (dztwin.size > 0) then
       current_person.push(twin_letter)
-      #twin_letter = twin_letter.next
+      twin_count += 1
     else
       current_person.push('.')
     end
@@ -125,7 +132,7 @@ def create_row(person, familyID, diseases, phenotypes, twin_letter)
       current_person.push('.')
     end
 
-    #Sort_Order
+    #SortOrder
     if person.father.nil? or person.father.empty? then
       if person.mother.nil? or person.mother.empty? then
         current_person.push(".")
@@ -170,7 +177,7 @@ def create_row(person, familyID, diseases, phenotypes, twin_letter)
     end
 
 
-  return current_person, twin_letter
+  return current_person, twin_count
 end
 
 
