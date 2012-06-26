@@ -44,7 +44,7 @@ gem 'ancestry'
 gem 'rspec-rails'
 #, '~> 2.6.0'
 
-gem 'madeline', '~> 0.1.8'
+gem 'madeline', '~> 0.1.10'
 
 gem 'rubyzip'
 gem 'auto_strip_attributes', "~> 1.0"
