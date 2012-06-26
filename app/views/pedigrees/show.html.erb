@@ -93,7 +93,7 @@
 <% end %>
 <br /><br />
 <h1>Diseases Diagnosed in this pedigree</h1>
-<%= render 'diseases/list', :diseases => @pedigree.diseases %>
+<%= render 'diseases/list', :diseases => @pedigree.diseases.paginate(:page => 5) %>
 <br /><br />
 <h1>Phenotypes in this pedigree</h1>
 <%= render 'partials/phenotypes', :phenotypes => @pedigree.phenotypes %>
