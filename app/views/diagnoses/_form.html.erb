@@ -7,7 +7,7 @@
   </div>
   <div class="field">
     <%= f.label :disease_id %><br />
-    <%= f.collection_select(:disease_id, Disease.all, :id, :name, { :include_blank => "-Select Disease or leave blank" }) %>
+    <%= f.collection_select(:disease_id, Disease.find(:all, :order => ['name']), :id, :name, { :include_blank => "-Select Disease or leave blank" }) %>
     <div>If disease is not in this list, then <%= link_to "create a new disease", new_disease_path %></div>
   </div>
   <div class="field">

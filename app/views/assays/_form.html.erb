@@ -7,15 +7,15 @@
   </div>
   <div class="field">
     <%= f.label :assay_type %><br />
-    <%= f.collection_select(:assay_type, Assay.find(:all, :select => 'DISTINCT assay_type'), :assay_type, :assay_type) %>
+    <%= f.collection_select(:assay_type, Assay.find(:all, :conditions =>[ "assay_type != ''"], :select => 'DISTINCT assay_type',:order => 'assay_type DESC'), :assay_type, :assay_type) %>
   </div>
   <div class="field">
     <%= f.label :vendor %><br />
-    <%= f.collection_select(:vendor, Assay.find(:all, :select => 'DISTINCT vendor'), :vendor, :vendor) %>
+    <%= f.collection_select(:vendor, Assay.find(:all, :conditions =>[ "vendor != ''"], :select => "DISTINCT vendor ",:order => 'vendor'), :vendor, :vendor) %>
   </div>
   <div class="field">
     <%= f.label :technology %><br />
-    <%= f.collection_select(:technology, Assay.find(:all, :select => 'DISTINCT technology'), :technology, :technology) %>
+    <%= f.collection_select(:technology, Assay.find(:all, :conditions =>[ "technology != ''"], :select => 'DISTINCT technology',:order => 'technology'), :technology, :technology) %>
   </div>
   <div class="field">
     <%= f.label :description %><br />
@@ -23,7 +23,7 @@
   </div>
   <div class="field">
     <%= f.label :status %><br />
-    <%= f.collection_select(:status, Assay.find(:all, :select => 'DISTINCT status'), :status, :status) %>
+    <%= f.collection_select(:status, Assay.find(:all, :conditions =>[ "status != ''"], :select => 'DISTINCT status'), :status, :status) %>
   </div>
   <% if params[:action] == 'new' then %>
     <div class="field">
