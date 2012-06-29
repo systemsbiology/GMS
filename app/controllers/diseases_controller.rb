@@ -2,7 +2,7 @@ class DiseasesController < ApplicationController
   # GET /diseases
   # GET /diseases.xml
   def index
-    @diseases = Disease.all
+    @diseases = Disease.find(:all, :order => ['name']).paginate :page => params[:page], :per_page => 100
 
     respond_to do |format|
       format.html # index.html.erb

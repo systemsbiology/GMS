@@ -85,7 +85,7 @@ GEM
       activesupport (>= 2.0.0)
     linecache19 (0.5.12)
       ruby_core_source (>= 0.1.4)
-    madeline (0.1.8)
+    madeline (0.1.10)
     mail (2.3.0)
       i18n (>= 0.4.0)
       mime-types (~> 1.16)
@@ -209,7 +209,7 @@ DEPENDENCIES
   gollum
   jquery-rails
   json_builder
-  madeline (~> 0.1.8)
+  madeline (~> 0.1.10)
   mysql
   paperclip
   rails

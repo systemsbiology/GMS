@@ -225,12 +225,13 @@ class PedigreesController < ApplicationController
       infile.print(madeline_info.join("\n"))
       infile.flush
       infile.close
+      #FileUtils.copy(infile.path, "/tmp/blah.txt")
 
       madeline_table = array_to_html_table(header.split(/\t/), madeline_array)
       madeline_table.gsub!(/table/, "table border=\"1\" cellspacing=\"0\"") #dunno how to get XMLBuilder to return a border
       # we want to regenerate the file every time because something may have changed.
       begin
-        tmpfile, warnings = Madeline::Interface.new(:embedded => true, :L => labels, "font-size"=> "10", "nolabeltruncation" => true, "sort" => "Sort_Order").draw(File.open(infile,'r'))
+        tmpfile, warnings = Madeline::Interface.new(:embedded => true, :L => labels, "font-size"=> "10", "nolabeltruncation" => true, "sort" => "SortOrder").draw(File.open(infile,'r'))
       rescue Exception => e
 	msg = e.message.gsub(/\e\[(\d+)m/, '')
 	msg.gsub!(/\n/, '<br />')
