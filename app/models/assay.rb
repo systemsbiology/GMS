@@ -2,6 +2,7 @@ class Assay < ActiveRecord::Base
   has_many :assemblies, :dependent => :destroy
   has_one :sample_assay
   has_one :sample, :through => :sample_assay
+  has_one :mediaName
 
   validates_presence_of :name, :assay_type, :technology
   validates_uniqueness_of :name

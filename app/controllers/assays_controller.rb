@@ -4,16 +4,18 @@ class AssaysController < ApplicationController
   # GET /assays.xml
   def index
     if params[:name] then
-      @assays = Assay.has_pedigree(params[:pedigree_filter]).has_name(params[:assay_name]).paginate(:page => params[:page], :per_page => 100)
+      @assays = Assay.has_pedigree(params[:pedigree_filter]).where(:name => params[:name]).paginate :page => params[:page], :per_page => 100
+    elsif params[:assay_name] then
+      @assays = Assay.has_pedigree(params[:pedigree_filter]).where(:name => params[:assay_name]).paginate :page => params[:page], :per_page => 100
     elsif params[:id]
-        @assays = Assay.has_pedigree(params[:pedigree_filter]).where("assays.id = ?", params[:id]).paginate :page => params[:page], :per_page => 100
+      @assays = Assay.has_pedigree(params[:pedigree_filter]).where("assays.id = ?", params[:id]).paginate :page => params[:page], :per_page => 100
     end
-
+    
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @assays }
-      format.js
       format.json { respond_with @assays } 
+      format.js
     end
   end
 

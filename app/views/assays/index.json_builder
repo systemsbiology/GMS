@@ -16,4 +16,5 @@
   updated_at assay.updated_at
   assay_id assay.id
   assay_type assay.assay_type
+  media_id assay.media_id
 end

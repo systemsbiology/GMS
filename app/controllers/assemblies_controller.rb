@@ -6,8 +6,8 @@ class AssembliesController < ApplicationController
   # GET /assembly.xml
   def index
 #    @assembly = find_all_by_pedigree_id(params[:pedigree_filter][:id]) if (params[:pedigree_filter])
-#    @assembly = @assembly.find(:all, :include => { :assay => { :sample => { :person => :pedigree } } },
-#                                        :conditions => [ 'pedigrees.id = ?', params[:pedigree_filter][:id] ]) if (params[:pedigree_filter])
+    #    @assembly = @assembly.find(:all, :include => { :assay => { :sample => { :person => :pedigree } } },
+    #                                        :conditions => [ 'pedigrees.id = ?', params[:pedigree_filter][:id] ]) if (params[:pedigree_filter])
     if params[:name] then
       if params[:name].match(/%/) then
         @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).where("name like ?", params[:name]).paginate :page => params[:page], :per_page => 100
@@ -17,7 +17,7 @@ class AssembliesController < ApplicationController
     else
       @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).paginate :page => params[:page], :per_page => 100
     end
-
+    
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @assemblies }
@@ -26,11 +26,10 @@ class AssembliesController < ApplicationController
     end
   end
 
+
   # GET /assembly/1
-  # GET /assembly/1.xml
   def show
     @assembly = Assembly.find(params[:id])
-
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @assembly }

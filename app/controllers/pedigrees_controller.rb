@@ -12,12 +12,20 @@ class PedigreesController < ApplicationController
   # GET /pedigrees
   # GET /pedigrees.xml
   def index
+    if params[:name] or  params[:pedigree_name] then
+      @pedigrees = Pedigree.where(:name => [params[:name] , params[:pedigree_name]] ).paginate :page => params[:page], :per_page => 100
+#    elsif params[:pedigree_name] then
+ #     @pedigrees = Pedigree.where(:name => params[:pedigree_name]).paginate :page => params[:page], :per_page => 100
+    elsif params[:id]
+      @pedigrees = Pedigree.where("pedigrees.id = ? or pedigrees.isb_pedigree_id = ?", 
+                                  params[:id],params[:id]).paginate :page => params[:page], :per_page => 100
+    else
     @pedigrees = Pedigree.find(:all, :include => :study, :order => ['studies.name', 'pedigrees.name'])
-
+    end
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @pedigrees }
-      format.json { render :json => @pedigrees }
+      format.json { respond_with :json => @pedigrees }
     end
   end
 

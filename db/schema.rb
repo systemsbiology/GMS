@@ -25,6 +25,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
 
   create_table "assays", :force => true do |t|
     t.string   "name"
+    t.string   "media_id"
     t.string   "vendor"
     t.string   "assay_type"
     t.string   "status"
@@ -48,11 +49,14 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.string   "file_type"
     t.date     "file_date"
     t.string   "status",              :limit => 50
+    t.date     "date_backedup"
     t.text     "metadata"
     t.string   "disk_id",             :limit => 50
     t.string   "software"
     t.string   "software_version"
     t.date     "record_date"
+    t.date     "qc_date"
+    t.boolean  "qc_pass",                           :default => false
     t.boolean  "current"
     t.text     "comments"
     t.integer  "created_by"
@@ -160,6 +164,10 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.string   "version"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.date     "genotype_vector"
+    t.date     "quartet"
+    t.date     "autozygosity_hmm"
+    t.date     "relation_pairing"
   end
 
   add_index "pedigrees", ["isb_pedigree_id"], :name => "pedigrees_isb_pedigree_id"
@@ -173,7 +181,6 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.date     "dod"
     t.boolean  "deceased",               :default => false, :null => false
     t.boolean  "planning_on_sequencing", :default => false
-    t.boolean  "complete"
     t.boolean  "root"
     t.text     "comments"
     t.datetime "created_at"

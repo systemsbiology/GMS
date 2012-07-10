@@ -6,3 +6,7 @@ pedigree_description @pedigree.description
 pedigree_id @pedigree.id
 pedigree_tag @pedigree.tag
 pedigree_isb_pedigree_id @pedigree.isb_pedigree_id
+genotype_vector @pedigree.genotype_vector
+quartet @pedigree.quartet
+autozygosity_hmm @pedigree.autozygosity_hmm
+relation_pairing @pedigree.relation_pairing
