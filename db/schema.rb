@@ -24,8 +24,9 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
   add_index "acquisitions", ["sample_id"], :name => "acquisitions_sample"
 
   create_table "assays", :force => true do |t|
-    t.string   "name"
+    t.string   "isb_assay_id"
     t.string   "media_id"
+    t.string   "name"
     t.string   "vendor"
     t.string   "assay_type"
     t.string   "status"
@@ -49,20 +50,20 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.string   "file_type"
     t.date     "file_date"
     t.string   "status",              :limit => 50
-    t.date     "date_backedup"
     t.text     "metadata"
     t.string   "disk_id",             :limit => 50
     t.string   "software"
     t.string   "software_version"
     t.date     "record_date"
-    t.date     "qc_date"
-    t.boolean  "qc_pass",                           :default => false
     t.boolean  "current"
     t.text     "comments"
     t.integer  "created_by"
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "ancestry"
+    t.datetime "coverage_data"
+    t.datetime "statistics"
+    t.datetime "bed_file"
   end
 
   create_table "assembly_files", :force => true do |t|
@@ -111,7 +112,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.integer "person_id"
     t.integer "disease_id"
     t.string  "age_of_onset",        :limit => 50
-    t.string  "disease_information"
+    t.text    "disease_information"
     t.integer "output_order"
     t.date    "created_at"
     t.date    "updated_at"
@@ -164,10 +165,10 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.string   "version"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.date     "genotype_vector"
-    t.date     "quartet"
-    t.date     "autozygosity_hmm"
-    t.date     "relation_pairing"
+    t.datetime "genotype_vector"
+    t.datetime "quartet"
+    t.datetime "autozygosity_hmm"
+    t.datetime "relation_pairing"
   end
 
   add_index "pedigrees", ["isb_pedigree_id"], :name => "pedigrees_isb_pedigree_id"
@@ -181,6 +182,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.date     "dod"
     t.boolean  "deceased",               :default => false, :null => false
     t.boolean  "planning_on_sequencing", :default => false
+    t.boolean  "complete"
     t.boolean  "root"
     t.text     "comments"
     t.datetime "created_at"
