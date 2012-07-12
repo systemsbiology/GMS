@@ -8,27 +8,35 @@ require 'iconv'
 class PedigreesController < ApplicationController
   unloadable
   respond_to :json
-
+  
   # GET /pedigrees
   # GET /pedigrees.xml
   def index
+    @pedigrees = Pedigree.find(:all, :include => :study, :order => ['studies.name', 'pedigrees.name'])
     if params[:name] or  params[:pedigree_name] then
       @pedigrees = Pedigree.where(:name => [params[:name] , params[:pedigree_name]] ).paginate :page => params[:page], :per_page => 100
-#    elsif params[:pedigree_name] then
- #     @pedigrees = Pedigree.where(:name => params[:pedigree_name]).paginate :page => params[:page], :per_page => 100
     elsif params[:id]
       @pedigrees = Pedigree.where("pedigrees.id = ? or pedigrees.isb_pedigree_id = ?", 
                                   params[:id],params[:id]).paginate :page => params[:page], :per_page => 100
     else
-    @pedigrees = Pedigree.find(:all, :include => :study, :order => ['studies.name', 'pedigrees.name'])
+      respond_to do |format|
+        format.html {
+          @pedigrees = Pedigree.find(:all, :include => :study, 
+                                     :order => ['studies.name', 'pedigrees.name'])
+        }
+        format.any{
+          @pedigrees = Pedigree.find(:all, :include => :study, 
+                                     :order => ['pedigrees.id'])
+        }
+      end
     end
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @pedigrees }
-      format.json { respond_with :json => @pedigrees }
+      format.json { respond_with @pedigrees }
     end
   end
-
+  
   # GET /pedigrees/1
   # GET /pedigrees/1.xml
   def show

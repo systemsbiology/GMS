@@ -8,27 +8,39 @@ class SamplesController < ApplicationController
   # GET /samples.xml
   def index
 #    @samples = Sample.has_pedigree(params[:pedigree_filter]).find(:all, :include => [:assays, {:person => :pedigree }], :order => ['pedigrees.name'])
-    @samples = Sample.has_pedigree(params[:pedigree_filter]).order_by_pedigree.paginate :page => params[:page], :per_page => 100
-    if params[:sample_vendor_id] then
-      if params[:sample_vendor_id].match(/%/) then
-        @samples = Sample.has_pedigree(params[:pedigree_filter]).where("samples.sample_vendor_id like ?", params[:sample_vendor_id]).find(:all, :include => {:person => {:pedigree => :study }}, :order => ['pedigrees.name']).paginate :page => params[:page], :per_page => 100
+    if params[:name] or params[:sample_vendor_id] then
+      nameArg=params[:name] if params[:name]
+      nameArg=params[:sample_vendor_id] if  params[:sample_vendor_id]
+      if nameArg.match(/%/) then
+        @samples = Sample.where("sample_vendor_id like ?", nameArg)
+          .find(:all, :include => {:person => {:pedigree => :study }}, 
+                :order => ['sample.sample_vendor_id']).paginate :page => params[:page], :per_page => 100
       else
-        @samples = Sample.has_pedigree(params[:pedigree_filter]).where("samples.sample_vendor_id = ?", params[:sample_vendor_id]).find(:all, :include => {:person => { :pedigree => :study} }, :order => ['pedigrees.name']).paginate :page => params[:page], :per_page => 100
-      end
-    elsif params[:isb_sample_id] then
-      if params[:isb_sample_id].match(/%/) then
-        @samples = Sample.has_pedigree(params[:pedigree_filter]).where("samples.isb_sample_id like ?", params[:isb_sample_id]).find(:all, :include => {:person => {:pedigree => :study }}, :order => ['pedigrees.name']).paginate :page => params[:page], :per_page => 100
-      else
-        @samples = Sample.has_pedigree(params[:pedigree_filter]).where("samples.isb_sample_id = ?", params[:isb_sample_id]).find(:all, :include => {:person => { :pedigree => :study} }, :order => ['pedigrees.name']).paginate :page => params[:page], :per_page => 100
+        @samples = Sample.where("sample_vendor_id = ?", nameArg)
+          .find(:all, :include => {:person => { :pedigree => :study} }, 
+                :order => ['sample.sample_vendor_id']).paginate :page => params[:page], :per_page => 100
       end
     elsif params[:id] then
       if params[:id].match(/%/) then
-        @samples = Sample.has_pedigree(params[:pedigree_filter]).where("samples.id like ?", params[:id]).find(:all, :include => {:person => {:pedigree => :study }}, :order => ['pedigrees.name']).paginate :page => params[:page], :per_page => 100
+        @samples = Sample.where("samples.id like ?", params[:id])
+          .find(:all, :include => {:person => {:pedigree => :study }}, 
+                :order => ['samples.id']).paginate :page => params[:page], :per_page => 100
       else
-        @samples = Sample.has_pedigree(params[:pedigree_filter]).where("samples.id = ?", params[:id]).find(:all, :include => {:person => { :pedigree => :study} }, :order => ['pedigrees.name']).paginate :page => params[:page], :per_page => 100
+        idNum=params[:id].gsub(/isb_sam.*_/,"")
+        @samples = Sample.where("id = ?", idNum)
+          .find(:all, :include => {:person => { :pedigree => :study} }, 
+                :order => ['samples.id']).paginate :page => params[:page], :per_page => 100
       end
     elsif params[:person] then
-      @samples = Sample.has_pedigree(params[:pedigree_filter]).has_person(params[:person]).order_by_pedigree.paginate :page => params[:page], :per_page => 100
+      @samples = Sample.has_person(params[:person])
+        .order_by_pedigree.paginate :page => params[:page], :per_page => 100
+      
+    else
+      
+      @samples = Sample.has_pedigree(params[:pedigree_filter])
+        .find(:all, :order => [ 'samples.id'])
+        .paginate :page => params[:page], :per_page => 100
+   
     end
 
     respond_to do |format|

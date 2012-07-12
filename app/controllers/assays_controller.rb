@@ -3,12 +3,26 @@ class AssaysController < ApplicationController
   # GET /assays
   # GET /assays.xml
   def index
-    if params[:name] then
-      @assays = Assay.has_pedigree(params[:pedigree_filter]).where(:name => params[:name]).paginate :page => params[:page], :per_page => 100
-    elsif params[:assay_name] then
-      @assays = Assay.has_pedigree(params[:pedigree_filter]).where(:name => params[:assay_name]).paginate :page => params[:page], :per_page => 100
+    if params[:name] or params[:assay_name] then
+      @assays = Assay.where(:name => [params[:name] , params[:assay_name]] )
+        .paginate :page => params[:page], :per_page => 100
     elsif params[:id]
-      @assays = Assay.has_pedigree(params[:pedigree_filter]).where("assays.id = ?", params[:id]).paginate :page => params[:page], :per_page => 100
+      idNum=params[:id].gsub(/isb_as.*y_/,"")
+      @assays = Assay.where("assays.id = ?", idNum)
+        .paginate :page => params[:page], :per_page => 100
+    else
+      respond_to do |format|
+        format.html {
+          @assays = Assay.has_pedigree(params[:pedigree_filter])
+            .find(:all, :order => [ 'assays.name'])
+            .paginate :page => params[:page], :per_page => 100
+        }
+        format.any  {
+          @assays = Assay.has_pedigree(params[:pedigree_filter])
+            .find(:all, :order => [ 'assays.id'])
+            .paginate :page => params[:page], :per_page => 100
+        }
+      end
     end
     
     respond_to do |format|

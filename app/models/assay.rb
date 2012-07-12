@@ -8,6 +8,10 @@ class Assay < ActiveRecord::Base
   validates_uniqueness_of :name
   auto_strip_attributes :name, :assay_type, :technology, :description
 
+  after_create :check_isb_assay_id
+  after_update :check_isb_assay_id
+
+
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
       pedigree_id = pedigree[:id]
@@ -36,6 +40,13 @@ class Assay < ActiveRecord::Base
   scope :include_pedigree, lambda {
     joins( :sample => { :person => :pedigree })
   }
+
+  def check_isb_assay_id
+    if self.isb_assay_id.nil? or !self.isb_assay_id.match(/isb_asy/) then
+      isb_assay_id = "isb_asy_"+self.id.to_s
+      self.update_attributes(:isb_assay_id => isb_assay_id)
+    end
+  end
 
   def identifier
     "#{name} - #{vendor} - #{assay_type}"

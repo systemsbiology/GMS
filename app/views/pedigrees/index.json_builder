@@ -1,6 +1,12 @@
-@pedigrees.each do |pedigree|
+array @pedigrees.each do |pedigree|
   id pedigree.id
-  isb_ped_id 'isb_ped_'+pedigree.id.to_s
+  if pedigree.isb_pedigree_id.nil? or pedigree.isb_pedigree_id.empty?
+     isb_ped_id 'isb_ped_'+pedigree.id.to_s
+     isb_pedigree_id 'isb_ped_'+pedigree.id.to_s
+  else
+     isb_pedigree_id pedigree.isb_pedigree_id
+     isb_ped_id pedigree.isb_pedigree_id
+  end         
   name pedigree.name
   study_id pedigree.study_id
   pedigree_name pedigree.name

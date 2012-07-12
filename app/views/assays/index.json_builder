@@ -1,11 +1,14 @@
-@assays.each do |assay|
-  isb_assay_id 'isb_asy_'+assay.id.to_s
+array @assays.each do |assay|
+  if assay.isb_assay_id.nil? or assay.isb_assay_id.empty?
+     isb_assay_id 'isb_asy_'+assay.id.to_s
+  else
+     isb_assay_id assay.isb_assay_id
+  end         
   pedigree_id assay.sample.person.pedigree.id
   id assay.id
   name assay.name
   technology assay.technology
   vendor assay.vendor
-  type assay.assay_type
   description assay.description
   current assay.current
   status assay.status

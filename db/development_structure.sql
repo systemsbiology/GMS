@@ -53,6 +53,7 @@ CREATE TABLE `assemblies` (
   `coverage_data` datetime default NULL,
   `statistics` datetime default NULL,
   `bed_file` datetime default NULL,
+  `isb_assembly_id` varchar(255) default NULL,
   PRIMARY KEY  (`id`)
 ) ENGINE=MyISAM AUTO_INCREMENT=1068 DEFAULT CHARSET=latin1;
 

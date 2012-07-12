@@ -1,9 +1,13 @@
-@assemblies.each do |assembly|
+array @assemblies.each do |assembly|
   id assembly.id
+  if assembly.isb_assembly_id.nil? or assembly.isb_assembly_id.empty?
+     isb_assembly_id 'isb_asm_'+assembly.id.to_s
+  else
+     isb_assembly_id assembly.isb_assembly_id
+  end         
+  name assembly.name
   assembly_id assembly.id
-  isb_assembly_id 'isb_asm_'+assembly.id.to_s
-  assay_id assembly.assay_id
-  isb_assay_id 'isb_asy_'+assembly.assay_id.to_s
+  assembly_name assembly.name
   pedigree_id assembly.assay.sample.person.pedigree.id
   current assembly.current
   description assembly.description
@@ -12,10 +16,11 @@
   file_type assembly.file_type
   genome_reference assembly.genome_reference.name
   location assembly.location
-  name assembly.name
   software assembly.software
   software_version assembly.software_version
   status assembly.status
   updated_at assembly.updated_at
-
+  coverage_data assembly.coverage_data
+  statistics assembly.statistics
+  bed_file assembly.bed_file
 end

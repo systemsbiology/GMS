@@ -12,6 +12,9 @@ class Assembly < ActiveRecord::Base
   validates_presence_of :name, :genome_reference_id, :assay, :location, :software, :software_version, :file_date
   validates_uniqueness_of :name, :location
 
+  after_create :check_isb_assay_id
+  after_update :check_isb_assay_id
+
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
       pedigree_id = pedigree[:id]
@@ -324,3 +327,11 @@ class Assembly < ActiveRecord::Base
     return false
   end
 end
+
+  def check_isb_assembly_id
+    if self.isb_assembly_id.nil? or !self.isb_assembly_id.match(/isb_asm/) then
+      isb_assembly_id = "isb_asm_"+self.id.to_s
+      self.update_attributes(:isb_assembly_id => isb_assembly_id)
+    end
+  end
+
