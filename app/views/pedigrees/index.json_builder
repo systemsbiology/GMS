@@ -1,0 +1,17 @@
+@pedigrees.each do |pedigree|
+  id pedigree.id
+  isb_ped_id 'isb_ped_'+pedigree.id.to_s
+  name pedigree.name
+  study_id pedigree.study_id
+  pedigree_name pedigree.name
+  pedigree_directory pedigree.directory
+  pedigree_description pedigree.description
+  pedigree_id pedigree.id
+  pedigree_tag pedigree.tag
+  created_at pedigree.created_at
+  updated_at   pedigree.updated_at
+  genotype_vector pedigree.genotype_vector
+  quartet pedigree.quartet
+  autozygosity_hmm pedigree.autozygosity_hmm
+  relation_pairing  pedigree.relation_pairing 
+end
