@@ -64,6 +64,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.datetime "coverage_data"
     t.datetime "statistics"
     t.datetime "bed_file"
+    t.string   "isb_assembly_id"
   end
 
   create_table "assembly_files", :force => true do |t|
