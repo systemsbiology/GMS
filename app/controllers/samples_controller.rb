@@ -14,11 +14,11 @@ class SamplesController < ApplicationController
       if nameArg.match(/%/) then
         @samples = Sample.where("sample_vendor_id like ?", nameArg)
           .find(:all, :include => {:person => {:pedigree => :study }}, 
-                :order => ['sample.sample_vendor_id']).paginate :page => params[:page], :per_page => 100
+                :order => ['samples.sample_vendor_id']).paginate :page => params[:page], :per_page => 100
       else
         @samples = Sample.where("sample_vendor_id = ?", nameArg)
           .find(:all, :include => {:person => { :pedigree => :study} }, 
-                :order => ['sample.sample_vendor_id']).paginate :page => params[:page], :per_page => 100
+                :order => ['samples.sample_vendor_id']).paginate :page => params[:page], :per_page => 100
       end
     elsif params[:id] then
       if params[:id].match(/%/) then
