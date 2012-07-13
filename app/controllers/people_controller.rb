@@ -5,15 +5,27 @@ require 'relationship'
 require 'sample'
 
 class PeopleController < ApplicationController
+  respond_to :json
   # GET /people
   # GET /people.xml
   def index
-    @people = Person.has_pedigree(params[:pedigree_filter]).paginate :page => params[:page], :per_page => 100
+    respond_to do |format|
+      format.html {
+        @people = Person.has_pedigree(params[:pedigree_filter])
+          .paginate :page => params[:page], :per_page => 100
+      }
+      format.any  {
+        @people = Person.has_pedigree(params[:pedigree_filter])
+          .find(:all, :order => [ 'people.id'])
+      }
+    end
+    
 
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @people }
       format.js
+      format.json { respond_with @people }
     end
   end
 
@@ -25,6 +37,7 @@ class PeopleController < ApplicationController
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @person }
+      format.json { respond_with @person }
     end
   end
 
