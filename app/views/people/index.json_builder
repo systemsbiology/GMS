@@ -1,0 +1,19 @@
+array @people do |person|
+id person.id
+  if person.isb_person_id.nil? or person.isb_person_id.empty?
+     isb_person_id 'isb_ind_'+person.id.to_s
+  else
+     isb_person_id person.isb_person_id
+  end         
+collaborator_id person.collaborator_id
+gender person.gender
+dob person.dob
+dod person.dod
+deceased person.deceased
+planning_on_sequencing person.planning_on_sequencing
+complete person.complete
+root person.root
+comments person.comments
+created_at person.created_at
+updated_at person.updated_at
+end
