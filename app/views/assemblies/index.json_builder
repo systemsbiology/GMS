@@ -5,10 +5,14 @@ array @assemblies.each do |assembly|
   else
      isb_assembly_id assembly.isb_assembly_id
   end         
+  if assembly.assay.nil?
+     pedigree_id 'unknown'
+  else        
+     pedigree_id assembly.assay.sample.person.pedigree.id
+  end         
   name assembly.name
   assembly_id assembly.id
   assembly_name assembly.name
-  pedigree_id assembly.assay.sample.person.pedigree.id
   current assembly.current
   description assembly.description
   disk_id assembly.disk_id

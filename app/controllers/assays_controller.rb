@@ -4,11 +4,11 @@ class AssaysController < ApplicationController
   # GET /assays.xml
   def index
     if params[:name] or params[:assay_name] then
-      @assays = Assay.where(:name => [params[:name] , params[:assay_name]] )
+      @assays = Assay.has_pedigree(params[:pedigree_filter]).where(:name => [params[:name] , params[:assay_name]] )
         .paginate :page => params[:page], :per_page => 100
     elsif params[:id]
       idNum=params[:id].gsub(/isb_as.*y_/,"")
-      @assays = Assay.where("assays.id = ?", idNum)
+      @assays = Assay.has_pedigree(params[:pedigree_filter]).where("assays.id = ?", idNum)
         .paginate :page => params[:page], :per_page => 100
     else
       respond_to do |format|
@@ -20,7 +20,6 @@ class AssaysController < ApplicationController
         format.any  {
           @assays = Assay.has_pedigree(params[:pedigree_filter])
             .find(:all, :order => [ 'assays.id'])
-            .paginate :page => params[:page], :per_page => 100
         }
       end
     end

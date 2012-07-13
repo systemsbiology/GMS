@@ -37,10 +37,18 @@ class SamplesController < ApplicationController
       
     else
       
-      @samples = Sample.has_pedigree(params[:pedigree_filter])
-        .find(:all, :order => [ 'samples.id'])
-        .paginate :page => params[:page], :per_page => 100
-   
+      respond_to do |format|
+        format.html {
+          @samples = Sample.has_pedigree(params[:pedigree_filter])
+            .find(:all, :order => [ 'samples.id'])
+            .paginate :page => params[:page], :per_page => 100
+        }
+        format.any  {
+          @samples = Sample.has_pedigree(params[:pedigree_filter])
+            .find(:all, :order => [ 'samples.id'])
+        }
+      end
+    
     end
 
     respond_to do |format|

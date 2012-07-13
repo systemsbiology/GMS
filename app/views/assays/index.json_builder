@@ -4,7 +4,11 @@ array @assays.each do |assay|
   else
      isb_assay_id assay.isb_assay_id
   end         
-  pedigree_id assay.sample.person.pedigree.id
+  if  assay.sample.nil? 
+    pedigree_id 'unknown'
+  else
+    pedigree_id assay.sample.person.pedigree.id
+  end         
   id assay.id
   name assay.name
   technology assay.technology

@@ -29,7 +29,6 @@ class AssembliesController < ApplicationController
         format.any  {
           @assemblies = Assembly.has_pedigree(params[:pedigree_filter])
             .find(:all, :order => [ 'assemblies.id'])
-            .paginate :page => params[:page], :per_page => 100
         }
       end     
     end
