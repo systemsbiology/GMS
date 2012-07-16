@@ -45,7 +45,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.integer  "genome_reference_id"
     t.integer  "assay_id"
     t.string   "name"
-    t.string   "isb_assebly_id"
+    t.string   "isb_assembly_id"
     t.string   "description"
     t.string   "location"
     t.string   "file_type"

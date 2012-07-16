@@ -1,30 +1,38 @@
 array @assemblies.each do |assembly|
-  id assembly.id
-  if assembly.isb_assembly_id.nil? or assembly.isb_assembly_id.empty?
-     isb_assembly_id 'isb_asm_'+assembly.id.to_s
-  else
-     isb_assembly_id assembly.isb_assembly_id
-  end         
-  if assembly.assay.nil?
-     pedigree_id 'unknown'
-  else        
-     pedigree_id assembly.assay.sample.person.pedigree.id
-  end         
-  name assembly.name
-  assembly_id assembly.id
-  assembly_name assembly.name
-  current assembly.current
-  description assembly.description
-  disk_id assembly.disk_id
-  file_date assembly.file_date
-  file_type assembly.file_type
-  genome_reference assembly.genome_reference.name
-  location assembly.location
-  software assembly.software
-  software_version assembly.software_version
-  status assembly.status
-  updated_at assembly.updated_at
-  coverage_data assembly.coverage_data
-  statistics assembly.statistics
-  bed_file assembly.bed_file
+	id                   assembly.id
+	name                 assembly.name                
+	if assembly.isb_assembly_id.nil? or assembly.isb_assembly_id.empty?
+	     isb_assembly_id 'isb_asm_'+assembly.id.to_s
+	else
+	     isb_assembly_id assembly.isb_assembly_id
+	end         
+	if assembly.assay.nil?
+	    pedigree_id 'unknown'
+	else        
+            pedigree_id assembly.assay.sample.person.pedigree.id
+	end         
+	genome_reference_id  assembly.genome_reference_id
+	genome_reference     assembly.genome_reference.name
+	assay_id             assembly.assay_id            
+	description          assembly.description         
+	location             assembly.location            
+	file_type            assembly.file_type           
+	file_date            assembly.file_date           
+	status               assembly.status              
+	metadata             assembly.metadata            
+	disk_id              assembly.disk_id             
+	software             assembly.software            
+	software_version     assembly.software_version    
+	record_date          assembly.record_date         
+	current              assembly.current             
+	comments             assembly.comments            
+	created_by           assembly.created_by          
+	created_at           assembly.created_at          
+	updated_at           assembly.updated_at          
+	ancestry             assembly.ancestry            
+	coverage_data_date   assembly.coverage_data_date  
+	qa_data_date         assembly.qa_data_date        
+	bed_file_date        assembly.bed_file_date       
+	genotype_file_date   assembly.genotypefile_date
 end
+	
