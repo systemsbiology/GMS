@@ -33,6 +33,6 @@ array @assemblies.each do |assembly|
 	coverage_data_date   assembly.coverage_data_date  
 	qa_data_date         assembly.qa_data_date        
 	bed_file_date        assembly.bed_file_date       
-	genotype_file_date   assembly.genotypefile_date
+	genotype_file_date   assembly.genotype_file_date
 end
 	
