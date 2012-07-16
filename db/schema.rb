@@ -170,7 +170,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.datetime "genotype_vector_date"
     t.datetime "quartet_date"
     t.datetime "auotzygosity_date"
-    t.datetime "relation_pairing"
+    t.datetime "relation_pairing_date"
   end
 
   add_index "pedigrees", ["isb_pedigree_id"], :name => "pedigrees_isb_pedigree_id"
