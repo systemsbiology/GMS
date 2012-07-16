@@ -45,6 +45,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.integer  "genome_reference_id"
     t.integer  "assay_id"
     t.string   "name"
+    t.string   "isb_assebly_id"
     t.string   "description"
     t.string   "location"
     t.string   "file_type"
@@ -61,10 +62,10 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.datetime "created_at"
     t.datetime "updated_at"
     t.string   "ancestry"
-    t.datetime "coverage_data"
-    t.datetime "statistics"
-    t.datetime "bed_file"
-    t.string   "isb_assembly_id"
+    t.datetime "coverage_data_date"
+    t.datetime "qa_data_date"
+    t.datetime "bed_file_date"
+    t.datetime "genotype_file_date"
   end
 
   create_table "assembly_files", :force => true do |t|
@@ -166,9 +167,9 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.string   "version"
     t.datetime "created_at"
     t.datetime "updated_at"
-    t.datetime "genotype_vector"
-    t.datetime "quartet"
-    t.datetime "autozygosity_hmm"
+    t.datetime "genotype_vector_date"
+    t.datetime "quartet_date"
+    t.datetime "auotzygosity_date"
     t.datetime "relation_pairing"
   end
 
