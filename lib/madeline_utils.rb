@@ -22,7 +22,6 @@ end
 
 # takes an ordered list of people and writes out their relationships
 def to_madeline(pedigree, people)
-
   results = Array.new
   familyID = pedigree.tag
 
@@ -60,6 +59,7 @@ def to_madeline(pedigree, people)
 end
 
 def create_row(person, familyID, diseases, phenotypes, twin_letter, twin_count)
+    return [],twin_count if person.nil? 
     current_person = Array.new
     current_person.push(familyID)
     current_person.push(person.madeline_identifier) # isb_person_id - collaborator_ids
