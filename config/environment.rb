@@ -4,6 +4,7 @@ require File.expand_path('../application', __FILE__)
 # Configuration directives for application locations
 PEDIGREES_DIR = Rails.root.join('public/pedigrees')
 MADELINE_DIR = Rails.root.join('public/pedigrees/madeline')
+EXPORT_DIR = Rails.root.join('public/pedigrees/export')
 PEDIGREE_ROOT = "/proj/famgen/studies"
 PEDFILES_DIR = Rails.root.join('public/pedigrees/pedFiles')
 KWANZAA_DIR = Rails.root.join('public/pedigrees/kwanzaa')
@@ -45,6 +46,7 @@ FILE_TYPES = {
 		'cnvSegments' => { 'type' => 'CNV-SEGMENTS', 'vendor' => 'CGI' },
 		'highConfidenceJunctions' => { 'type' => 'JUNCTIONS', 'vendor' => 'CGI' },
 		'summary-' => { 'type' => 'SUMMARY', 'vendor' => 'CGI'},
+		'highConfidenceSvEvents' => {'type' => 'SVEVENTS', 'vendor' => 'CGI' },
 		# VCF FILES
 		'.snp.filtered.vcf' => { 'type' => 'VCF-SNP-ANNOTATION', 'vendor' => 'VCF' },
 		'.indel.vcf' => { 'type' => 'VCF-INDEL-ANNOTATION', 'vendor' => 'VCF' }
