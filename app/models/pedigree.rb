@@ -44,6 +44,7 @@ class Pedigree < ActiveRecord::Base
     cm = Array.new
     cmhash = Hash.new
     ordered_people.each do |person|
+      next if person.nil?
       if (person.spouses.size > 0 and person.offspring.empty?) then
         unless (cm.include?(person.id)) then
           cm.push(person.id)
