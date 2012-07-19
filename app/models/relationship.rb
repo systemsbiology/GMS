@@ -1,7 +1,7 @@
 class Relationship < ActiveRecord::Base
   belongs_to :person, :class_name => "Person"
   belongs_to :relation, :class_name => "Person"
-  validates_presence_of :person_id, :relation_id, :relationship_type, :name
+  validates_presence_of :person_id, :relation_id, :relationship_type, :name, :relation_order
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
