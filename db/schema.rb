@@ -50,9 +50,9 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.string   "location"
     t.string   "file_type"
     t.date     "file_date"
-    t.string   "status",              :limit => 50
+    t.string   "status",                                            :limit => 50
     t.text     "metadata"
-    t.string   "disk_id",             :limit => 50
+    t.string   "disk_id",                                           :limit => 50
     t.string   "software"
     t.string   "software_version"
     t.date     "record_date"
@@ -66,6 +66,33 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.datetime "qa_data_date"
     t.datetime "bed_file_date"
     t.datetime "genotype_file_date"
+    t.float    "COVERAGE_Alltypes_Fully_Called_Percent"
+    t.float    "COVERAGE_Alltypes_Partially_Called_Percent"
+    t.float    "COVERAGE_Alltypes_No_Called_Percent"
+    t.integer  "COVERAGE_Alltypes_Fully_Called_Count",              :limit => 8
+    t.integer  "COVERAGE_Alltypes_Partially_Called_Count",          :limit => 8
+    t.integer  "COVERAGE_Alltypes_No_Called_Count",                 :limit => 8
+    t.integer  "COVERAGE_Exon_Any_Called_Count",                    :limit => 8
+    t.integer  "COVERAGE_Unclassified_Any_Called_Count",            :limit => 8
+    t.integer  "COVERAGE_Repeat_Simple_Low_Fully_Called_Count",     :limit => 8
+    t.integer  "COVERAGE_Repeat_Int_Young_Fully_Called_Count",      :limit => 8
+    t.integer  "COVERAGE_Repeat_Other_Fully_Called_Count",          :limit => 8
+    t.integer  "COVERAGE_Cnv_Fully_Called_Count",                   :limit => 8
+    t.integer  "COVERAGE_Segdup_Fully_Called_Count",                :limit => 8
+    t.integer  "COVERAGE_Exon_Partially_Called_Count",              :limit => 8
+    t.integer  "COVERAGE_Unclassified_Partially_Called_Count",      :limit => 8
+    t.integer  "COVERAGE_Repeat_Simple_Low_Partially_Called_Count", :limit => 8
+    t.integer  "COVERAGE_Repeat_Int_Young_Partially_Called_Count",  :limit => 8
+    t.integer  "COVERAGE_Repeat_Other_Partially_Called_Count",      :limit => 8
+    t.integer  "COVERAGE_Cnv_Partially_Called_Count",               :limit => 8
+    t.integer  "COVERAGE_Segdup_Partially_Called_Count",            :limit => 8
+    t.integer  "COVERAGE_Exon_No_Called_Count",                     :limit => 8
+    t.integer  "COVERAGE_Unclassified_No_Called_Count",             :limit => 8
+    t.integer  "COVERAGE_Repeat_Simple_Low_No_Called_Count",        :limit => 8
+    t.integer  "COVERAGE_Repeat_Int_Young_No_Called_Count",         :limit => 8
+    t.integer  "COVERAGE_Repeat_Other_No_Called_Count",             :limit => 8
+    t.integer  "COVERAGE_Cnv_No_Called_Count",                      :limit => 8
+    t.integer  "COVERAGE_Segdup_No_Called_Count",                   :limit => 8
   end
 
   create_table "assembly_files", :force => true do |t|

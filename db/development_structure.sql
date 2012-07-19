@@ -7,7 +7,7 @@ CREATE TABLE `acquisitions` (
   UNIQUE KEY `person_id` (`person_id`,`sample_id`),
   KEY `acquisitions_person` (`person_id`),
   KEY `acquisitions_sample` (`sample_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=721 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=728 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `assays` (
   `id` int(11) NOT NULL auto_increment,
@@ -27,13 +27,14 @@ CREATE TABLE `assays` (
   `created_at` datetime default NULL,
   `updated_at` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=686 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=746 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `assemblies` (
   `id` int(11) NOT NULL auto_increment,
   `genome_reference_id` int(11) default NULL,
   `assay_id` int(11) default NULL,
   `name` varchar(255) default NULL,
+  `isb_assembly_id` varchar(255) default NULL,
   `description` varchar(255) default NULL,
   `location` varchar(255) default NULL,
   `file_type` varchar(255) default NULL,
@@ -50,12 +51,39 @@ CREATE TABLE `assemblies` (
   `created_at` datetime default NULL,
   `updated_at` datetime default NULL,
   `ancestry` varchar(255) default NULL,
-  `coverage_data` datetime default NULL,
-  `statistics` datetime default NULL,
-  `bed_file` datetime default NULL,
-  `isb_assembly_id` varchar(255) default NULL,
+  `coverage_data_date` datetime default NULL,
+  `qa_data_date` datetime default NULL,
+  `bed_file_date` datetime default NULL,
+  `genotype_file_date` datetime default NULL,
+  `COVERAGE_Alltypes_Fully_Called_Percent` float default NULL,
+  `COVERAGE_Alltypes_Partially_Called_Percent` float default NULL,
+  `COVERAGE_Alltypes_No_Called_Percent` float default NULL,
+  `COVERAGE_Alltypes_Fully_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Alltypes_Partially_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Alltypes_No_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Exon_Any_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Unclassified_Any_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Repeat_Simple_Low_Fully_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Repeat_Int_Young_Fully_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Repeat_Other_Fully_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Cnv_Fully_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Segdup_Fully_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Exon_Partially_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Unclassified_Partially_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Repeat_Simple_Low_Partially_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Repeat_Int_Young_Partially_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Repeat_Other_Partially_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Cnv_Partially_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Segdup_Partially_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Exon_No_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Unclassified_No_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Repeat_Simple_Low_No_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Repeat_Int_Young_No_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Repeat_Other_No_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Cnv_No_Called_Count` bigint(20) default NULL,
+  `COVERAGE_Segdup_No_Called_Count` bigint(20) default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=1068 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=1128 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `assembly_files` (
   `id` int(11) NOT NULL auto_increment,
@@ -78,7 +106,7 @@ CREATE TABLE `assembly_files` (
   `updated_at` datetime default NULL,
   `ancestry` varchar(255) default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=4901 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=5321 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `audits` (
   `id` int(11) NOT NULL auto_increment,
@@ -123,7 +151,7 @@ CREATE TABLE `diseases` (
   `created_at` datetime default NULL,
   `updated_at` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=26 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=27 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `file_types` (
   `id` int(11) NOT NULL auto_increment,
@@ -155,7 +183,7 @@ CREATE TABLE `memberships` (
   UNIQUE KEY `pedigree_id` (`pedigree_id`,`person_id`),
   KEY `membership_person` (`person_id`),
   KEY `membership_pedigree` (`pedigree_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=990 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `pedigrees` (
   `id` int(11) NOT NULL auto_increment,
@@ -168,14 +196,14 @@ CREATE TABLE `pedigrees` (
   `version` varchar(255) default NULL,
   `created_at` datetime default NULL,
   `updated_at` datetime default NULL,
-  `genotype_vector` datetime default NULL,
-  `quartet` datetime default NULL,
-  `autozygosity_hmm` datetime default NULL,
-  `relation_pairing` datetime default NULL,
+  `genotype_vector_date` datetime default NULL,
+  `quartet_date` datetime default NULL,
+  `auotzygosity_date` datetime default NULL,
+  `relation_pairing_date` datetime default NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `index_pedigrees_on_name_and_tag` (`name`,`tag`),
   KEY `pedigrees_isb_pedigree_id` (`isb_pedigree_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=101 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=102 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `people` (
   `id` int(11) NOT NULL auto_increment,
@@ -193,7 +221,7 @@ CREATE TABLE `people` (
   `updated_at` datetime default NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `index_people_on_isb_person_id` (`isb_person_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=985 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=995 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `person_aliases` (
   `id` int(11) NOT NULL auto_increment,
@@ -216,7 +244,7 @@ CREATE TABLE `phenotypes` (
   `created_at` datetime default NULL,
   `updated_at` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=121 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=122 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `relationships` (
   `id` int(11) NOT NULL auto_increment,
@@ -258,7 +286,7 @@ CREATE TABLE `sample_assays` (
   UNIQUE KEY `sample_id` (`sample_id`,`assay_id`),
   KEY `sample_assays_sample` (`sample_id`),
   KEY `sample_assays_assay` (`assay_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=687 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=747 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `sample_types` (
   `id` int(11) NOT NULL auto_increment,
@@ -268,7 +296,7 @@ CREATE TABLE `sample_types` (
   `created_at` datetime default NULL,
   `updated_at` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `samples` (
   `id` int(11) NOT NULL auto_increment,
@@ -289,7 +317,7 @@ CREATE TABLE `samples` (
   `updated_at` datetime default NULL,
   PRIMARY KEY  (`id`),
   KEY `samples_isb_sample_id` (`isb_sample_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=702 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=709 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `schema_migrations` (
   `version` varchar(255) NOT NULL,
@@ -308,7 +336,7 @@ CREATE TABLE `studies` (
   `created_at` datetime default NULL,
   `updated_at` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=30 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `temp_objects` (
   `id` int(11) NOT NULL auto_increment,
@@ -319,7 +347,7 @@ CREATE TABLE `temp_objects` (
   `created_at` datetime default NULL,
   `updated_at` datetime default NULL,
   PRIMARY KEY  (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=582 DEFAULT CHARSET=latin1;
+) ENGINE=MyISAM AUTO_INCREMENT=586 DEFAULT CHARSET=latin1;
 
 CREATE TABLE `traits` (
   `id` int(11) NOT NULL auto_increment,
@@ -329,7 +357,7 @@ CREATE TABLE `traits` (
   `output_order` varchar(255) default NULL,
   PRIMARY KEY  (`id`),
   UNIQUE KEY `person_id` (`person_id`,`phenotype_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=450 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=451 DEFAULT CHARSET=latin1;
 
 INSERT INTO schema_migrations (version) VALUES ('1');
 
