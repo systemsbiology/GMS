@@ -22,3 +22,8 @@
 every 30.minutes do 
   rake "clean:temp_objects"
 end
+
+every 1.days do
+  rake "export:export_all_pedigrees"
+  rake "export:export_individual_pedigrees"
+end
