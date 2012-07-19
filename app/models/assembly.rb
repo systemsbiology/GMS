@@ -38,12 +38,16 @@ class Assembly < ActiveRecord::Base
   # in the config files.
   def ensure_files_up_to_date
     files = find_assembly_files
+    #print "files #{files}\n"
     add_files = check_add_assembly_files(files)
+    #print "add files #{add_files}\n\n"
     errors = add_assembly_files(add_files)
+    #print "errors #{errors}\n\n"
     if errors.size > 0 then
       return errors
     end
     update_files = check_update_assembly_files(files)
+    #puts "update files #{update_files}\n\n"
     errors = update_assembly_files(update_files)
     if errors.size > 0 then
       return errors
@@ -57,12 +61,18 @@ class Assembly < ActiveRecord::Base
   def find_assembly_files
     start_dir = self.location
     files = Hash.new
+    if ! File.directory? start_dir then
+      errors.add(:location, "Directory #{start_dir} does not exist on the system.")
+      abort("Directory #{start_dir} does not exist on the system for #{self.inspect}")
+    end
+    #puts "start dir is #{start_dir}"
     Find.find(start_dir) do |path|
       filename = File.basename(path).split("/").last
       FILE_TYPES.each { |filepart, filehash| 
 	type = filehash["type"]
 	vendor = filehash["vendor"]
         if filename.match(filepart) then 
+     #     puts "filename is #{filename}"
           files[type] = Hash.new
 	  files[type]["path"] = path
 	  files[type]["vendor"] = vendor
@@ -124,6 +134,8 @@ class Assembly < ActiveRecord::Base
   end
 
   def add_assembly_files(files=self.check_add_assembly_files)
+    #print "self at front of adda_ssembly_files #{self.inspect} #{self.location}\n\n"
+    #print "self sample #{self.assay.sample.inspect}\n\n"
     if files.size == 0 then
       logger.error("add_assembly_files didn't get any results from check_add_assembly_files")
       return []
@@ -132,8 +144,8 @@ class Assembly < ActiveRecord::Base
     files.each do |file_path, file_hash|
       file_type = file_hash["type"]
       file_vendor = file_hash["vendor"]
-      #puts "file type is #{file_type} and path is #{file_path}"
-      #puts FileType.find_by_type_name(file_type).id
+#      puts "file type is #{file_type} and path is #{file_path}"
+#      puts FileType.find_by_type_name(file_type).id
       file_type_id = FileType.find_by_type_name(file_type).id
       # header returns the top of the file, use variables in environment.rb to 
       # figure out what the names of the fields are that we're looking for
@@ -152,6 +164,8 @@ class Assembly < ActiveRecord::Base
 	end
 	software_version = "UNKNOWN"
       end
+
+       puts "file #{file_path} file_vendor #{file_vendor} file_type_id #{file_type_id} check #{check} software #{software} software_version #{software_version}\n"
 
       if check == 0 then
         logger.error("skipping file #{file_path} because it contains incorrect values for this filetype")
@@ -274,14 +288,18 @@ class Assembly < ActiveRecord::Base
         logger.error("ERROR: file genome_reference #{header[CGI_GENOME_REFERENCE]} doesn't match  #{self.genome_reference.build_name}.  Make sure that the value for CGI_GENOME_REFERENCE in config/environment.rb is correct.")
 	return 0 
       end
+
       if header[CGI_SAMPLE].nil? or header[CGI_SAMPLE] != self.assay.sample.sample_vendor_id then
-        logger.error("ERROR: file sample #{header[CGI_SAMPLE]} doesn't match #{self.assay.sample.sample_vendor_id}.  Make sure that the value for CGI_SAMPLE in config/environment.rb is correct.")
+        #print "file sample #{header[CGI_SAMPLE]} doesn't match #{self.assay.sample.sample_vendor_id}\n"
+        logger.error("ERROR: file HEADER sample #{header[CGI_SAMPLE]} doesn't match SELF VENDOR_ID #{self.assay.sample.sample_vendor_id}.  Make sure that the value for CGI_SAMPLE in config/environment.rb is correct.")
 	return 0 
       end
+
       if header[CGI_SOFTWARE_PROGRAM].nil? then
         logger.error("ERROR: file_sample #{header[CGI_SAMPLE]} doesn't have a CGI_SOFTWARE_PROGRAM value.")
 	return 0
       end
+
 #  CGI uses GENE-ANNOTATION for ncRNA file but we want to be more specific, so we can't check unless we add exceptions.
 #      if header[CGI_FILE_TYPE] and header[CGI_FILE_TYPE] != file_type then
 #        logger.error("ERROR: file type #{header[CGI_FILE_TYPE]} doesn't match #{file_type}.  Make sure that the value for CGI_FILE_TYPE in config/environment.rb is correct.")
