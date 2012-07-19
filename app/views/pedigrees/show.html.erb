@@ -65,6 +65,9 @@
     </thead>
     <tbody>
     <% ordered_pedigree(@pedigree.id).each do |person| %>
+      <% if person.nil? %>
+        <tr><td colspan="8">People in this pedigree have been incorrectly linked to other pedigrees via incorrect relationships.  Please check the database for information about this pedigree and fix it.</td></tr>
+      <% else %>
       <tr>
         <td><% if person.planning_on_sequencing %><span style="background-color:<% if person.complete then %>green<% else %>red<% end %>">&nbsp;&nbsp;</span><% else %>&nbsp;&nbsp;<% end %> <%= link_to person.isb_person_id, person %></td>
         <td><%= person.full_collaborator %></td>
@@ -75,6 +78,7 @@
 	<td><%= person.phenotypes.count > 0 ? link_to(person.phenotypes.count, traits_path(:person => person)) : person.phenotypes.count  %></td>
 	<td><%= person.diseases.count > 0 ? link_to(person.diseases.count, person_path(person)) : person.diseases.count %></td>
       </tr>
+      <% end %>
     <% end %>
     <tbody>
   </table>
