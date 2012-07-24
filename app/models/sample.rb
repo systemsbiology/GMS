@@ -15,7 +15,13 @@ class Sample < ActiveRecord::Base
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
+      if pedigree.kind_of?(Array) then
+        pedigree_id = pedigree[0]
+      elsif pedigree.kind_of?(Hash) then
       pedigree_id = pedigree[:id]
+      else
+      pedigree_id = pedigree.to_i
+      end
       unless pedigree_id.blank?
         { :include => { :person => :pedigree  },
           :conditions => [ 'pedigrees.id = ?', pedigree_id]
