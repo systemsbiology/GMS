@@ -309,26 +309,37 @@ class PeopleController < ApplicationController
     temp_objects = TempObject.find_all_by_trans_id(trans_id)
     @errors = Array.new
     temp_objects.each do |temp_obj|
-      obj_array = Marshal.load(temp_obj.object)
+      # need the begin rescue block because Person includes pedigree information and it needs to lazy load the pedigree class otherwise there is an error
+      begin 
+        obj_array = Marshal.load(temp_obj.object)
+      rescue ArgumentError => error
+        lazy_load ||= Hash.new {|hash, hash_key| hash[hash_key] = true; false}
+        if error.to_s[/undefined class|referred/] && !lazy_load[error.to_s.split.last.constantize]
+          retry
+        else
+          raise error
+        end
+      end
       obj_array.each do |obj|
 	if obj.class == Array then
 	  if temp_obj.object_type == "Relationship" then
   	    # this is to deal with Relationship objects because we create a straight array
 	    # for them because we don't know the person.id for the person if it hasn't
   	    # been created already...
-	    person_collaborator_id = obj[0]
-	    relation_collaborator_id = obj[1]
-	    rel_name = obj[2]
-	    rel_order = obj[3]
+	    pedigree_id = obj[0]
+	    person_collaborator_id = obj[1]
+	    relation_collaborator_id = obj[2]
+	    rel_name = obj[3]
+	    rel_order = obj[4]
 
 	    rel = Relationship.new
-	    person = Person.find_by_collaborator_id(person_collaborator_id)
+	    person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(person_collaborator_id)
 	    if person.nil? then
-	      rel.errors.add(:person_id, "not found for #{person_collaborator_id}")
+	      rel.errors.add(:person_id, "not found for #{person_collaborator_id} in pedigree #{pedigree_id}")
 	      @errors.push(["relationship", rel, rel.errors])
 	      next
 	    end
-	    relation = Person.find_by_collaborator_id(relation_collaborator_id)
+	    relation = Person.has_pedigree(pedigree_id).find_by_collaborator_id(relation_collaborator_id)
 	    if relation.nil? then 
 	      rel.errors.add(:person_id, "not found for #{relation_collaborator_id}")
 	      @errors.push(["relationship", rel, rel.errors])
@@ -393,10 +404,10 @@ class PeopleController < ApplicationController
 	    end 
 	  elsif temp_obj.object_type == "Membership" then
 	    ped = Pedigree.find(obj[0])
-	    person = Person.find_by_collaborator_id(obj[1])
+	    person = Person.find_by_collaborator_id_and_pedigree_id(obj[1], obj[0])
   	    m = Membership.new
 	    if person.nil? then
-	      m.errors.add(:person_id,"not found for #{obj[1]}")
+	      m.errors.add(:person_id,"not found for #{obj[1]} in pedigree #{obj[0]}")
 	      @errors.push(["membership",m, m.errors])
 	    else
 	      m.person_id = person.id
@@ -408,11 +419,15 @@ class PeopleController < ApplicationController
 	      end
 	    end
 	  elsif temp_obj.object_type == "Acquisition" then
-	    person = Person.find_by_collaborator_id(obj[0])
-	    sample = Sample.find_by_sample_vendor_id(obj[1])
+	    pedigree_id = obj[0]
+	    person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(obj[1])
+	    sample = Sample.find_by_sample_vendor_id_and_pedigree_id(obj[2], obj[0])
   	    acq = Acquisition.new
 	    if person.nil? then
 	      acq.errors.add(:person_id,"not found for #{obj[0]}")
+	      @errors.push(["acquisition",acq, acq.errors])
+	    elsif sample.nil? then
+	      acq.errors.add(:sample_id,"not found for #{obj[0]} person #{obj[1]} and sample #{obj[2]}")
 	      @errors.push(["acquisition",acq, acq.errors])
 	    else
 	      acq.person_id = person.id
@@ -425,14 +440,20 @@ class PeopleController < ApplicationController
 	    end
 	  elsif temp_obj.object_type == "Diagnosis" then 
 	    disease = Disease.find(obj[0])
-	    person = Person.find_by_collaborator_id(obj[1])
-	    diagnosis = Diagnosis.new
-	    diagnosis.person_id = person.id
-	    diagnosis.disease_id = disease.id
-	    if diagnosis.valid? then
-	      diagnosis.save
-	    else
+	    pedigree_id = obj[1]
+	    person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(obj[2])
+            diagnosis = Diagnosis.new
+	    if person.nil? then
+	      diagnosis.errors.add(:person_id,"not found for disease #{obj[0]} pedigree #{pedigree_id} collaborator_id #{obj[2]}")
 	      @errors.push(["diagnosis",diagnosis, diagnosis.errors])
+	    else
+  	      diagnosis.person_id = person.id
+	      diagnosis.disease_id = disease.id
+	      if diagnosis.valid? then
+	        diagnosis.save
+	      else
+	        @errors.push(["diagnosis",diagnosis, diagnosis.errors])
+	      end
 	    end
 	  end
 	else
@@ -550,15 +571,14 @@ class PeopleController < ApplicationController
 	if (customer_subject_id.is_a? Float) then 
 	  customer_subject_id = customer_subject_id.to_i
 	end
-
-        p = Person.find_by_collaborator_id(customer_subject_id) || Person.new
+        p = Person.has_pedigree(pedigree.id).find_by_collaborator_id(customer_subject_id) || Person.new
         p.collaborator_id = customer_subject_id
-	logger.debug("collaborator_id is #{customer_subject_id}")
         p.gender = row[headers["Gender"]].downcase  # downcase it to make sure Female and FEMALE and female are the same...
 	if p.gender != "male" and p.gender != "female" and p.gender != "unknown" then
 	  p.errors.add(:gender,"invalid selection #{row[headers["Gender"]]}")
         end
         p.comments = row[headers["Comments"]]
+        p.pedigree_id = pedigree.id
 
         # add diagnosis for this person if affected 
         affected_status = row[headers["Affected Status"]]
@@ -572,7 +592,7 @@ class PeopleController < ApplicationController
 	  # other statuses are unaffected and unknown but those aren't handled right now...
 	  # don't really have a way to indicate in the database that the person is known unaffected versus unknown
           if affected_status == "affected" then
-	    diagnoses.push([disease.id, p.collaborator_id])
+	    diagnoses.push([disease.id, pedigree.id, p.collaborator_id])
 	  elsif affected_status == "unknown" or affected_status == "unaffected" then
 	    # do nothing - these are valid statuses but not stored in db
 	  else
@@ -593,22 +613,22 @@ class PeopleController < ApplicationController
 	r = Relationship.new
 	if mother_id == father_id then
 	  unless mother_id.nil? or mother_id.to_s.match('NA') or mother_id.to_s.empty? then
-            relationships.push([mother_id, customer_subject_id, 'mother', child_order])
+            relationships.push([pedigree.id, mother_id, customer_subject_id, 'mother', child_order])
 	    r.errors.add(:parent_id, "Father ID '#{father_id}' and mother ID '#{mother_id}' are the same.  Only entering one relationship.")
 	  end
 	else
 	  unless mother_id.nil? or mother_id.to_s.match('NA') or mother_id.to_s.empty? then
-            relationships.push([mother_id, customer_subject_id, 'mother', child_order])
+            relationships.push([pedigree.id, mother_id, customer_subject_id, 'mother', child_order])
 	  end
 	  unless father_id.nil? or father_id.to_s.match('NA') or father_id.to_s.empty? then
-            relationships.push([father_id, customer_subject_id, 'father', child_order]) 
+            relationships.push([pedigree.id, father_id, customer_subject_id, 'father', child_order]) 
 	  end
         end
 
 	mz_twin_id = row[headers["Monozygotic Twin Subject ID"]]
 	mz_twin_id = mz_twin_id.to_i if (mz_twin_id.is_a? Float)
 	if (!mz_twin_id.nil? and !mz_twin_id.empty? and !mz_twin_id.to_s.match('NA')) then
-          relationships.push([customer_subject_id, mz_twin_id, 'monozygotic twin','1'])
+          relationships.push([pedigree.id, customer_subject_id, mz_twin_id, 'monozygotic twin','1'])
         end
 
 	spouse_id =  row[headers["Spouse Subject ID"]]
@@ -617,7 +637,7 @@ class PeopleController < ApplicationController
   	  spouse_order = row[headers["Spouse Order"]].to_i
   	  spouse_order = 1 if spouse_order.nil? or spouse_order.to_s.match('NA')
           #this person has a spouse and they are the X spouse that they've had
-	  relationships.push([customer_subject_id, spouse_id, 'undirected', spouse_order])
+	  relationships.push([pedigree.id, customer_subject_id, spouse_id, 'undirected', spouse_order])
 
           if r.errors.size > 0 then 
 	    errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
@@ -628,7 +648,7 @@ class PeopleController < ApplicationController
         vendor_id = row[headers["Sequencing Sample ID"]]
         if !vendor_id.nil? then  
           # create the sample information
-	  s = Sample.find_by_sample_vendor_id(vendor_id) || Sample.new
+	  s = Sample.find(:first, :conditions => {:sample_vendor_id => vendor_id, :pedigree_id =>pedigree.id}) || Sample.new
           source = row[headers["Sample Source"]]
 
   	  customer_sample_id = row[headers["Customer Sample ID"]]
@@ -653,8 +673,9 @@ class PeopleController < ApplicationController
           end
           vendor_id = vendor_id
           s.sample_vendor_id = vendor_id
+	  s.pedigree_id = pedigree.id
 
-	  acquisitions.push([customer_subject_id, vendor_id])
+	  acquisitions.push([pedigree.id, customer_subject_id, vendor_id])
  
 	  # handle volume, concentration, quantity
           volume = row[headers["Volume"]]
@@ -700,9 +721,6 @@ class PeopleController < ApplicationController
 
 	# queue up membership information /sigh
         memberships.push([pedigree.id, p.collaborator_id])
-
-
-
 
       end # end if flag
 

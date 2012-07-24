@@ -216,6 +216,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.text     "comments"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "pedigree_id"
   end
 
   add_index "people", ["isb_person_id"], :name => "index_people_on_isb_person_id", :unique => true
@@ -300,6 +301,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.text     "comments"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "pedigree_id"
   end
 
   add_index "samples", ["isb_sample_id"], :name => "samples_isb_sample_id"

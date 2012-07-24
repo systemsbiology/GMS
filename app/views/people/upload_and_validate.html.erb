@@ -73,12 +73,14 @@ Problems in line number <%= error[0] %>:<br/>
 <table class="tablesorter">
   <thead>
     <th>disease</th>
+    <th>pedigree</th>
     <th>person</th>
   </thead>
   <% @diagnoses.each do |diag| %>
   <tr>
     <td><%= Disease.find(diag[0]).name %></td>
     <td><%= diag[1] %></td>
+    <td><%= diag[2] %></td>
   </tr>
   <% end %>
 </table>
@@ -101,6 +103,7 @@ Problems in line number <%= error[0] %>:<br/>
 <h3>Relationships Found</h3>
 <table class="tablesorter">
   <thead>
+    <th>relationship pedigree</th>
     <th>relationship person</th>
     <th>relationship relation</th>
     <th>relationship type</th>
@@ -112,6 +115,7 @@ Problems in line number <%= error[0] %>:<br/>
     <td><%= rel[1] %></td>
     <td><%= rel[2] %></td>
     <td><%= rel[3] %></td>
+    <td><%= rel[4] %></td>
   </tr>
   <% end %>
 </table>

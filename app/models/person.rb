@@ -19,7 +19,8 @@ class Person < ActiveRecord::Base
 
   auto_strip_attributes :collaborator_id
   validates_presence_of :collaborator_id, :gender
-  validates_uniqueness_of :collaborator_id, :isb_person_id
+  validates_uniqueness_of :collaborator_id, :scope => :pedigree_id
+  validates_uniqueness_of :isb_person_id
 
   after_save :check_isb_person_id
   after_update :check_isb_person_id
@@ -101,7 +102,7 @@ class Person < ActiveRecord::Base
       pedigree_id = pedigree.to_i
       end
       unless pedigree_id.blank?
-        joins(:pedigree).
+        includes(:pedigree).
         where('pedigrees.id = ?', pedigree_id)
       end
     end

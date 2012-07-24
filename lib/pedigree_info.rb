@@ -665,6 +665,7 @@ def down_breadth_unrooted_branch(people, current_gen)
   people.each do |person|
     puts("down_breadth_unrooted_branch loop for person #{person.inspect}")
     # offspring orders by relation_order
+    next if person.nil?
     offspr = person.offspring
     puts("offspring is #{offspr}")
     person.offspring.each do |offspring_rel|
@@ -686,6 +687,7 @@ def up_breadth_unrooted_branch(people, current_gen)
   puts("up_breadth_unrooted_branch called")
   new_gen = Array.new
   people.each do |person|
+    next if person.nil?
     person.ordered_parents.each do |parent_rel|
       parent = parent_rel.relation
       puts("up_breadth_unrooted_branch parent is #{parent.inspect}")
@@ -702,7 +704,7 @@ end
 
 def side_unrooted_branch(person, previous)
   puts("side_unrooted_branch called")
-  return previous if person.spouses.size == 0
+  return previous if person.nil? or person.spouses.size == 0
   person.spouses.each do |spouse_rel|
     spouse = spouse_rel.relation
     puts("side_unrooted_branch found spouse #{spouse.inspect}")
