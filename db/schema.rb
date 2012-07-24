@@ -107,7 +107,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.integer "person_id"
     t.integer "disease_id"
     t.string  "age_of_onset",        :limit => 50
-    t.string  "disease_information"
+    t.text    "disease_information"
     t.integer "output_order"
     t.date    "created_at"
     t.date    "updated_at"
@@ -178,6 +178,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.text     "comments"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "pedigree_id"
   end
 
   add_index "people", ["isb_person_id"], :name => "index_people_on_isb_person_id", :unique => true
@@ -262,6 +263,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.text     "comments"
     t.datetime "created_at"
     t.datetime "updated_at"
+    t.integer  "pedigree_id"
   end
 
   add_index "samples", ["isb_sample_id"], :name => "samples_isb_sample_id"
