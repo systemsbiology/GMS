@@ -6,38 +6,31 @@ class AssembliesController < ApplicationController
   # GET /assembly.xml
   def index
 #    @assembly = find_all_by_pedigree_id(params[:pedigree_filter][:id]) if (params[:pedigree_filter])
-    #    @assembly = @assembly.find(:all, :include => { :assay => { :sample => { :person => :pedigree } } },
-    #                                        :conditions => [ 'pedigrees.id = ?', params[:pedigree_filter][:id] ]) if (params[:pedigree_filter])
-
-    @assemblies = Assembly.has_pedigree(params[:pedigree_filter])
-      .paginate :page => params[:page], :per_page => 100
-    if params[:name] or params[:assembly_name] then
-      @assemblies = Assembly.where(:name => [params[:name] , params[:assembly_name]] )
-        .paginate :page => params[:page], :per_page => 100
-    elsif params[:id] 
-      idNum=params[:id].gsub(/isb_asm_/,"")
-      @assemblies = Assembly.where("assemblies.id = ?", 
-                                   idNum)
-        .paginate :page => params[:page], :per_page => 100
+#    @assembly = @assembly.find(:all, :include => { :assay => { :sample => { :person => :pedigree } } },
+#                                        :conditions => [ 'pedigrees.id = ?', params[:pedigree_filter][:id] ]) if (params[:pedigree_filter])
+    if params[:name] then
+      if params[:name].match(/%/) then
+        @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).where("name like ?", params[:name]).paginate :page => params[:page], :per_page => 100
+      else
+        @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).where(:name => params[:name]).paginate :page => params[:page], :per_page => 100
+      end
     else
-      respond_to do |format|
-        format.html {# show.html.erb
-          @assemblies = Assembly.has_pedigree(params[:pedigree_filter])
-            .find(:all, :order => [ 'assemblies.name'])
-            .paginate :page => params[:page], :per_page => 100
-        }
-        format.any  {
-          @assemblies = Assembly.has_pedigree(params[:pedigree_filter])
-            .find(:all, :order => [ 'assemblies.id'])
-        }
-      end     
+      @assemblies = Assembly.has_pedigree(params[:pedigree_filter]).paginate :page => params[:page], :per_page => 100
+    end
+
+    respond_to do |format|
+      format.html # index.html.erb
+      format.xml  { render :xml => @assemblies }
+      format.json  { respond_with @assemblies }
+      format.js
     end
   end
 
-
   # GET /assembly/1
+  # GET /assembly/1.xml
   def show
     @assembly = Assembly.find(params[:id])
+
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @assembly }
@@ -143,5 +136,8 @@ class AssembliesController < ApplicationController
     end
   end
 
+  def graph_by_month
+
+  end
 
 end
