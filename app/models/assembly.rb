@@ -9,11 +9,11 @@ class Assembly < ActiveRecord::Base
 
   auto_strip_attributes :name, :location, :description, :metadata, :software, :software_version, :comments
   validate :validates_assembly_directory
-  validates_presence_of :name, :genome_reference_id, :assay, :location, :software, :software_version, :file_date
+  validates_presence_of :name, :genome_reference_id, :assay, :location, :software, :software_version
   validates_uniqueness_of :name, :location
 
-  after_create :check_isb_assay_id
-  after_update :check_isb_assay_id
+  after_create :check_isb_assembly_id
+  after_update :check_isb_assembly_id
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
