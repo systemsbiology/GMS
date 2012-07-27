@@ -83,7 +83,7 @@
 	    <% if person.samples.first.customer_sample_id.nil? %>
 	      <td>NA</td>
 	    <% else %>
-	    <td><%= person.samples.first.customer_sample_id %></td>
+	      <td><%= person.samples.first.customer_sample_id %></td>
 	    <% end %>
 	  <% else %>
 	    <td><%= image_tag('file_location.png', :size => "20x20", :onmouseover => "$('#person_#{person.id}').poshytip('show')", :onmouseout => "$('#person_#{person.id}').poshytip('hide')", :id => "person_#{person.id}") %><%= link_to 'Multiple Samples', samples_path(:person => {:id => person}), {:onmouseover => "$('#person_#{person.id}').poshytip('show')", :onmouseout => "$('#person_#{person.id}').poshytip('hide')" } %></td>
@@ -108,8 +108,9 @@
 	     </script>
 	  <% end %>
 	<% else %>
-	<td>NA</td>
-	<td>NA</td>
+	  <td>NA</td>
+	  <td>NA</td>
+	  <td>NA</td>
 	<% end %>
 	<td><%= person.phenotypes.count > 0 ? link_to(person.phenotypes.count, traits_path(:person => person)) : person.phenotypes.count  %></td>
 	<td><%= person.diseases.count > 0 ? link_to(person.diseases.count, person_path(person)) : person.diseases.count %></td>
