@@ -22,13 +22,29 @@ class Person < ActiveRecord::Base
   validates_uniqueness_of :collaborator_id, :scope => :pedigree_id
   validates_uniqueness_of :isb_person_id
 
-  after_save :check_isb_person_id
-  after_update :check_isb_person_id
+  after_save :check_isb_person_id, :check_completeness
+  after_update :check_isb_person_id, :check_completeness
+
 
   def check_isb_person_id
     if self.isb_person_id.nil? then
       isb_person_id = 'isb_ind_'+ self.id.to_s
       self.update_attributes(:isb_person_id => isb_person_id)
+    end
+  end
+
+  def check_completeness
+    # if any sample is complete then person is complete
+    return if self.complete 
+    self.samples.each do |sample|
+      sample.assays.each do |assay|
+        assay.assemblies.each do |assembly|
+	  af = AssemblyFile.find_all_by_assembly_id_and_file_type_id(assembly.id, [1,8])
+	  if af.count > 0
+	    self.update_attributes(:complete => true)
+	  end
+	end
+      end
     end
   end
 
