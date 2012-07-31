@@ -476,6 +476,7 @@ class PeopleController < ApplicationController
       end
 
     end # end temp_objects.each do
+    sleep(5.seconds)
   end
 
 ############################################################################################################
