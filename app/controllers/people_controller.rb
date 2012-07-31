@@ -251,7 +251,8 @@ class PeopleController < ApplicationController
     # person needs to be written first
     rc = write_temp_object(@trans_id, "person",@people) unless @people.nil? or @people.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
-    
+    sleep(5.seconds) # to make sure person gets written...
+
     # sample must be written next
     rc = write_temp_object(@trans_id, "sample",@samples) unless @samples.nil? or @samples.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
@@ -578,11 +579,9 @@ class PeopleController < ApplicationController
 
         p = Person.has_pedigree(pedigree.id).find_by_collaborator_id(customer_subject_id) 
 	if (p.nil?) then
-	  logger.debug("checking customer_sample_id #{customer_sample_id}")
 	  p = Person.has_pedigree(pedigree.id).find_by_collaborator_id(customer_sample_id)
 	end
 	p = Person.new if p.nil?
-	logger.debug("person is #{p.inspect}")
         p.collaborator_id = customer_subject_id
         p.gender = row[headers["Gender"]].downcase  # downcase it to make sure Female and FEMALE and female are the same...
 	if p.gender != "male" and p.gender != "female" and p.gender != "unknown" then
