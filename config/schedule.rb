@@ -25,5 +25,8 @@ end
 
 every 1.days do
   rake "export:export_all_pedigrees"
-  rake "export:export_individual_pedigrees"
+  rake "export:export_all_assemblies"
+  rake "export:export_all_assembly_files"
+  rake "export:export_all_individuals"
+  rake "export:export_all_samples"
 end
