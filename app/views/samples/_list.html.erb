@@ -37,10 +37,11 @@
 <% end %>
 </tbody>
 </table>
+
+<%= will_paginate @samples %>
 <% else %>
 <table class="tablesorter">
   <tr><td>No samples found for this query</td></tr>
 </table>
 <% end %>
 
-<%= will_paginate @samples %>
