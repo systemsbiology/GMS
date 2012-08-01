@@ -1,9 +1,9 @@
 require 'fileutils.rb'
+load 'config/user.rb' # contains set :user, "username"
 
 set :application, "GMS"
 set :deploy_to, "/u5/www/software/gms/"
 set :keep_releases, 3
-set :user, "dmauldin"
 set :shared_host, "bobama.systemsbiology.net"
 set :whenever_command, "bundle exec whenever"
 set :environment, "production"
