@@ -49,7 +49,7 @@ namespace :pedigree do
     if args[:pedigree_id].nil? then
       puts "adding all pedigrees to list"
       Pedigree.all.each do |ped|
-        puts "addinng #{ped.id} to list"
+        puts "adding #{ped.id} to list"
         peds.push(ped.id)
       end
     else
@@ -84,6 +84,35 @@ namespace :pedigree do
   def parse_json(filename)
     index_contents = File.read(filename)
     ActiveSupport::JSON.decode(index_contents)
+  end
+
+  desc "run pedigree_founders"
+  task :pedigree_founders, [:pedigree_id] => :environment do |t,args|
+    peds = Array.new
+    if args[:pedigree_id].nil? then
+      peds.push(1)
+    else
+      peds.push(args[:pedigree_id])
+    end
+    peds.each do |ped_id|
+      people = pedigree_founders(ped_id)
+      puts "people for ped #{ped_id} are #{people.inspect}"
+    end  
+  end
+
+  desc "update completeness"
+  task :check_completeness, [:pedigree_id] => :environment do |t,args|
+    peds = Array.new
+    if args[:pedigree_id].nil? then
+      peds = Pedigree.all.map(&:id)
+    else
+      peds.push(args[:pedigree_id])
+    end
+    peds.each do |ped_id|
+      Pedigree.find(ped_id).people.each do |person|
+        person.check_completeness
+      end
+    end
   end
 
 end

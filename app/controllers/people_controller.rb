@@ -251,7 +251,8 @@ class PeopleController < ApplicationController
     # person needs to be written first
     rc = write_temp_object(@trans_id, "person",@people) unless @people.nil? or @people.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
-    
+    sleep(5.seconds) # to make sure person gets written...
+
     # sample must be written next
     rc = write_temp_object(@trans_id, "sample",@samples) unless @samples.nil? or @samples.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
@@ -475,6 +476,7 @@ class PeopleController < ApplicationController
       end
 
     end # end temp_objects.each do
+    sleep(5.seconds)
   end
 
 ############################################################################################################
@@ -567,11 +569,20 @@ class PeopleController < ApplicationController
         next if row[headers["Customer Subject ID"]] == "NA19240" # skip example row
 
         # create the person information 
+	# need to check both customer_subject_id and customer_sample_id in case they're
+	# trying to switch which one is which in the database... /facepalm
 	customer_subject_id = row[headers["Customer Subject ID"]]
 	if (customer_subject_id.is_a? Float) then 
 	  customer_subject_id = customer_subject_id.to_i
 	end
-        p = Person.has_pedigree(pedigree.id).find_by_collaborator_id(customer_subject_id) || Person.new
+
+  	customer_sample_id = row[headers["Customer Sample ID"]]
+
+        p = Person.has_pedigree(pedigree.id).find_by_collaborator_id(customer_subject_id) 
+	if (p.nil?) then
+	  p = Person.has_pedigree(pedigree.id).find_by_collaborator_id(customer_sample_id)
+	end
+	p = Person.new if p.nil?
         p.collaborator_id = customer_subject_id
         p.gender = row[headers["Gender"]].downcase  # downcase it to make sure Female and FEMALE and female are the same...
 	if p.gender != "male" and p.gender != "female" and p.gender != "unknown" then
@@ -650,11 +661,7 @@ class PeopleController < ApplicationController
           # create the sample information
 	  s = Sample.find(:first, :conditions => {:sample_vendor_id => vendor_id, :pedigree_id =>pedigree.id}) || Sample.new
           source = row[headers["Sample Source"]]
-
-  	  customer_sample_id = row[headers["Customer Sample ID"]]
-	  if customer_sample_id != customer_subject_id then
-	    s.customer_sample_id = customer_sample_id
-	  end
+          s.customer_sample_id = customer_sample_id # don't check for duplicates, just add it and they can change it later
 
           sample_type = SampleType.find_by_name(source)
           if sample_type.nil? then

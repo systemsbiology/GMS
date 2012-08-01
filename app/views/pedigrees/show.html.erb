@@ -59,6 +59,8 @@
       <th>Dob</th>
       <th>Dod</th>
       <th>Number of Samples</th>
+      <th>Sample Vendor ID</th>
+      <th>Customer Sample ID</th>
       <th>Number of Phenotypes</th>
       <th>Number of Diseases Diagnosed</th>
     </tr>
@@ -74,7 +76,42 @@
         <td><%= person.gender %></td>
         <td><%= person.dob %></td>
         <td><%= person.dod %></td>
-	<td><% if person.sequenced? and person.samples.count > 0 %><%= link_to person.samples.count, samples_path(:person => {:id => person}) unless person.samples.nil? %><% else %>NA<% end %></td>
+	<% if person.sequenced? and person.samples.count > 0 %>
+	  <td><%= link_to person.samples.count, samples_path(:person => {:id => person}) unless person.samples.nil? %></td>
+	  <% if person.samples.count == 1 %>
+	    <td><%= person.samples.first.sample_vendor_id %></td>
+	    <% if person.samples.first.customer_sample_id.nil? %>
+	      <td>NA</td>
+	    <% else %>
+	      <td><%= person.samples.first.customer_sample_id %></td>
+	    <% end %>
+	  <% else %>
+	    <td><%= image_tag('file_location.png', :size => "20x20", :onmouseover => "$('#person_#{person.id}').poshytip('show')", :onmouseout => "$('#person_#{person.id}').poshytip('hide')", :id => "person_#{person.id}") %><%= link_to 'Multiple Samples', samples_path(:person => {:id => person}), {:onmouseover => "$('#person_#{person.id}').poshytip('show')", :onmouseout => "$('#person_#{person.id}').poshytip('hide')" } %></td>
+            <script>
+	      $("#person_<%= person.id %>").poshytip({
+	        content: '<%= person.samples.map(&:sample_vendor_id).join(", ") %>',
+		className: 'tip-yellow',
+		showOn: 'none',
+		alignTo: 'target',
+		alignX: 'inner-left'
+	      });
+	     </script>
+             <td><%= image_tag('file_location.png', :size => "20x20", :onmouseover => "$('#person_customer_#{person.id}').poshytip('show')", :onmouseout => "$('#person_customer_#{person.id}').poshytip('hide')", :id => "person_customer_#{person.id}") %><%= link_to 'Multiple Samples', samples_path(:person => {:id => person}), {:onmouseover => "$('#person_customer_#{person.id}').poshytip('show')", :onmouseout => "$('#person_customer_#{person.id}').poshytip('hide')" } %></td>
+            <script>
+	      $("#person_customer_<%= person.id %>").poshytip({
+	        content: '<%= person.samples.map(&:customer_sample_id).collect! {|obj| obj.nil? ? 'NA' : obj }.join(", ") %>',
+	        className: 'tip-yellow',
+		showOn: 'none',
+		alignTo: 'target',
+		alignX: 'inner-left'
+	      });
+	     </script>
+	  <% end %>
+	<% else %>
+	  <td>NA</td>
+	  <td>NA</td>
+	  <td>NA</td>
+	<% end %>
 	<td><%= person.phenotypes.count > 0 ? link_to(person.phenotypes.count, traits_path(:person => person)) : person.phenotypes.count  %></td>
 	<td><%= person.diseases.count > 0 ? link_to(person.diseases.count, person_path(person)) : person.diseases.count %></td>
       </tr>

@@ -43,7 +43,6 @@ class AssemblyFile < ActiveRecord::Base
   def update_completeness
     if self.file_type_id == 1 or self.file_type_id == 8 then
       person = self.assembly.assay.sample.person
-      logger.debug("setting person #{person.inspect} to complete")
       person.update_attributes(:complete => true)
       person.save
     end
