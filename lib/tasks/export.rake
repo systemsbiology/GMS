@@ -46,7 +46,6 @@ namespace :export do
 
     # want the format to be
     # isb_pedigree_id pedigree_tag isb_person_id collaborator_id gender isb_sample_id(csv) sample_vendor_id(csv)
-    puts "getting information for pedigree #{pedigree_id}"
     ped_output = Array.new
     ped = Pedigree.find(pedigree_id)
     ped.people.each do |person|
