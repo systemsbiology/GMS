@@ -52,10 +52,10 @@ server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
 
    desc "Export files"
    task :run_all_exports, :roles => :app do
-     Rake::Task["export:export_all_assemblies"].invoke
-     Rake::Task["export:export_all_assembly_files"].invoke
-     Rake::Task["export:export_all_individuals"].invoke
-     Rake::Task["export:export_all_samples"].invoke
+     run("cd #{deploy_to}/current; bundle exec rake export:export_all_assemblies")
+     run("cd #{deploy_to}/current; bundle exec rake export:export_all_assembly_files")
+     run("cd #{deploy_to}/current; bundle exec rake export:export_all_individuals")
+     run("cd #{deploy_to}/current; bundle exec rake export:export_all_samples")
    end
 
  end
