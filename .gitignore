@@ -14,3 +14,4 @@ public/pedigrees/*
 #*
 .#*
 config/user.rb
+config/database.yml
