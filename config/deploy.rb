@@ -46,8 +46,16 @@ server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
    end
   
    desc "Symlinks the database.yml"
-   task :symlink_db, :rolse => :app do
+   task :symlink_db, :roles => :app do
      run "ln -nfs #{deploy_to}/shared/config/database.yml #{release_path}/config/database.yml"
+   end
+
+   desc "Export files"
+   task :run_all_exports, :roles => :app do
+     Rake::Task["export:export_all_assemblies"].invoke
+     Rake::Task["export:export_all_assembly_files"].invoke
+     Rake::Task["export:export_all_individuals"].invoke
+     Rake::Task["export:export_all_samples"].invoke
    end
 
  end
@@ -207,4 +215,4 @@ server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
 
 after 'deploy:update_code', 'deploy:symlink_db'
 after "deploy:update_code", "rvm:trust_rvmrc"
-
+after 'deploy:update_code', 'deploy:run_all_exports'
