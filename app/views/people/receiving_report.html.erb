@@ -6,7 +6,8 @@
 <table class="tablesorter">
   <thead>
   <tr>
-    <th colspan="2">Sample</th>
+    <th>Status</th>
+    <th>Sample</th>
     <th>ISB Sample ID</th>
     <th>ISB Person ID&nbsp;&nbsp;&nbsp;</th>
     <th>Collaborator ID&nbsp;&nbsp;&nbsp;</th>
@@ -43,11 +44,12 @@
       <% if sample.assays.size == 0 then %>
            <tr>
             <td style="background-color:
-	      <% if sample.status == 'sequenced' %>red<%
-	         elsif sample.status == 'submitted' %>yellow<%
-		 elsif sample.status == 'pending' %>#CC6600<%
+	      <% if sample.status == 'sequenced' %>red"><span style="color: red;">F</span><%
+	         elsif sample.status == 'submitted' %>yellow"><span style="color: yellow;">I</span><%
+		 elsif sample.status == 'pending' %>#CC6600"><span style="color: #CC6600;">P</span><%
+		 elsif sample.status == 'failed' %>red"> <span style="color: red;">F</span><%
 	         elsif sample.status.nil? %>red<%
-	         end %>">&nbsp;</td>
+	         end %>&nbsp;</td>
             <td><%= sample.sample_vendor_id %></td>
             <td><%= link_to sample.isb_sample_id, sample_path(sample) %></td>
             <td><%= link_to person.isb_person_id, person_path(person) %></td>
@@ -67,14 +69,14 @@
           <tr>
             <td style="background-color:
               <% if assay.status then
-                   if assay.status == 'Received' %>green<%
-  	           elsif assay.status = 'Pending' %>yellow<%
+                   if assay.status == 'Received' %>green"> <span style="color: green;">C</span><%
+  	           elsif assay.status == 'Pending' %>yellow"> <span style="color: yellow;">I</span><%
 	           end
 	         else
-	           if sample.status == 'submitted' %>yellow<%
-	           elsif sample.status.nil? %>#CC6600<%
+	           if sample.status == 'submitted' %>yellow"> <span style="color: yellow;">I</span></%
+	           elsif sample.status.nil? %>#CC6600"> <span style="color: #CC6600;">P</span><%
 	           end
-	         end %>">&nbsp;</td>
+	         end %>&nbsp;</td>
             <td><%= sample.sample_vendor_id %></td>
             <td><%= link_to sample.isb_sample_id, sample_path(sample) %></td>
             <td><%= link_to person.isb_person_id, person_path(person) %></td>
