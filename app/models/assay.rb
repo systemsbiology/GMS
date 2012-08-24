@@ -54,6 +54,15 @@ class Assay < ActiveRecord::Base
     end
   end
 
+  def varfile
+      self.assemblies.each do |assembly|
+        if assembly.assembly_files.where(:file_type_id => 1).count > 0 then
+          return true
+        end
+      end
+    return false
+  end
+
   def identifier
     "#{name} - #{vendor} - #{assay_type}"
   end

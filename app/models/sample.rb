@@ -53,6 +53,18 @@ class Sample < ActiveRecord::Base
     end
   end
 
+  def varfile
+    self.assays.each do |assay|
+      assay.assemblies.each do |assembly|
+        if assembly.assembly_files.where(:file_type_id => 1).count > 0 then
+	  return true
+	end
+      end
+    end
+    return false
+
+  end
+
   def identifier 
     if self.person.nil? then
       return "#{isb_sample_id} - #{sample_vendor_id} - NA"
