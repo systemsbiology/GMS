@@ -34,9 +34,9 @@ def to_madeline(pedigree, people)
   blah = twin_count % 2 
     if (((twin_count % 2) == 0) and twin_count > 0) then
       # in order for the letter to not be the same, we need to create a new object.
-      #tl = twin_letter.dup
-      #tl.next!
-      #twin_letter = tl
+      tl = twin_letter.dup
+      tl.next!
+      twin_letter = tl
       twin_count = 0
     end
     cp, twin_count = create_row(person, familyID, diseases, phenotypes, twin_letter, twin_count)
