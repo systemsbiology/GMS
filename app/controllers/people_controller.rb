@@ -251,7 +251,6 @@ class PeopleController < ApplicationController
     # person needs to be written first
     rc = write_temp_object(@trans_id, "person",@people) unless @people.nil? or @people.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
-    sleep(5.seconds) # to make sure person gets written...
 
     # sample must be written next
     rc = write_temp_object(@trans_id, "sample",@samples) unless @samples.nil? or @samples.empty?
@@ -327,6 +326,7 @@ class PeopleController < ApplicationController
   	    # this is to deal with Relationship objects because we create a straight array
 	    # for them because we don't know the person.id for the person if it hasn't
   	    # been created already...
+	    logger.debug("temp_obj is #{temp_obj.inspect}")
 	    pedigree_id = obj[0]
 	    person_collaborator_id = obj[1]
 	    relation_collaborator_id = obj[2]
@@ -367,8 +367,13 @@ class PeopleController < ApplicationController
 	      rel_name = 'monozygotic twin'
 	    end
 
+	    if rel_name == 'dizygotic twin' then
+	      rel_name = 'dizygotic twin'
+	    end
+
 	    rel.name = rel_name
 	    rel.relationship_type = rel.lookup_relationship_type(rel_name)
+	    logger.debug("relationship type is #{rel.relationship_type} for #{rel.inspect} for person #{person.inspect} and relation #{relation.inspect}")
 	    rel.relation_order = rel_order unless rel_order.nil?
 	    begin
 	      if rel.valid? then
@@ -584,10 +589,14 @@ class PeopleController < ApplicationController
 	end
 	p = Person.new if p.nil?
         p.collaborator_id = customer_subject_id
-        p.gender = row[headers["Gender"]].downcase  # downcase it to make sure Female and FEMALE and female are the same...
-	if p.gender != "male" and p.gender != "female" and p.gender != "unknown" then
-	  p.errors.add(:gender,"invalid selection #{row[headers["Gender"]]}")
-        end
+	if row[headers["Gender"]].nil? then
+	  p.errors.add(:gender, "Must provide a gender for person #{customer_sample_id}")
+	else
+          p.gender = row[headers["Gender"]].downcase  # downcase it to make sure Female and FEMALE and female are the same...
+	  if p.gender != "male" and p.gender != "female" and p.gender != "unknown" then
+	    p.errors.add(:gender,"invalid selection #{row[headers["Gender"]]}")
+          end
+	end
         p.comments = row[headers["Comments"]]
         p.pedigree_id = pedigree.id
 
@@ -619,8 +628,8 @@ class PeopleController < ApplicationController
 	mother_id = mother_id.to_i if (mother_id.is_a? Float)
         father_id = row[headers["Father's Subject ID"]]
 	father_id = father_id.to_i if (father_id.is_a? Float)
-	child_order = row[headers["Child Order"]].to_i
-	child_order = '' if child_order.nil? # it's easier to find relationships that have no order value than to find ones that have a 1 value defaultly
+	
+	child_order = row[headers["Child Order"]] ? row[headers["Child Order"]].to_i : 1
 	r = Relationship.new
 	if mother_id == father_id then
 	  unless mother_id.nil? or mother_id.to_s.match('NA') or mother_id.to_s.empty? then
@@ -645,8 +654,9 @@ class PeopleController < ApplicationController
 	spouse_id =  row[headers["Spouse Subject ID"]]
 	spouse_id = spouse_id.to_i if (spouse_id.is_a? Float)
 	if !spouse_id.nil? and !spouse_id.to_s.match('NA') then
-  	  spouse_order = row[headers["Spouse Order"]].to_i
-  	  spouse_order = 1 if spouse_order.nil? or spouse_order.to_s.match('NA')
+  	  spouse_order = row[headers["Spouse Order"]]
+	  spouse_order = spouse_order.to_i if (spouse_order.is_a? Float)
+  	  spouse_order = 1 if (spouse_order.nil? or spouse_order.to_s.match('NA'))
           #this person has a spouse and they are the X spouse that they've had
 	  relationships.push([pedigree.id, customer_subject_id, spouse_id, 'undirected', spouse_order])
 
@@ -738,6 +748,8 @@ class PeopleController < ApplicationController
       flash[:error] = "Error loading header information for FGG Manifest."
       render :action => "upload" and return(0)
     end
+
+    logger.debug("relationships is #{relationships}")
 
     return 1, people, samples, relationships, memberships, diagnoses, acquisitions, errors
   end # end process fgi manifest definition
