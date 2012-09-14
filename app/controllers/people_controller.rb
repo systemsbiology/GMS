@@ -303,11 +303,42 @@ class PeopleController < ApplicationController
   def confirm
     trans_id = params[:trans_id]
 
-    # may need to order this find eventually. Person needs to be processed first.
-    # if getting errors about samples or relationships not finding the person
-    # then this is likely the problem
-    temp_objects = TempObject.find_all_by_trans_id(trans_id)
+
+    #process Person objects first
     @errors = Array.new
+    person_temp_object = TempObject.find_by_trans_id_and_object_type(trans_id, "Person")
+    begin
+      person_obj_array = Marshal.load(person_temp_object.object)
+      logger.debug("person_obj_array #{person_obj_array.inspect}")
+    rescue ArgumentError => error
+      lazy_load ||= Hash.new {|hash, hash_key| hash[hash_key] = true; false}
+      if error.to_s[/undefined class|referred/] && !lazy_load[error.to_s.split.last.constantize]
+        retry
+      else
+        raise error
+      end
+    end
+
+    person_obj_array.each do |person_obj|
+      logger.debug("person obj is #{person_obj.inspect}")
+      if person_obj.valid? then
+        person_obj.save!
+      else
+        @errors.push(["#{person_obj.object_type}",person_obj, person_obj.errors])
+      end
+    end
+
+    begin
+      person_temp_object.destroy
+    rescue Exception => exc
+      person_temp_object.errors.add(:object_type, "could not be destroyed")
+      @errors.push(["person_temp_object", person_temp_object.errors])
+      logger.error("person_temp_object #{person_temp_object.inspect} could not be destroyed!!  #{exc.message}")
+    end
+
+    # process the rest of the objects
+    temp_objects = TempObject.find_all_by_trans_id(trans_id)
+    logger.debug("temp objects are #{temp_objects.inspect}")
     temp_objects.each do |temp_obj|
       # need the begin rescue block because Person includes pedigree information and it needs to lazy load the pedigree class otherwise there is an error
       begin 
