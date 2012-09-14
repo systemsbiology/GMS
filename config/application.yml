@@ -6,16 +6,18 @@ defaults: &defaults
     father: parent, 
     son: child, 
     daughter: child,
+    parent: parent,
+    child: child,
     "monozygotic twin": undirected,
     "dizygotic twin": undirected
   }
   relationship_reverse: { 
     husband: wife, 
     wife: husband, 
-    son: { male: father, female: mother},
-    father: { male: son, female: daughter },
-    daughter: { male: father,  female: mother},
-    mother: { male: son, female: daughter },
+    son: { male: father, female: mother, unknown: parent },
+    father: { male: son, female: daughter, unknown: child },
+    daughter: { male: father,  female: mother, unknown: parent},
+    mother: { male: son, female: daughter, unknown: child },
     "monozygotic twin": "monozygotic twin",
     "dizygotic twin": "dizygotic twin"
   }
@@ -25,7 +27,8 @@ defaults: &defaults
     mother: female,
     husband: male,
     son: male,
-    father: male
+    father: male,
+    unknown: unknown
   }
 
 development:
