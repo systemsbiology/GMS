@@ -30,7 +30,7 @@
       <td><%= pedigree.study.name if pedigree.study %></td>
       <td style="white-space: normal;"><%= pedigree.description %></td>
       <td><%= link_to 'Edit', edit_pedigree_path(pedigree) %></td>
-      <% if false %><td><%= link_to 'Destroy', pedigree, :confirm => 'Are you sure?', :method => :delete %></td><% end %>
+      <% if false %><td><%= button_to 'Delete pedigree', pedigree, :confirm => 'Are you sure?', :method => :delete %></td><% end %>
     </tr>
   <% end %>
   </tbody>

@@ -21,7 +21,7 @@
     <td><%= genome_reference.location %></td>
     <td><%= link_to 'Show', genome_reference %></td>
     <td><%= link_to 'Edit', edit_genome_reference_path(genome_reference) %></td>
-    <td><%= link_to 'Destroy', genome_reference, :confirm => 'Are you sure?', :method => :delete %></td>
+    <td><%= button_to 'Delete genome reference', genome_reference, :confirm => 'Are you sure?', :method => :delete %></td>
   </tr>
 <% end %>
 </table>
