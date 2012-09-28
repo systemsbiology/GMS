@@ -30,4 +30,4 @@
 <%= link_to 'Back to Person', person_path(@diagnosis.person) %> |
 <%= link_to 'Back to Pedigree', pedigree_path(@diagnosis.person.pedigree) %>
 <br /><br />
-<%= button_to 'Delete Diagnosis', @diagnosis, :confirm => "Are you sure?", :method => :delete %>
+<%= link_to 'Delete Diagnosis', @diagnosis, :confirm => "Are you sure?", :method => :delete %>
