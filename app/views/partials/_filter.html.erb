@@ -1,4 +1,4 @@
-<%= form_tag("#", :method => "get", :remote => true) do %>
+<%= form_tag("#", :method => "get") do %>
     <% if params[:pedigree_filter] && params[:pedigree_filter][:id] then %>
     <% cur_pedigree_id = params[:pedigree_filter][:id].to_i %>
     <% else %>
