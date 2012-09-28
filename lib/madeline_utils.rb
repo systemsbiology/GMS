@@ -144,7 +144,11 @@ def create_row(person, familyID, diseases, phenotypes, twin_letter, twin_count)
     else
       #order children by father
       rel = Relationship.where(:person_id => person.father.first.id, :relation_id => person.id)
-      current_person.push(rel.first.relation_order)
+      if rel.first && rel.first.relation_order then
+        current_person.push(rel.first.relation_order)
+      else
+        current_person.push('.')
+      end
     end
 
     diseases.each do |disease|
