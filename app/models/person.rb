@@ -1,4 +1,8 @@
 class Person < ActiveRecord::Base
+  after_save :check_isb_person_id, :check_completeness
+  after_update :check_isb_person_id, :check_completeness
+  before_destroy :destroy_samples
+
 #  has_many :memberships
   has_one :membership, :dependent => :destroy
   has_one :pedigree, :through => :membership
@@ -12,8 +16,8 @@ class Person < ActiveRecord::Base
   has_many :person_aliases, :class_name => "PersonAlias", :dependent => :destroy
   has_many :traits, :dependent => :destroy
   has_many :phenotypes, :through => :traits
-  has_many :samples, :through => :acquisitions, :dependent => :destroy
   has_many :acquisitions, :dependent => :destroy
+  has_many :samples, :through => :acquisitions, :dependent => :destroy
   has_many :diagnoses, :dependent => :destroy
   has_many :diseases, :through => :diagnoses
 
@@ -21,9 +25,6 @@ class Person < ActiveRecord::Base
   validates_presence_of :collaborator_id, :gender
   validates_uniqueness_of :collaborator_id, :scope => :pedigree_id
   validates_uniqueness_of :isb_person_id
-
-  after_save :check_isb_person_id, :check_completeness
-  after_update :check_isb_person_id, :check_completeness
 
 
   def check_isb_person_id
@@ -175,6 +176,12 @@ class Person < ActiveRecord::Base
       return "#{collaborator_id};#{self.person_aliases.map(&:value).join(";")}"
     else
       return "#{collaborator_id}"
+    end
+  end
+
+  def destroy_samples
+    self.samples.each do |sample|
+      sample.destroy
     end
   end
 

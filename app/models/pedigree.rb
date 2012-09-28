@@ -2,16 +2,18 @@ require 'pedigree_info'
 require 'madeline_utils'
 
 class Pedigree < ActiveRecord::Base
-  has_many :people, :through => :memberships
-  has_many :memberships
+  after_save :check_pedigree_tag, :check_isb_pedigree_id
+  after_update :check_pedigree_tag, :check_isb_pedigree_id
+  before_destroy :destroy_people
+
+  has_many :people, :through => :memberships, :dependent => :destroy
+  has_many :memberships, :dependent => :destroy
   belongs_to :study
 
   auto_strip_attributes :name, :tag, :description
   validates_presence_of :name, :tag, :study_id
   validates_uniqueness_of :name, :tag
 
-  after_save :check_pedigree_tag, :check_isb_pedigree_id
-  after_update :check_pedigree_tag, :check_isb_pedigree_id
 
   def phenotypes
     self.people.map(&:phenotypes).flatten.uniq
@@ -109,6 +111,15 @@ class Pedigree < ActiveRecord::Base
     end
     return true if ((plan_count > 0) and (plan_count == complete_count))
     return false
+  end
+
+  def destroy_people
+    people = self.people
+    logger.debug("found #{people.inspect} in destroy_people")
+    people.each do |person|
+      person.destroy
+    end
+
   end
 
 end

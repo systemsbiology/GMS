@@ -36,16 +36,14 @@
 </tr>
 <tr><td colspan="3"><b>Pedigree Status:</b> <% if @pedigree.complete then %><span style="background-color:green;">&nbsp;&nbsp;</span>Complete<% else %><span style="background-color:red;">&nbsp;&nbsp;</span>Incomplete<% end %></td></tr>
 </table>
+<%= link_to 'Back', pedigrees_path %> | 
+<%= link_to 'Edit', edit_pedigree_path(@pedigree) %> |
+<% par = Hash.new;  par[:pedigree_filter] = Hash.new;  par[:pedigree_filter][:id] = @pedigree.id %>
+<%= link_to "Receiving Log for Pedigree #{@pedigree.name}", receiving_report_path(par) %> |
+<% if false %> <%= link_to "Delete pedigree #{@pedigree.name}, all people, and all samples associated", @pedigree, :confirm => "Are you sure you want to delete this pedigree, all of its people, and all of their associated information (including samples)?", :method => :delete %> <% end %>
+<br />
 <br />
 <%= button_to "Download Pedigree File", pedigree_file_path(@pedigree) %>
-<br />
-
-<%= link_to 'Edit', edit_pedigree_path(@pedigree) %> |
-<%= link_to 'Back', pedigrees_path %>
-<br />
-<% par = Hash.new;  par[:pedigree_filter] = Hash.new;  par[:pedigree_filter][:id] = @pedigree.id %>
-<%= link_to "Receiving Log for Pedigree #{@pedigree.name}", receiving_report_path(par) %>
-<br />
 <p><span style="font-weight: bold; text-decoration: underline;">People in this Pedigree</span></p>
 <% if @pedigree.people.size == 0 %>
   <p>No people currently entered for this pedigree</p>
