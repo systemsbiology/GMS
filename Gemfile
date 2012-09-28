@@ -22,7 +22,7 @@ gem 'ruby-debug19', :require => 'ruby-debug'
 gem 'settingslogic'
 
 gem 'will_paginate'
-gem 'jquery-rails'
+gem 'jquery-rails', '~> 2.1'
 gem 'formtastic'
 gem 'event-calendar', :require => 'event_calendar'
 gem 'simple_navigation'
