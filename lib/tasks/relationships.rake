@@ -222,6 +222,16 @@ namespace :relationships do
             end
           end
 	  rel.relationship_type = rel_type
+
+	  rev_rel = Relationship.where(:person_id => missing_child, :relation_id => person).first
+	  puts "foudn rev_rel #{rev_rel.inspect}"
+	  if rev_rel.relation_order == 0 then
+	    rev_rel.relation_order = 1
+	    rev_rel.save
+	  end
+
+	  puts "assigning relation_order #{rev_rel.relation_order} to relatino"
+	  rel.relation_order = rev_rel.relation_order
   
           check = Relationship.where(:person_id => rel.person_id, :relation_id => rel.relation_id, :relationship_type => rel.relationship_type, :name => rel.name)
           #puts "check #{check.inspect}"
@@ -230,7 +240,7 @@ namespace :relationships do
 	    puts "created relationship between #{Person.find(person).collaborator_id} (#{Person.find(person).isb_person_id}) and #{Person.find(missing_child).collaborator_id} (#{Person.find(missing_child).isb_person_id})"
             puts "rel #{rel.inspect}"
 	  else 
-	    raise "Error creating relationship"
+	    raise "Error creating relationship #{rel.inspect} #{rel.errors.inspect}"
 	  end
          puts "##############################"
         end
