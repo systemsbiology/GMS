@@ -744,10 +744,11 @@ class PeopleController < ApplicationController
             samples << s
 	    p.planning_on_sequencing = 1
           else
-	    p.planning_on_sequencing = 0
             errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
             errors["#{counter}"]["sample"] = s.errors
           end
+	else
+	    p.planning_on_sequencing = 0
         end # end if !vendor_id.nil?
 
         if p.valid?
