@@ -1,7 +1,7 @@
 class Person < ActiveRecord::Base
   after_save :check_isb_person_id, :check_completeness
   after_update :check_isb_person_id, :check_completeness
-  before_destroy :destroy_samples
+  before_destroy :destroy_samples, :destroy_relationships
 
 #  has_many :memberships
   has_one :membership, :dependent => :destroy
@@ -67,6 +67,7 @@ class Person < ActiveRecord::Base
     parent_relationships = self.parents
     father = Array.new
     parent_relationships.each do |rel|
+      next unless rel.relation
       father.push(rel.relation) if rel.relation.gender == 'male'
     end
     return father
@@ -76,6 +77,7 @@ class Person < ActiveRecord::Base
     parent_relationships = self.parents
     mother = Array.new
     parent_relationships.each do |rel|
+      next unless rel.relation
       mother.push(rel.relation) if rel.relation.gender == 'female'
     end
     return mother
@@ -182,6 +184,21 @@ class Person < ActiveRecord::Base
   def destroy_samples
     self.samples.each do |sample|
       sample.destroy
+    end
+  end
+
+  def destroy_relationships
+    self.parents.each do |parent|
+      parent.destroy
+    end
+    self.offspring.each do |child|
+      child.destroy
+    end
+    self.spouses.each do |spouse|
+      spouse.destroy
+    end
+    self.twin.each do |tw|
+      tw.destroy
     end
   end
 

@@ -151,6 +151,7 @@
     </thead>
     <tbody>
 <% @person_relationships.each do |relationship| %>
+  <% next unless relationship.relation %>
   <tr>
     <td><%= link_to relationship.person.collaborator_id, relationship.person %></td>
     <td>is the <%= link_to relationship.name, relationship %> of </td>
