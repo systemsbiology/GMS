@@ -34,6 +34,9 @@
   <%= @study.contact %>
 </p>
 
+<% if true %> <%= link_to "Delete study #{@study.name}, all pedigrees, all people, and all samples associated", @study, :confirm => "Are you sure you want to delete this study, all of its pedigrees, all of its people, and all of their associated information (including samples)?", :method => :delete %> <% end %>
+
+
 <p>
   <b>Pedigrees:</b>
 <% if @pedigrees.nil? or @pedigrees.empty? %>
