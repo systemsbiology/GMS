@@ -197,7 +197,7 @@ class Person < ActiveRecord::Base
     self.spouses.each do |spouse|
       spouse.destroy
     end
-    self.twin.each do |tw|
+    self.twins.each do |tw|
       tw.destroy
     end
   end
