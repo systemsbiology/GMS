@@ -23,7 +23,7 @@
   </div>
   <div class="field">
     <%= f.label :status %><br />
-    <%= f.collection_select(:status, Assay.find(:all, :conditions =>[ "status != ''"], :select => 'DISTINCT status'), :status, :status) %>
+    <%= f.collection_select(:status, ["created","pending", "submitted", "recieved"], :downcase, :titleize, { :include_blank => "-Select Assay Status", :selected => @assay.status || '' }) %>
   </div>
   <% if params[:action] == 'new' then %>
     <div class="field">
