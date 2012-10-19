@@ -47,7 +47,8 @@
 	      <% if sample.status == 'sequenced' %>red"><span style="color: red;">F</span><%
 	         elsif sample.status == 'submitted' %>yellow"><span style="color: yellow;">I</span><%
 		 elsif sample.status == 'pending' %>#CC6600"><span style="color: #CC6600;">P</span><%
-		 elsif sample.status == 'failed' %>red"> <span style="color: red;">F</span><%
+		 elsif sample.status == 'passed qc' %>#CC6600"><span style="color: #CC6600;">P</span><%
+		 elsif sample.status == 'failed qc' %>red"> <span style="color: red;">F</span><%
 	         elsif sample.status.nil? %>red<%
 	         end %>&nbsp;</td>
             <td><%= sample.sample_vendor_id %></td>
@@ -71,6 +72,7 @@
               <% if assay.status then
                    if assay.status == 'Received' %>green"> <span style="color: green;">C</span><%
   	           elsif assay.status == 'Pending' %>yellow"> <span style="color: yellow;">I</span><%
+  	           elsif assay.status == 'created' %>yellow"> <span style="color: yellow;">I</span><%
 	           end
 	         else
 	           if sample.status == 'submitted' %>yellow"> <span style="color: yellow;">I</span></%
