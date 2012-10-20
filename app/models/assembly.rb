@@ -47,16 +47,16 @@ class Assembly < ActiveRecord::Base
   # in the config files.
   def ensure_files_up_to_date
     files = find_assembly_files
-    #print "files #{files}\n"
+    #logger.debug("files #{files}")
     add_files = check_add_assembly_files(files)
-    #print "add files #{add_files}\n\n"
+    #logger.debug( "add files #{add_files}")
     errors = add_assembly_files(add_files)
-    #print "errors #{errors}\n\n"
+    #logger.debug("errors #{errors}")
     if errors.size > 0 then
       return errors
     end
     update_files = check_update_assembly_files(files)
-    #puts "update files #{update_files}\n\n"
+    #logger.debug("update files #{update_files}")
     errors = update_assembly_files(update_files)
     if errors.size > 0 then
       return errors
@@ -69,19 +69,20 @@ class Assembly < ActiveRecord::Base
   # look on disk for the assembly files specified in the config under PEDIGREE_ROOT
   def find_assembly_files
     start_dir = self.location
+    #logger.debug("checking in location #{start_dir}")
     files = Hash.new
     if ! File.directory? start_dir then
       errors.add(:location, "Directory #{start_dir} does not exist on the system.")
       abort("Directory #{start_dir} does not exist on the system for #{self.inspect}")
     end
-    #puts "start dir is #{start_dir}"
+    #logger.debug("start dir is #{start_dir}")
     Find.find(start_dir) do |path|
       filename = File.basename(path).split("/").last
       FILE_TYPES.each { |filepart, filehash| 
 	type = filehash["type"]
 	vendor = filehash["vendor"]
         if filename.match(filepart) then 
-     #     puts "filename is #{filename}"
+          #logger.debug( "filename is #{filename}")
           files[type] = Hash.new
 	  files[type]["path"] = path
 	  files[type]["vendor"] = vendor
@@ -129,7 +130,7 @@ class Assembly < ActiveRecord::Base
 
       if !af.nil? then
         if af.location != file_path or af.file_type != file_type then
-	  #puts "updating file #{file_path} #{af.inspect}"
+	  #logger.debug("updating file #{file_path} #{af.inspect}")
 	  update[af.id] = Hash.new
           update[af.id]['path'] = file_path
 	  update[af.id]['type'] = file_type
@@ -217,13 +218,13 @@ class Assembly < ActiveRecord::Base
   end
 
   def update_assembly_files(files=self.check_update_assembly_files)
-    #puts "update_assembly_files says files are #{files.inspect}\n\n"
+    #logger.debug("update_assembly_files says files are #{files.inspect}")
     asm_file_errors = Array.new
     files.each do |assembly_file_id, innerhash|
       file_type = innerhash["type"]
       file_path = innerhash["path"]
       file_vendor = innerhash["vendor"]
-      #puts "updating #{file_type} and #{file_path}"
+      #logger.debug( "updating #{file_type} and #{file_path}")
 
       assembly_file = AssemblyFile.find(assembly_file_id)
 
@@ -274,8 +275,9 @@ class Assembly < ActiveRecord::Base
 					"current" => 1,
 					"metadata" => xml
 					)
-      return asm_file_errors
     end
+
+    return asm_file_errors
   end
 
   def identifier
@@ -283,6 +285,8 @@ class Assembly < ActiveRecord::Base
   end
 
   def check_cgi_header(header, file_type, file_path)
+     return 1 if file_type == 'SVEVENTS' #SVEVENTS don't have any of this info in the header :(
+
      if header[CGI_SAMPLE].nil? then
         logger.error("ERROR: file #{file_path} with type #{file_type} doesn't appear to be a valid CGI file.")
 	return 0
