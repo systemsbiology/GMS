@@ -14,7 +14,7 @@
 <% @person_aliases.each do |person_alias| %>
   <tr>
     <td><%= person_alias.id %></td>
-    <td><%= person_alias.name %></td>
+    <td><%= person_alias.alias_type %></td>
     <td><%= person_alias.value %></td>
     <td><%= person_alias.person_id %></td>
     <td><%= link_to 'Show', person_alias %></td>
