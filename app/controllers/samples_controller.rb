@@ -142,8 +142,6 @@ class SamplesController < ApplicationController
 
     ac_notice = ''
     if (params[:person] and params[:person][:id]) then
-      logger.debug("sample #{@sample.inspect}")
-      logger.debug("person #{@sample.person.inspect}")
       if (@sample.person.nil? || params[:person][:id].to_i != @sample.person.id.to_i) then
         #logger.debug("updating the person associated with this sample from #{@sample.person.id} to #{params[:person][:id]}")
 	#check that there isn't an entry for this acquisition in the db already!
@@ -175,19 +173,18 @@ class SamplesController < ApplicationController
 	      ac_notice << "Failed to create a new association between sample and person."
 	    end
 	  end
-	end
+        end
+      end
 
-        # check to see if sequenced is true on person.  if not, then update it to yes.
-	person = Person.find(params[:person][:id])
-        if (person.sequenced? == false) then
-  	  person.planning_on_sequencing = 1
-	  if (person.save) then
-	    ac_notice << "  Updated person to show that sequencing was done."
-	  end
+      # check to see if sequenced is true on person.  if not, then update it to yes.
+      person = Person.find(params[:person][:id])
+      if (person.sequenced? == false) then
+  	person.planning_on_sequencing = 1
+	if (person.save) then
+          ac_notice << "  Updated person to show that sequencing was done."
         end
       end
     end
-    logger.debug("ac notice is #{ac_notice}")
     @sample.errors.add(:sample, ac_notice) unless ac_notice.empty?
 
     respond_to do |format|
