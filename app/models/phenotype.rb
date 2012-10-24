@@ -3,7 +3,7 @@ class Phenotype < ActiveRecord::Base
   has_many :traits, :dependent => :destroy
   belongs_to :disease
 
-  auto_strip_attributes :name, :description
-  validates_presence_of :name
-  validates_uniqueness_of :name
+  auto_strip_attributes :name, :tag, :description
+  validates_presence_of :name, :tag
+  validates_uniqueness_of :name, :tag
 end
