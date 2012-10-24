@@ -74,7 +74,7 @@
         <td><%= person.gender %></td>
         <td><%= person.dob %></td>
         <td><%= person.dod %></td>
-	<% if person.sequenced? and person.samples.count > 0 %>
+	<% if person.samples.count > 0 %>
 	  <td><%= link_to person.samples.count, samples_path(:person => {:id => person}) unless person.samples.nil? %></td>
 	  <% if person.samples.count == 1 %>
 	    <td><%= person.samples.first.sample_vendor_id %></td>
