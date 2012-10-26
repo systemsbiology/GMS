@@ -33,6 +33,6 @@ array @pedigrees.each do |pedigree|
   updated_at   pedigree.updated_at
   genotype_vector_date pedigree.genotype_vector_date
   quartet_date pedigree.quartet_date
-  auotzygosity_date pedigree.auotzygosity_date
+  autozygosity_date pedigree.autozygosity_date
   relation_pairing_date  pedigree.relation_pairing_date
 end
