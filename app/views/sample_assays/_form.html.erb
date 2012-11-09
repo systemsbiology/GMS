@@ -7,7 +7,7 @@
   </div>
   <div class="field">
     <%= f.label :assay_id %><br />
-    <%= f.text_field :assay_id %>
+    <%= f.text_field :assay_id, :value => params[:assay_id]%>
   </div>
   <div class="actions">
     <%= f.submit %>
