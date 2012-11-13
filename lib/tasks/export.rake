@@ -135,7 +135,6 @@ namespace :export do
       end
       mother = person.mother.empty? ? 'NULL' : person.mother.first.isb_person_id
       father = person.father.empty? ? 'NULL' : person.father.first.isb_person_id
-      next unless person.gender
       output = [ped.study.tag, ped.isb_pedigree_id, ped.tag, person.isb_person_id, person.collaborator_id, person.gender, father, mother, person_samples_id.join(","), person_samples_vendor_id.join(","), person_sample_types.join(","), person_assays_id.join(","), person_assays_name.join(","), person_assemblies_id.join(","), person_assemblies_name.join(","), person_assemblies_location.join(","), person_assemblies_software_version.join(","), person_assemblies_genome_reference.join(",")]
       ind_output.push(output.join("\t"))
     end

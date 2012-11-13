@@ -55,13 +55,11 @@
 <br />
 <%= link_to 'Add a new Diagnosis', new_diagnosis_path(:person_id => @person) %>
 <br />
-<h1>Traits for this person</h1>
+<h1>Traits</h1>
 <%= render 'traits/list', :traits => @person.traits %>
-<br />
 <%= link_to 'Add a new Trait', new_trait_path(:person_id => @person) %>
 <br />
-<% if @person.planning_on_sequencing then %>
-<h1>Listing samples</h1>
+<h1>Samples</h1>
 <% if @person.samples.size > 0 %>
 <script>
   $(document).ready(function() { setupTablesorter() });
@@ -103,8 +101,7 @@
 <% end %>
 <%= link_to "New Sample for person #{@person.isb_person_id}", new_sample_path(:person_id => @person) %> <br />
 <br />
-<% end %>
-<h1>Listing Relationships</h1>
+<h1>Relationships</h1>
 <% if @person.relationships.size > 0 then %>
 <table class="tablesorter">
   <thead>

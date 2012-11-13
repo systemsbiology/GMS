@@ -19,7 +19,7 @@
   <tr>
     <td> <%= image_tag('file_location.png', :size => "20x20", :onmouseover => "$('#assembly_file_loc_#{assembly_file.id}').poshytip('show')", :onmouseout => "$('#assembly_file_loc_#{assembly_file.id}').poshytip('hide')", :id => "assembly_file_loc_#{assembly_file.id}") %> <%= link_to assembly_file.name, assembly_file %></td>
     <td><%= assembly_file.file_type.type_name %></td>
-    <td> <%= link_to assembly_file.assembly.assay.sample.sample_vendor_id, sample_path(assembly_file.assembly.assay.sample) %></td>
+    <td> <%= assembly_file.assembly.assay.sample.nil? ? 'No sample linked to this assembly file' : link_to(assembly_file.assembly.assay.sample.sample_vendor_id, sample_path(assembly_file.assembly.assay.sample)) %></td>
     <td><%= link_to assembly_file.assembly.name, assembly_path(assembly_file.assembly) %></td>
     <td><%= assembly_file.assembly.assay.sample.nil? ? '' : assembly_file.assembly.assay.sample.person.nil? ? '' : assembly_file.assembly.assay.sample.person.pedigree.name %></td>
     <td><%= assembly_file.genome_reference.name %></td>

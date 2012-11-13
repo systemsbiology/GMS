@@ -32,7 +32,7 @@
   <% if params[:person] %>
   <p>No traits for person <%if params[:person] %><%= Person.find(params[:person]).full_identifier %><% end %></p>
   <% else %>
-  <p>No traits for pedigree</p>
+  <p>No traits for person</p>
   <% end %>
   </table>
 <% end %>

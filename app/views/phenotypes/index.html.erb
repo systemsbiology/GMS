@@ -6,6 +6,7 @@
   <tr>
     <th>Disease</th>
     <th>Name</th>
+    <th>Tag</th>
     <th>Description</th>
   </tr>
   </thead>
@@ -14,6 +15,7 @@
   <tr>
     <td><%= link_to(phenotype.disease.name,phenotype.disease) if phenotype.disease %></td>
     <td><%= link_to phenotype.name, phenotype %></td>
+    <td><%= phenotype.tag %></td>
     <td><%= phenotype.description %></td>
     <% if false %>
     <td><%= link_to 'Show', phenotype %></td>

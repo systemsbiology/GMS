@@ -30,7 +30,11 @@
 <div>
   <div><span style="font-weight:bold; text-decoration: underline;">Summary File Contents</span></div>
   <div>
-  <%= simple_format(File.read(@assembly_file.location)) %>
+  <% if FileTest.exists?(@assembly_file.location) %>
+    <%= simple_format(File.read(@assembly_file.location)) %>
+  <% else %>
+    <p>Error finding file.</p>
+  <% end %>
   </div>
 </div>
 <% end %>

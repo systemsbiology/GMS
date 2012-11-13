@@ -142,38 +142,50 @@ class SamplesController < ApplicationController
 
     ac_notice = ''
     if (params[:person] and params[:person][:id]) then
-      if (params[:person][:id].to_i != @sample.person.id.to_i) then
+      if (@sample.person.nil? || params[:person][:id].to_i != @sample.person.id.to_i) then
         #logger.debug("updating the person associated with this sample from #{@sample.person.id} to #{params[:person][:id]}")
 	#check that there isn't an entry for this acquisition in the db already!
 	check_aq = Acquisition.find(:all, :conditions => {:person_id => params[:person][:id], :sample_id => @sample.id})
 	if (check_aq.size > 0) then
 	  @sample.errors.add("Cannot create duplicate sample (#{@sample.id}) and person (#{@sample.person.id}) link.")
 	else 
-  	  acquisition = Acquisition.find(:all, :conditions => {:person_id => @sample.person.id, :sample_id => @sample.id})
-	  if (acquisition.size > 1) then
-	    #logger.debug("Found multiple samples for this sample (#{@sample.id}) and person(#{@sample.person.id}) combination!!!  This is an error in the database!!  Fix it manually!  #{acquisition.inspect}")
-	    @sample.errors.add("Found multiple samples for sample #{@sample.id} and person #{@sample.person.id}.  Fix manually.")
-	  else 
-	    acquisition = acquisition.first
-	    acquisition.person_id = params[:person][:id]
-	    if (acquisition.save) then
-	      ac_notice << "Sample association with Person was successfully updated."
-	      # check to see if sequenced is true on person.  if not, then update it to yes.
-	      if (@sample.person.sequenced? == false) then
-	        person = @sample.person
-		person.planning_on_sequencing = 1
-		if (person.save) then
-		  ac_notice << "Updated person to show that sequencing was done."
-		end
+	  if (@sample.person) then
+    	    acquisition = Acquisition.find(:all, :conditions => {:person_id => @sample.person.id, :sample_id => @sample.id})
+	    if (acquisition.size > 1) then
+	      #logger.debug("Found multiple samples for this sample (#{@sample.id}) and person(#{@sample.person.id}) combination!!!  This is an error in the database!!  Fix it manually!  #{acquisition.inspect}")
+  	      @sample.errors.add("Found multiple samples for sample #{@sample.id} and person #{@sample.person.id}.  Fix manually.")
+	    else 
+	      acquisition = acquisition.first
+	      acquisition.person_id = params[:person][:id]
+	      if (acquisition.save) then
+	        ac_notice << "Sample association with Person was successfully updated."
+	      else
+	        ac_notice << "Sample association update failed."
+	        @sample.errors.add(ac_notice)
 	      end
+	    end
+	  else
+	    # create a new acquisition
+	    acquisition = Acquisition.new(:person_id => params[:person][:id], :sample_id => @sample.id)
+	    if (acquisition.save) then
+	      ac_notice << "Created new association between sample and person."
 	    else
-	      ac_notice << "Sample association update failed."
-	      @sample.errors.add(ac_notice)
+	      ac_notice << "Failed to create a new association between sample and person."
 	    end
 	  end
-	end
+        end
+      end
+
+      # check to see if sequenced is true on person.  if not, then update it to yes.
+      person = Person.find(params[:person][:id])
+      if (person.sequenced? == false) then
+  	person.planning_on_sequencing = 1
+	if (person.save) then
+          ac_notice << "  Updated person to show that sequencing was done."
+        end
       end
     end
+    @sample.errors.add(:sample, ac_notice) unless ac_notice.empty?
 
     respond_to do |format|
       if @sample.update_attributes(params[:sample])

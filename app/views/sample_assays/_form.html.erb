@@ -2,16 +2,12 @@
   <%= render "partials/error_messages", :target => @sample_assay %>
 
   <div class="field">
-    <%= f.label :id %><br />
-    <%= f.text_field :id %>
-  </div>
-  <div class="field">
     <%= f.label :sample_id %><br />
     <%= f.text_field :sample_id %>
   </div>
   <div class="field">
     <%= f.label :assay_id %><br />
-    <%= f.text_field :assay_id %>
+    <%= f.text_field :assay_id, :value => params[:assay_id]%>
   </div>
   <div class="actions">
     <%= f.submit %>
