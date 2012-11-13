@@ -5,7 +5,7 @@
 <%= render "partials/filter" %>
 
 <% unless params[:pedigree_filter].nil? or params[:pedigree_filter][:id].blank? %>
-  <p><b>Files for Pedigree <u><%= Pedigree.find(params[:pedigree_filter][:id]).name %></u></b></p>
+  <p><b>Assemblies for Pedigree <u><%= Pedigree.find(params[:pedigree_filter][:id]).name %></u></b></p>
 <% end %>
 <div id="filter_table">
   <%= render 'list', :assemblies => @assemblies %>
