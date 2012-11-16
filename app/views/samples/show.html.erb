@@ -88,6 +88,7 @@
   <thead>
   <tr>
     <th>Name</th>
+    <th>ID</th>
     <th>Sample</th>
     <th>ISB Sample ID</th>
     <th>ISB Person ID&nbsp;&nbsp;&nbsp;</th>
@@ -102,6 +103,7 @@
   <% @sample.assays.each do |assay| %>
   <tr>
     <td><%= link_to assay.name, assay %></td>
+    <td><%= link_to "isb_asy_"+assay.id.to_s, assay %></td>
     <td><%= assay.sample.sample_vendor_id %></td>
     <td><%= assay.sample.isb_sample_id %></td>
     <% if assay.sample.person.nil? then %>
@@ -122,3 +124,45 @@
 <p>No assays for this sample</p>
 <% end %>
 <%= link_to 'Add new assay', new_assay_path(:sample_id => @sample) %>
+
+<br/>
+
+<h1>Listing assemblies</h1>
+<% if @sample.assays.size > 0 %>
+<script>
+  $(document).ready(function() { setupTablesorter() });
+</script>
+<table class="tablesorter">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>ID</th>
+    <th>Assay</th>
+    <th>Sample</th>
+    <th>Genome reference&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+    <th>Assembler version</th>
+    <th>Date Recieved</th>
+    <th>Current</th>
+  </tr>
+  </thead>
+  <tbody>
+  <% @sample.assays.each do |assay| %>
+  <% assay.assemblies.each do |assembly| %>
+  <tr>
+    <td><%= link_to assembly.name, assembly %></td>
+    <td><%= link_to "isb_asm_"+assembly.id.to_s, assembly %></td>
+    <td><%= link_to assay.name, assay %></td>
+    <td><%= assay.sample.sample_vendor_id %></td>
+    <td><%= assembly.genome_reference.name %></td>
+    <td><%= assembly.software_version %> </td>
+    <td><%= assembly.file_date %> </td>
+    <td><%= assembly.current %> </td>
+  </tr>
+<% end %>
+<% end %>
+</tbody>
+</table>
+<% else %>
+<p>No assemblies for this sample</p>
+<% end %>
+<%= link_to 'Add new assembly', new_assembly_path(:sample_id => @sample) %>
