@@ -5,13 +5,14 @@
   <thead>
   <tr>
     <th>Name</th>
+    <th>ID</th>
     <th>Sample</th>
-    <th>ISB Sample ID</th>
-    <th>ISB Person ID&nbsp;&nbsp;&nbsp;</th>
-    <th>Collaborator ID&nbsp;&nbsp;&nbsp;</th>
+<!--    <th>ISB Sample ID</th> -->
+<!--    <th>ISB Person ID&nbsp;&nbsp;&nbsp;</th> -->
+    <th>Person&nbsp;&nbsp;&nbsp;</th>
     <th>Pedigree</th>
     <th>Assay type</th>
-    <th>Technology&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+    <th>Technology</th>
     <th>Status</th>
   </tr>
   </thead>
@@ -32,11 +33,17 @@
   <% else %>
   <tr>
     <td><%= link_to assay.name, assay %></td>
-    <td><%= assay.sample.sample_vendor_id %></td>
-    <td><%= assay.sample.isb_sample_id %></td>
-    <td><%= assay.sample.person.isb_person_id %></td>
-    <td><%= assay.sample.person.collaborator_id %></td>
-    <td><%= assay.sample.person.pedigree.name %></td>
+    <td><%= link_to "isb_asy_"+assay.id.to_s, assay %></td>
+    <td><%= link_to assay.sample.sample_vendor_id,assay.sample %></td>
+    <% if assay.sample.person.collaborator_id.nil? then %>
+    <td colspan="1"><%= link_to assay.sample.person.isb_person_id, assay.sample.person  %>
+    <%else%>
+    <td colspan="1"><%= link_to assay.sample.person.collaborator_id, assay.sample.person  %>
+    <%end%>
+<!--    <td><%= link_to assay.sample.isb_sample_id,assay.sample %></td> -->
+<!--    <td><%= link_to assay.sample.person.isb_person_id,assay.sample.person %></td>-->
+<!--    <td><%= link_to assay.sample.person.collaborator_id, assay.sample.person %></td> -->
+    <td><%= link_to assay.sample.person.pedigree.name, assay.sample.person.pedigree%></td>
     <td><%= assay.assay_type %></td>
     <td><%= assay.technology %></td>
     <td><%= assay.status %></td>

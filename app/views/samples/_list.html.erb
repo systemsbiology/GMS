@@ -2,12 +2,11 @@
 <table class="tablesorter">
   <thead>
   <tr>
-    <th class="{sorter: 'digit'}">ISB sample</th>
+    <th class="{sorter: 'digit'}">Name</th>
+    <th>ISB ID</th>
     <th>Customer Sample ID</th>
-    <th>ISB Person</th>
     <th>Person</th>
     <th>Pedigree</th>
-    <th>Vendor ID</th>
     <th>Sample type</th>
     <th>Status</th>
     <th>Volume</th>
@@ -18,16 +17,19 @@
   <tbody>
 <% @samples.each do |sample| %>
   <tr>
+    <td><%= link_to sample.sample_vendor_id,sample if sample.sample_vendor_id %></td>
     <td><%= link_to sample.isb_sample_id, sample, :id => sample.id %></td>
     <td><%= sample.customer_sample_id %></td>
     <% if sample.person.nil? then %>
     <td colspan="3">No person information for this sample</td>
     <% else %>
-    <td><%= sample.person.isb_person_id %></td>
-    <td><%= sample.person.collaborator_id %></td>
-    <td><%= sample.person.pedigree.name if sample.person.pedigree %></td>
+    <% if sample.person.collaborator_id.nil? then %>
+    <td colspan="1"><%= link_to sample.person.isb_perons_id, sample.person  %>
+    <%else%>
+    <td colspan="1"><%= link_to sample.person.collaborator_id, sample.person  %>
+    <%end%>
+    <td><%= link_to(sample.person.pedigree.name, sample.person.pedigree.name )if sample.person.pedigree %></td>
     <% end %>
-    <td><%= sample.sample_vendor_id if sample.sample_vendor_id %></td>
     <td><%= sample.sample_type.nil? ? 'unknown' : sample.sample_type.name  %></td>
     <td><%= sample.status %></td>
     <td><%= sample.volume %></td>

@@ -7,6 +7,23 @@
     <td colspan="2"> <b>File type:</b> <%= @assembly_file.file_type.type_name %> </td>
   </tr>
   <tr>
+    <td colspan="1"> <b>Assay:</b> <%= link_to @assembly_file.assembly.assay.name , assay_path(@assembly_file.assembly.assay) %> </td>
+    <td colspan="1"> <b>Sample:</b> <%= link_to @assembly_file.assembly.assay.sample.sample_vendor_id  , sample_path(@assembly_file.assembly.assay.sample) %> </td>
+    <td colspan="1"> 
+      <b>Person:</b>
+      <% if @assembly_file.assembly.assay.sample.person.collaborator_id.nil? then %>
+      <%= link_to @assembly_file.assembly.assay.sample.person.isb_person_id, @assembly_file.assembly.assay.sample.person  %>
+      <%else%>
+      <%= link_to @assembly_file.assembly.assay.sample.person.collaborator_id, @assembly_file.assembly.assay.sample.person  %>
+      (<%= link_to @assembly_file.assembly.assay.sample.person.isb_person_id, @assembly_file.assembly.assay.sample.person  %>)
+<%end%>
+
+
+ </td>
+    <td colspan="1"> <b>Pedigree:</b> <%= link_to @assembly_file.assembly.assay.sample.person.pedigree.name  , pedigree_path(@assembly_file.assembly.assay.sample.person.pedigree) %> </td>
+  </tr>
+
+  <tr>
     <td><b>Software:</b> <%= @assembly_file.software %> </td>
     <td><b>Software version:</b> <%= @assembly_file.software_version %> </td>
     <td><b>File date:</b> <%= @assembly_file.file_date %> </td>

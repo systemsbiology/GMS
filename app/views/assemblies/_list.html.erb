@@ -5,9 +5,12 @@
   <thead>
   <tr>
     <th>Assembly Name</th>
+    <th>ISB ID</th>
+    <th>Sample</th>
+    <th>Person</th>
+    <th>Assay</th>
     <th>Pedigree</th>
     <th>Genome reference&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-    <th>Sample ID</th>
     <th>File type</th>
     <th>Software&nbsp;&nbsp;</th>
     <th>Software version</th>
@@ -18,9 +21,32 @@
 <% assemblies.each do |assembly| %>
   <tr>
     <td><%= image_tag('file_location.png', :size => "20x20", :onmouseover => "$('#assembly_loc_#{assembly.id}').poshytip('show')", :onmouseout => "$('#assembly_loc_#{assembly.id}').poshytip('hide')", :id => "assembly_loc_#{assembly.id}") %> <%= link_to assembly.name, assembly %></td>
-    <td><%= assembly.assay.sample.nil? ? '' : assembly.assay.sample.person.nil? ? '' : link_to(assembly.assay.sample.person.pedigree.name, assembly.assay.sample.person.pedigree) %></td>
+    <td><%= link_to 'isb_asm_'+assembly.id.to_s,assembly %></td>
+    <% if assembly.assay.sample.nil? then %>
+    <td colspan="1">'No sample found'</td>
+    <% else %>
+    <td colspan="1"><%= link_to assembly.assay.sample.sample_vendor_id, assembly.assay.sample  %>
+    <%end%>
+    <% if assembly.assay.sample.person.nil? then %>
+    <td colspan="1">'No person found'</td>
+    <% else %>
+    <% if assembly.assay.sample.person.collaborator_id.nil? then %>
+    <td colspan="1"><%= link_to assembly.assay.sample.person.isb_perons_id, assembly.assay.sample.person  %>
+    <%else%>
+    <td colspan="1"><%= link_to assembly.assay.sample.person.collaborator_id, assembly.assay.sample.person  %>
+    <%end%>
+    <%end%>
+    <% if assembly.assay.nil? then %>
+    <td colspan="1">'No assay found'</td>
+    <% else %>
+    <td><%= link_to assembly.assay.name.to_s, assembly.assay %></td>
+    <%end%>
+    <% if assembly.assay.sample.person.pedigree.nil? then %>
+    <td colspan="1">'No pedigree found'</td>
+    <% else %>
+    <td colspan="1"><%= link_to assembly.assay.sample.person.pedigree.name, assembly.assay.sample.person.pedigree  %>
+    <%end%>
     <td><%= assembly.genome_reference.name %></td>
-    <td><%= assembly.assay.sample.nil? ? 'No sample linked to this assembly' : link_to(assembly.assay.sample.sample_vendor_id, assembly.assay.sample) %></td>
     <td><%= assembly.file_type %></td>
     <td><%= assembly.software %></td>
     <td><%= assembly.software_version %></td>

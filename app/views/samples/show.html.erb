@@ -15,13 +15,14 @@
  <td>&nbsp</td>
  <span style="font-weight: bold; color: red;">No person information for this sample</span>
  <% else %>
- <td>
-   <b>Person:</b>
-   <%= @sample.person.collaborator_id %>
- </td>
- <td>
-   <b>ISB Person:</b>
-   <%= link_to @sample.person.isb_person_id, person_path(@sample.person) %>
+  <td colspan="2">
+      <b>Person:</b>
+      <% if @sample.person.collaborator_id.nil? then %>
+      <%= link_to @sample.person.isb_person_id, @sample.person  %>
+      <%else%>
+      <%= link_to @sample.person.collaborator_id, @sample.person  %>
+      (<%= link_to @sample.person.isb_person_id, @sample.person  %>)
+<%end%>
  </td>
 </tr>
 <tr>

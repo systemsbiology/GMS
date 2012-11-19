@@ -2,21 +2,32 @@
 
 <table class="tablesorter">
   <tr>
-    <td><b>Name:</b><%= @assembly.name %></td>
-    <td><b>Genome reference:</b> <%= @assembly.genome_reference.name %> </td>
-    <td colspan="2"> <b>Type:</b> <%= @assembly.file_type %> </td>
-  </tr>
-  <tr>
-    <td><b>Software:</b> <%= @assembly.software %> </td>
-    <td><b>Software version:</b> <%= @assembly.software_version %> </td>
-    <td><b>Date:</b> <%= @assembly.file_date %> </td>
-    <td><b>Current:</b> <%= @assembly.current %> </td>
+    <td colspan="1"><b>Name:</b><%= @assembly.name %></td>
+    <td colspan="1"><b>ID:</b>isb_asm_<%= @assembly.id %></td>
+    <td colspan="1"><b>Genome reference:</b> <%= @assembly.genome_reference.name %> </td>
+    <td colspan="1"> <b>Type:</b> <%= @assembly.file_type %> </td>
   </tr>
   <tr>
     <td colspan="1"> <b>Assay:</b> <%= link_to @assembly.assay.name , assay_path(@assembly.assay) %> </td>
     <td colspan="1"> <b>Sample:</b> <%= link_to @assembly.assay.sample.sample_vendor_id  , sample_path(@assembly.assay.sample) %> </td>
-    <td colspan="1"> <b>Person:</b> <%= link_to @assembly.assay.sample.person.collaborator_id  , person_path(@assembly.assay.sample.person) %> </td>
+    <td colspan="1"> 
+      <b>Person:</b>
+      <% if @assembly.assay.sample.person.collaborator_id.nil? then %>
+      <%= link_to @assembly.assay.sample.person.isb_person_id, @assembly.assay.sample.person  %>
+      <%else%>
+      <%= link_to @assembly.assay.sample.person.collaborator_id, @assembly.assay.sample.person  %>
+      (<%= link_to @assembly.assay.sample.person.isb_person_id, @assembly.assay.sample.person  %>)
+<%end%>
+
+
+ </td>
     <td colspan="1"> <b>Pedigree:</b> <%= link_to @assembly.assay.sample.person.pedigree.name  , pedigree_path(@assembly.assay.sample.person.pedigree) %> </td>
+  </tr>
+  <tr>
+    <td colspan="1"><b>Software:</b> <%= @assembly.software %> </td>
+    <td colspan="1"><b>Software version:</b> <%= @assembly.software_version %> </td>
+    <td colspan="1"><b>Date:</b> <%= @assembly.file_date %> </td>
+    <td colspan="1"><b>Current:</b> <%= @assembly.current %> </td>
   </tr>
   <tr>
     <td colspan="4"> <b>Location:</b> <%= @assembly.location %> </td>

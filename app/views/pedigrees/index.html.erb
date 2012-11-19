@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <script>
   $(document).ready(function() { setupTablesorter() });
 </script>
@@ -11,6 +12,7 @@
   <tr>
     <th>Status&nbsp;&nbsp;&nbsp;&nbsp;</th>
     <th>Name</th>
+    <th>ID</th>
     <th>Tag&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
     <th>Study</th>
     <th>Description</th>
@@ -26,8 +28,9 @@
         <td style="background-color:red"><span style="color: red;">I</span></td>
       <% end %>
       <td><%= link_to pedigree.name, pedigree %></td>
-      <td><%= pedigree.tag %></td>
-      <td><%= pedigree.study.name if pedigree.study %></td>
+      <td><%= link_to pedigree.isb_pedigree_id, pedigree %></td>
+      <td><%= link_to pedigree.tag,pedigree %></td>
+      <td><%= link_to pedigree.study.name, pedigree.study if pedigree.study %></td>
       <td style="white-space: normal;"><%= pedigree.description %></td>
       <td><%= link_to 'Edit', edit_pedigree_path(pedigree) %></td>
       <% if true  %><td><%= link_to 'Delete pedigree', pedigree, :confirm => 'Are you sure?', :method => :delete %></td><% end %>

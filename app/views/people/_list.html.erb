@@ -5,7 +5,7 @@
   <thead>
   <tr>
     <th>ISB Person ID</th>
-    <th>Collaborator ID</th>
+    <th>Name</th>
     <th>Pedigree</th>
     <th>Gender</th>
     <th>Birth Date</th>
@@ -18,7 +18,7 @@
   <tr>
     <td style="width: 100px;"><%= link_to person.isb_person_id, person %></td>
     <td><%= person.full_collaborator %></td>
-    <td><%= person.pedigree.name if person.pedigree %></td>
+    <td><%= link_to person.pedigree.name, person.pedigree if person.pedigree %></td>
     <td style="width: 50px;"><%= person.gender %></td>
     <td style="width: 50px;"><%= person.dob %></td>
     <td style="width: 50px;"><%= person.dod %></td>

@@ -17,6 +17,10 @@
   <b>Name:</b>
   <%= @pedigree.name %>
 </td>
+<td>
+  <b>ID:</b>
+  <%= @pedigree.isb_pedigree_id %>
+</td>
 
 <td>
   <b>Tag:</b>
@@ -24,17 +28,17 @@
 </td>
 <td>
   <b>Study:</b>
-  <%= @pedigree.study.name if @pedigree.study %>
+  <%= link_to @pedigree.study.name,@pedigree.study if @pedigree.study %>
 </td>
 </tr>
 <tr>
 
-<td colspan="3">
+<td colspan="4">
   <b>Description:</b>
   <%= @pedigree.description %>
 </td>
 </tr>
-<tr><td colspan="3"><b>Pedigree Status:</b> <% if @pedigree.complete then %><span style="background-color:green;">&nbsp;&nbsp;</span>Complete<% else %><span style="background-color:red;">&nbsp;&nbsp;</span>Incomplete<% end %></td></tr>
+<tr><td colspan="4"><b>Pedigree Status:</b> <% if @pedigree.complete then %><span style="background-color:green;">&nbsp;&nbsp;</span>Complete<% else %><span style="background-color:red;">&nbsp;&nbsp;</span>Incomplete<% end %></td></tr>
 </table>
 <%= link_to 'Back', pedigrees_path %> | 
 <%= link_to 'Edit', edit_pedigree_path(@pedigree) %> |
