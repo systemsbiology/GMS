@@ -785,4 +785,10 @@ class PeopleController < ApplicationController
     return 1, people, samples, relationships, memberships, diagnoses, acquisitions, errors
   end # end process fgi manifest definition
 
+  def get_drop_down_people_by_pedigree
+    options = Person.find_all_by_pedigree_id(params[:pedigree_id]).collect { |per| "\"#{per.id}\" : \"#{per.full_identifier}\"" }
+    render :text => "{#{options.join(",")}}"
+    #@people = Person.find_all_by_pedigree_id(params[:pedigree_id])
+    #render :json => @people
+  end
 end
