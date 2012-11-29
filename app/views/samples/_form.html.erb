@@ -1,12 +1,51 @@
 <%= form_for(@sample) do |f| %>
   <%= render "partials/error_messages", :target => @sample %>
 
+  <% sel_person = params[:person_id] %>
+  <% if sel_person.nil? and @sample.person then sel_person = @sample.person.id end %>
+  <% if sel_person.nil? then sel_person = '' end %>
+
+  <div class="field">
+    <%= f.label :pedigree %><br />
+    <%= collection_select(:pedigree, :id, Pedigree.order("pedigrees.tag"), :id, :name, options = { :selected => @sample.pedigree_id, :include_blank => "-Select the pedigree this sample belongs to" }) %>
+  </div>
+  <script>
+
+    $("#pedigree_id").change(function() {
+      var url = '/people/get_drop_down_people_by_pedigree';
+      var request = $.ajax({
+        data: { 'pedigree_id' : $(this).val() },
+	dataType: 'json',
+      	type: 'GET',
+	url: url
+	});
+      request.complete(
+      );
+
+      request.done( function(responseData) {
+          $("#person_id").children().remove();
+	  if ($.isEmptyObject(responseData)) {
+	    $("#person_id").append('<option value="">-No People in this pedigree. Select Pedigree</option>');
+	  } else {
+	    $("#person_id").append('<option value="">-Select Person</option>');
+	    for (var key in responseData) {
+	      $("#person_id").append($('<option>', {
+	        value : key,
+  	        text : responseData[key]
+	      }));
+	    }
+	  }
+        });
+      request.fail(function(jqXHR, textStatus) {
+        alert("Request failed: "+textStatus);
+      });
+    }
+    ).trigger('change');
+
+  </script>
   <div class="field">
     <%= f.label :person %><br />
-    <% sel_person = params[:person_id] %>
-    <% if sel_person.nil? and @sample.person then sel_person = @sample.person.id end %>
-    <% if sel_person.nil? then sel_person = '' end %>
-    <%= collection_select(:person, :id, Person.all, :id, :full_identifier, options = {:selected => sel_person, :include_blank => "-Select the person this sample belongs to"}) %>
+    <%= select("person", "id", ["-Select Pedigree"]) %>
   </div>
   <div class="field">
     <%= f.label :customer_sample_id %> - The Sample ID if it is different than Subject ID.<br/> 
