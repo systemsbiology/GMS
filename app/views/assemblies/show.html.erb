@@ -4,13 +4,19 @@
   <tr>
     <td><b>Name:</b><%= @assembly.name %></td>
     <td><b>Genome reference:</b> <%= @assembly.genome_reference.name %> </td>
-    <td colspan="2"> <b>File type:</b> <%= @assembly.file_type %> </td>
+    <td colspan="2"> <b>Type:</b> <%= @assembly.file_type %> </td>
   </tr>
   <tr>
     <td><b>Software:</b> <%= @assembly.software %> </td>
     <td><b>Software version:</b> <%= @assembly.software_version %> </td>
-    <td><b>File date:</b> <%= @assembly.file_date %> </td>
+    <td><b>Date:</b> <%= @assembly.file_date %> </td>
     <td><b>Current:</b> <%= @assembly.current %> </td>
+  </tr>
+  <tr>
+    <td colspan="1"> <b>Assay:</b> <%= link_to @assembly.assay.name , assay_path(@assembly.assay) %> </td>
+    <td colspan="1"> <b>Sample:</b> <%= link_to @assembly.assay.sample.sample_vendor_id  , sample_path(@assembly.assay.sample) %> </td>
+    <td colspan="1"> <b>Person:</b> <%= link_to @assembly.assay.sample.person.collaborator_id  , person_path(@assembly.assay.sample.person) %> </td>
+    <td colspan="1"> <b>Pedigree:</b> <%= link_to @assembly.assay.sample.person.pedigree.name  , pedigree_path(@assembly.assay.sample.person.pedigree) %> </td>
   </tr>
   <tr>
     <td colspan="4"> <b>Location:</b> <%= @assembly.location %> </td>
@@ -27,9 +33,13 @@
 </table>
 <br />
 <%= link_to 'Edit', edit_assembly_path(@assembly) %> |
-<%= link_to 'Back to all assemblies', assemblies_path %> |
-<%= link_to "Back to assay #{@assembly.assay.name}", assay_path(@assembly.assay) %>
-<br />
+<%= link_to 'Back to all assemblies', assemblies_path %> <br/>
+<%= link_to "Back to assay #{@assembly.assay.name}", assay_path(@assembly.assay) %><br/>
+<%= link_to "Back to sample #{@assembly.assay.sample.sample_vendor_id} (#{@assembly.assay.sample.isb_sample_id})", sample_path(@assembly.assay.sample)  %> <br/>
+<%= link_to "Back to person #{@assembly.assay.sample.person.collaborator_id} (#{@assembly.assay.sample.person.isb_person_id})", person_path(@assembly.assay.sample.person) unless @assembly.assay.sample.nil? or @assembly.assay.sample.person.nil? %><br/>
+<%= link_to "Back to pedigree #{@assembly.assay.sample.person.pedigree.name}", pedigree_path(@assembly.assay.sample.person.pedigree) %><br/>
+
+
 <%= link_to "Ensure Files are up to date", ensure_files_up_to_date_path(@assembly) %>
 <br /><br />
 <%= render 'assembly_files/list', :assembly_files => @assembly.assembly_files.paginate(:page => 1,:per_page => 100) %>

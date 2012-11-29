@@ -2,7 +2,7 @@
 
 <table class="tablesorter">
 <tr>
-  <td><b>Sample:</b> <%= @person.isb_person_id %></td>
+  <td><b>ISB ID:</b> <%= @person.isb_person_id %></td>
   <td colspan="2"><b>Subject:</b> <%= @person.collaborator_id %></td>
 </tr>
 <% if @person.person_aliases.size > 0 %>
@@ -12,7 +12,8 @@
 <% end %>
 <tr>
   <td><b>Gender:</b> <%= @person.gender %></td>
-  <td colspan="2"><b>Planning on Sequencing this person:</b> <%= @person.planning_on_sequencing %></td>
+  <td><b>Pedigree:</b> <%= link_to @person.pedigree.name, @person.pedigree %></td>
+  <td colspan="1"><b>Planning on Sequencing this person:</b> <%= @person.planning_on_sequencing %></td>
 </tr>
 <tr>
   <td><b>Dob:</b> <%= @person.dob %></td>
@@ -67,8 +68,8 @@
 <table class="tablesorter">
   <thead>
   <tr>
-    <th>ISB sample</th>
     <th>Sample Vendor ID</th>
+    <th>ISB sample ID</th>
     <th>ISB Person</th>
     <th>Person</th>
     <th>Pedigree</th>
@@ -82,8 +83,8 @@
   <tbody>
 <% @person.samples.each do |sample| %>
   <tr>
+    <td><%= link_to sample.sample_vendor_id,sample %></td>
     <td><%= link_to sample.isb_sample_id, sample %></td>
-    <td><%= sample.sample_vendor_id %></td>
     <td><%= sample.person.isb_person_id %></td>
     <td><%= sample.person.collaborator_id %></td>
     <td><%= sample.person.pedigree.nil? ? 'NA' : sample.person.pedigree.name %></td>
@@ -100,7 +101,108 @@
 <p> No samples for this person.</p>
 <% end %>
 <%= link_to "New Sample for person #{@person.isb_person_id}", new_sample_path(:person_id => @person) %> <br />
+
 <br />
+<h1>Assays</h1>
+<% if @person.samples.size > 0 %>
+
+<script>
+  $(document).ready(function() { setupTablesorter() });
+</script>
+<table class="tablesorter">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>ID</th>
+    <th>Sample</th>
+    <th>ISB Sample ID</th>
+    <th>ISB Person ID&nbsp;&nbsp;&nbsp;</th>
+    <th>Collaborator ID&nbsp;&nbsp;&nbsp;</th>
+    <th>Pedigree</th>
+    <th>Assay type</th>
+    <th>Technology&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+    <th>Status</th>
+  </tr>
+  </thead>
+  <tbody>
+<% @person.samples.each do |sample| %>
+<% sample.assays.each do |assay| %>
+  <tr>
+    <td><%= link_to assay.name, assay %></td>
+    <td><%= link_to "isb_asy_"+assay.id.to_s, assay %></td>
+    <td><%= assay.sample.sample_vendor_id %></td>
+    <td><%= assay.sample.isb_sample_id %></td>
+    <% if assay.sample.person.nil? then %>
+    <td colspan="3">No Person information for this sample</td>
+    <% else %>
+    <td><%= assay.sample.person.isb_person_id %></td>
+    <td><%= assay.sample.person.collaborator_id %></td>
+    <td><%= assay.sample.person.pedigree.name %></td>
+    <% end %>
+    <td><%= assay.assay_type %></td>
+    <td><%= assay.technology %></td>
+    <td><%= assay.status %></td>
+  </tr>
+<% end %>
+<%end%>
+</tbody>
+</table>
+<% else %>
+<p> No assays for this person.</p>
+<% end %>
+<%= link_to 'Add new assay', new_assay_path() %>
+
+<br />
+<h1>Assemblies</h1>
+<% if @person.samples.size > 0 %>
+
+<script>
+  $(document).ready(function() { setupTablesorter() });
+</script>
+<table class="tablesorter">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>ID</th>
+    <th>Assay</th>
+    <th>Sample</th>
+    <th>Genome reference&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
+    <th>Assembler version</th>
+    <th>Date Recieved</th>
+    <th>Current</th>
+  </tr>
+  </thead>
+  <tbody>
+<% @person.samples.each do |sample| %>
+  <% sample.assays.each do |assay| %>
+  <% assay.assemblies.each do |assembly| %>
+  <tr>
+    <td><%= link_to assembly.name, assembly %></td>
+    <td><%= link_to "isb_asm_"+assembly.id.to_s, assembly %></td>
+    <td><%= link_to assay.name, assay %></td>
+    <td><%= assay.sample.sample_vendor_id %></td>
+    <td><%= assembly.genome_reference.name %></td>
+    <td><%= assembly.software_version %> </td>
+    <td><%= assembly.file_date %> </td>
+    <td><%= assembly.current %> </td>
+  </tr>
+<% end %>
+<% end %>
+<% end %>
+</tbody>
+</table>
+<% else %>
+<p>No assemblies for this sample</p>
+<% end %>
+<%= link_to 'Add new assembly', new_assembly_path(:sample_id => @sample) %>
+
+
+
+
+
+
+
+
 <h1>Relationships</h1>
 <% if @person.relationships.size > 0 then %>
 <table class="tablesorter">

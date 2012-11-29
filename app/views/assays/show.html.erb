@@ -16,10 +16,11 @@
 </td>
 </tr>
 <tr>
-  <td colspan="2">
+  <td colspan="1">
   <b>Vendor:</b>
   <%= @assay.vendor %>
   </td>
+ <td><b>Pedigree:</b> <%= link_to @assay.sample.person.pedigree.name, @assay.sample.person.pedigree %></td>
   <td><b>Status:</b>
   <%= @assay.status %>
   </td>
