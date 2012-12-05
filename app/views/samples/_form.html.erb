@@ -3,7 +3,6 @@
 
   <% sel_person = params[:person_id] %>
   <% if sel_person.nil? and @sample.person then sel_person = @sample.person.id end %>
-  <% if sel_person.nil? then sel_person = '' end %>
 
   <div class="field">
     <%= f.label :pedigree %><br />
@@ -35,6 +34,9 @@
 	      }));
 	    }
 	  }
+	  <% if !sel_person.nil? %>
+	    $("#person_id").val(<%= sel_person %>);
+	  <% end %>
         });
       request.fail(function(jqXHR, textStatus) {
         alert("Request failed: "+textStatus);
