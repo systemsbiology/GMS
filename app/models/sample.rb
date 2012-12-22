@@ -56,6 +56,7 @@ class Sample < ActiveRecord::Base
 
   def trigger_person_sample_check
     person = self.person
+    return if person.nil?
     person.check_sequencing_status
   end
 

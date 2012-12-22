@@ -307,7 +307,12 @@ class PeopleController < ApplicationController
     #process Person objects first
     @errors = Array.new
     person_temp_object = TempObject.find_by_trans_id_and_object_type(trans_id, "Person")
+    if (person_temp_object.nil?) then
+      logger.error("No temp objects found to enter in database for transaction id #{trans_id}")
+      return
+    end
     begin
+      logger.debug("person_temp_object #{person_temp_object.inspect}")
       person_obj_array = Marshal.load(person_temp_object.object)
       logger.debug("person_obj_array #{person_obj_array.inspect}")
     rescue ArgumentError => error
@@ -495,6 +500,7 @@ class PeopleController < ApplicationController
 	  end
 	else
 	  if obj.valid? then
+	  logger.debug("saving object #{obj.inspect}")
 	    obj.save
 	  else
 	    @errors.push(["#{temp_obj.object_type}",obj, obj.errors])
