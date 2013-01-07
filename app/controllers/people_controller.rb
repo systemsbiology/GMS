@@ -309,41 +309,44 @@ class PeopleController < ApplicationController
     person_temp_object = TempObject.find_by_trans_id_and_object_type(trans_id, "Person")
     if (person_temp_object.nil?) then
       logger.error("No temp objects found to enter in database for transaction id #{trans_id}")
-      return
-    end
-    begin
-      logger.debug("person_temp_object #{person_temp_object.inspect}")
-      person_obj_array = Marshal.load(person_temp_object.object)
-      logger.debug("person_obj_array #{person_obj_array.inspect}")
-    rescue ArgumentError => error
-      lazy_load ||= Hash.new {|hash, hash_key| hash[hash_key] = true; false}
-      if error.to_s[/undefined class|referred/] && !lazy_load[error.to_s.split.last.constantize]
-        retry
-      else
-        raise error
+      # don't need to return here because this prevents the processing of pedigrees that already
+      # have person information entered in the database
+    else
+      # process the person objects
+      begin
+        #logger.debug("person_temp_object #{person_temp_object.inspect}")
+        person_obj_array = Marshal.load(person_temp_object.object)
+        #logger.debug("person_obj_array #{person_obj_array.inspect}")
+      rescue ArgumentError => error
+        lazy_load ||= Hash.new {|hash, hash_key| hash[hash_key] = true; false}
+        if error.to_s[/undefined class|referred/] && !lazy_load[error.to_s.split.last.constantize]
+          retry
+        else
+          raise error
+        end
       end
-    end
 
-    person_obj_array.each do |person_obj|
-      logger.debug("person obj is #{person_obj.inspect}")
-      if person_obj.valid? then
-        person_obj.save!
-      else
-        @errors.push(["#{person_obj.object_type}",person_obj, person_obj.errors])
+      person_obj_array.each do |person_obj|
+        #logger.debug("person obj is #{person_obj.inspect}")
+        if person_obj.valid? then
+          person_obj.save!
+        else
+          @errors.push(["#{person_obj.object_type}",person_obj, person_obj.errors])
+        end
       end
-    end
 
-    begin
-      person_temp_object.destroy
-    rescue Exception => exc
-      person_temp_object.errors.add(:object_type, "could not be destroyed")
-      @errors.push(["person_temp_object", person_temp_object.errors])
-      logger.error("person_temp_object #{person_temp_object.inspect} could not be destroyed!!  #{exc.message}")
+      begin
+        person_temp_object.destroy
+      rescue Exception => exc
+        person_temp_object.errors.add(:object_type, "could not be destroyed")
+        @errors.push(["person_temp_object", person_temp_object.errors])
+        logger.error("person_temp_object #{person_temp_object.inspect} could not be destroyed!!  #{exc.message}")
+      end
     end
 
     # process the rest of the objects
     temp_objects = TempObject.find_all_by_trans_id(trans_id)
-    logger.debug("temp objects are #{temp_objects.inspect}")
+    #logger.debug("temp objects are #{temp_objects.inspect}")
     temp_objects.each do |temp_obj|
       # need the begin rescue block because Person includes pedigree information and it needs to lazy load the pedigree class otherwise there is an error
       begin 
@@ -362,7 +365,7 @@ class PeopleController < ApplicationController
   	    # this is to deal with Relationship objects because we create a straight array
 	    # for them because we don't know the person.id for the person if it hasn't
   	    # been created already...
-	    logger.debug("temp_obj is #{temp_obj.inspect}")
+	    #logger.debug("temp_obj is #{temp_obj.inspect}")
 	    pedigree_id = obj[0]
 	    person_collaborator_id = obj[1]
 	    relation_collaborator_id = obj[2]
@@ -409,7 +412,7 @@ class PeopleController < ApplicationController
 
 	    rel.name = rel_name
 	    rel.relationship_type = rel.lookup_relationship_type(rel_name)
-	    logger.debug("relationship type is #{rel.relationship_type} for #{rel.inspect} for person #{person.inspect} and relation #{relation.inspect}")
+	    #logger.debug("relationship type is #{rel.relationship_type} for #{rel.inspect} for person #{person.inspect} and relation #{relation.inspect}")
 	    rel.relation_order = rel_order unless rel_order.nil?
 	    begin
 	      if rel.valid? then
@@ -446,6 +449,7 @@ class PeopleController < ApplicationController
 	    end 
 	  elsif temp_obj.object_type == "Membership" then
 	    ped = Pedigree.find(obj[0])
+	    #logger.debug("processing membership information for pedigree #{ped.inspect}")
 	    person = Person.find_by_collaborator_id_and_pedigree_id(obj[1], obj[0])
   	    m = Membership.new
 	    if person.nil? then
@@ -500,7 +504,7 @@ class PeopleController < ApplicationController
 	  end
 	else
 	  if obj.valid? then
-	  logger.debug("saving object #{obj.inspect}")
+	  #logger.debug("saving object #{obj.inspect}")
 	    obj.save
 	  else
 	    @errors.push(["#{temp_obj.object_type}",obj, obj.errors])
@@ -786,7 +790,7 @@ class PeopleController < ApplicationController
       render :action => "upload" and return(0)
     end
 
-    logger.debug("relationships is #{relationships}")
+    #logger.debug("relationships is #{relationships}")
 
     return 1, people, samples, relationships, memberships, diagnoses, acquisitions, errors
   end # end process fgi manifest definition
