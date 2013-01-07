@@ -189,7 +189,7 @@ class SamplesController < ApplicationController
 
     respond_to do |format|
       if @sample.update_attributes(params[:sample])
-        logger.debug("sample is #{@sample.inspect} after params #{params[:sample]}")
+        #logger.debug("sample is #{@sample.inspect} after params #{params[:sample]}")
         format.html { redirect_to(@sample, :notice => "Sample was successfully updated. #{ac_notice}") }
         format.xml  { head :ok }
       else
