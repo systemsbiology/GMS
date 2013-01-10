@@ -84,7 +84,7 @@ class SamplesController < ApplicationController
 
   # GET /samples/1/edit
   def edit
-    @sample = Sample.find(params[:id])
+    @sample = Sample.find(params[:id], :include => { :person => :pedigree} )
   end
 
   # POST /samples
@@ -189,7 +189,7 @@ class SamplesController < ApplicationController
 
     respond_to do |format|
       if @sample.update_attributes(params[:sample])
-        logger.debug("sample is #{@sample.inspect} after params #{params[:sample]}")
+        #logger.debug("sample is #{@sample.inspect} after params #{params[:sample]}")
         format.html { redirect_to(@sample, :notice => "Sample was successfully updated. #{ac_notice}") }
         format.xml  { head :ok }
       else
@@ -208,5 +208,10 @@ class SamplesController < ApplicationController
       format.html { redirect_to(samples_url) }
       format.xml  { head :ok }
     end
+  end
+
+  def get_drop_down_samples_by_pedigree
+    options = Sample.find_all_by_pedigree_id(params[:pedigree_id]).collect { |x| "\"#{x.id}\" : \"#{x.full_identifier}\""}
+    render :text => "{#{options.join(",")}}"
   end
 end

@@ -115,4 +115,30 @@ namespace :pedigree do
     end
   end
 
+  desc "output family structure for simulated genomes"
+  task :output_family_structure, [:pedigree_id] => :environment do |t, args|
+    peds = Array.new
+    outfile = "family_structure"
+    if args[:pedigree_id].nil? then
+      peds = Pedigree.all.map(&:id)
+      outfile << ".txt"
+    else
+      peds.push(args[:pedigree_id])
+      outfile << "_#{args[:pedigree_id]}.txt"
+    end
+    raise "No pedigrees found " if peds.size <= 0
+
+    out = File.open(outfile, "w+")
+    out.write("Pedigree ID\tChild ID\tFather ID\tMother ID\tChild Gender\n")
+    peds.each do |ped_id|
+      rels = pedigree_relationships(ped_id)
+      rels.each do |ind|
+        child = Person.find_by_isb_person_id(ind["individual_id"])
+        out.write("#{ped_id}\t#{ind["individual_id"]}\t#{ind["father"]}\t#{ind["mother"]}\t#{child.gender}\n")
+      end
+    end
+    out.close
+
+  end
+
 end

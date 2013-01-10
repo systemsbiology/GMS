@@ -39,17 +39,20 @@ EXCEL_FGG_HEADER_INDEX_FILE = "config/fgg_manifest_indexes.yml"
 # don't forget to add these to the file_types table if you add a new one!
 FILE_TYPES = {
 		# CGI FILES
-		'var-' =>  { 'type' => 'VAR-ANNOTATION', 'vendor' => 'CGI' },
-		'gene-' => { 'type' => 'GENE-ANNOTATION', 'vendor' => 'CGI' },
-		'geneVarSummary-' => { 'type' => 'GENE-VAR-SUMMARY-REPORT', 'vendor' => 'CGI'},
-		'ncRNA-' => {'type' => 'NCRNA-ANNOTATION', 'vendor' => 'CGI' },
-		'cnvSegments' => { 'type' => 'CNV-SEGMENTS', 'vendor' => 'CGI' },
+		'var-' 			  =>  { 'type' => 'VAR-ANNOTATION', 'vendor' => 'CGI' },
+		'gene-' 		  => { 'type' => 'GENE-ANNOTATION', 'vendor' => 'CGI' },
+		'geneVarSummary-' 	  => { 'type' => 'GENE-VAR-SUMMARY-REPORT', 'vendor' => 'CGI'},
+		'ncRNA-' 		  => {'type' => 'NCRNA-ANNOTATION', 'vendor' => 'CGI' },
+		'cnvSegments' 		  => { 'type' => 'CNV-SEGMENTS', 'vendor' => 'CGI' },
 		'highConfidenceJunctions' => { 'type' => 'JUNCTIONS', 'vendor' => 'CGI' },
-		'summary-' => { 'type' => 'SUMMARY', 'vendor' => 'CGI'},
-		'highConfidenceSvEvents' => {'type' => 'SVEVENTS', 'vendor' => 'CGI' },
+		'summary-' 		  => { 'type' => 'SUMMARY', 'vendor' => 'CGI'},
+		'highConfidenceSvEvents'  => {'type' => 'SVEVENTS', 'vendor' => 'CGI' },
 		# VCF FILES
-		'.snp.filtered.vcf' => { 'type' => 'VCF-SNP-ANNOTATION', 'vendor' => 'VCF' },
-		'.indel.vcf' => { 'type' => 'VCF-INDEL-ANNOTATION', 'vendor' => 'VCF' }
+		'.snp.filtered.vcf' 	  => { 'type' => 'VCF-SNP-ANNOTATION', 'vendor' => 'VCF' },
+		'.indel.vcf' 		  => { 'type' => 'VCF-INDEL-ANNOTATION', 'vendor' => 'VCF' },
+		# Analysis directories
+		'ReMastered_MasterVar_'   => { 'type' => 'ReMastered-MasterVar', 'vendor' => 'ISB'},
+		'ReMastered_Var_' 	  => { 'type' => 'ReMastered-Var', 'vendor' => 'ISB'},
             }
 
 

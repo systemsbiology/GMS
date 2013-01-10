@@ -1,4 +1,5 @@
 class Sample < ActiveRecord::Base
+  before_destroy :trigger_person_sample_check
   # assays has to come before sample_assays in order for the dependent destroy to work
   has_many :assays, :through => :sample_assays, :dependent => :destroy
   has_many :sample_assays, :dependent => :destroy
@@ -10,8 +11,8 @@ class Sample < ActiveRecord::Base
   validates_presence_of :sample_type_id, :status, :sample_vendor_id #, :volume, :concentration, :quantity
   validates_uniqueness_of :sample_vendor_id
 
-  after_create :check_isb_sample_id
-  after_update :check_isb_sample_id
+  after_save :check_isb_sample_id, :trigger_person_sample_check
+  after_commit :trigger_person_sample_check
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
@@ -51,6 +52,12 @@ class Sample < ActiveRecord::Base
       isb_sample_id = "isb_sample_"+self.id.to_s
       self.update_attributes(:isb_sample_id => isb_sample_id)
     end
+  end
+
+  def trigger_person_sample_check
+    person = self.person
+    return if person.nil?
+    person.check_sequencing_status
   end
 
   def varfile

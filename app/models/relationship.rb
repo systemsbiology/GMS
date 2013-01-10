@@ -123,12 +123,12 @@ class Relationship < ActiveRecord::Base
     end
 
     if relationship_gender[self.name].nil? then
-      logger.debug("Error: relationship_gender does not contain #{self.name}.  Please add to config/application.yml before adding this relationship.")
+      logger.error("Error: relationship_gender does not contain #{self.name}.  Please add to config/application.yml before adding this relationship.")
       return false
     end
 
     if self.relationship_type.nil? then
-      logger.debug("Error: relationship provided to relationship_gender does not contain a relationship_type.")
+      logger.error("Error: relationship provided to relationship_gender does not contain a relationship_type.")
       return false
     end
 
@@ -163,7 +163,7 @@ class Relationship < ActiveRecord::Base
 ##    end
 ##
 ##    if self.relationship_type == 'child' then
-#      logger.debug("in relatinship_type child for #{self.inspect} self.person.gender #{self.person.gender} raltionship_gender[self.name] #{relationship_gender[self.name]} self.relation.gender #{self.relation.gender} relationship_gender[self.reverse_name] #{relationship_gender[self.reverse_name]}" )
+#      logger.debug("in relatinship_type child for #{self.inspect} self.person.gender #{self.person.gender} relationship_gender[self.name] #{relationship_gender[self.name]} self.relation.gender #{self.relation.gender} relationship_gender[self.reverse_name] #{relationship_gender[self.reverse_name]}" )
 #      if self.person.gender == relationship_gender[self.name] and self.relation.gender == relationship_gender[self.reverse_name] then
 #        return true
 #      else

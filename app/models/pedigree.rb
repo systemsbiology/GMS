@@ -115,7 +115,7 @@ class Pedigree < ActiveRecord::Base
 
   def destroy_people
     people = self.people
-    logger.debug("found #{people.inspect} in destroy_people")
+    #logger.debug("found #{people.inspect} in destroy_people")
     people.each do |person|
       person.destroy
     end

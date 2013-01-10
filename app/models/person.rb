@@ -26,6 +26,13 @@ class Person < ActiveRecord::Base
   validates_uniqueness_of :collaborator_id, :scope => :pedigree_id
   validates_uniqueness_of :isb_person_id
 
+  def check_sequencing_status 
+    if self.samples.empty? then
+      self.update_attributes(:planning_on_sequencing => false)
+    else 
+      self.update_attributes(:planning_on_sequencing => true)
+    end
+  end
 
   def check_isb_person_id
     if self.isb_person_id.nil? then

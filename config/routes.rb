@@ -12,9 +12,11 @@ Gms::Application.routes.draw do
   match "assays/summary_report/(:id)", :to =>  "assays#summary_report", :as => "summary_report"
   resources :assays
   resources :sample_assays
+  match "samples/get_drop_down_samples_by_pedigree", :to => "samples#get_drop_down_samples_by_pedigree", :as => "get_drop_down_samples_by_pedigree"
   resources :samples
   resources :sample_types
   resources :acquisitions
+  match "people/get_drop_down_people_by_pedigree", :to => "people#get_drop_down_people_by_pedigree", :as => "get_drop_down_people_by_pedigree"
   match "people/receiving_report/(:id)", :to => "people#receiving_report", :as => "receiving_report"
   match "people/upload", :to => "people#upload", :as => "upload"
   match "people/upload_and_validate", :to => "people#upload_and_validate", :as => "upload_and_validate"
