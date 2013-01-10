@@ -47,6 +47,8 @@
     <td><%= assay.assay_type %></td>
     <td><%= assay.technology %></td>
     <td><%= assay.status %></td>
+      <% if false  %><td><%= link_to 'Delete assay', assay, :confirm => 'Are you sure?', :method => :delete %></td><% end %>
+
   </tr>
   <% end %>
 <% end %>
