@@ -5,15 +5,15 @@
   <thead>
   <tr>
     <th>Assembly Name</th>
-    <th>ISB ID</th>
-    <th>Sample</th>
-    <th>Person</th>
-    <th>Assay</th>
-    <th>Pedigree</th>
+    <th>ISB ID&nbsp;&nbsp;&nbsp;</th>
+    <th>Sample&nbsp;&nbsp;&nbsp;</th>
+    <th>Person&nbsp;&nbsp;&nbsp;</th>
+    <th>Assay&nbsp;&nbsp;&nbsp;</th>
+    <th>Pedigree&nbsp;&nbsp;&nbsp;</th>
     <th>Genome reference&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
-    <th>File type</th>
-    <th>Software&nbsp;&nbsp;</th>
-    <th>Software version</th>
+    <th>File&nbsp;&nbsp;&nbsp;type&nbsp;&nbsp;&nbsp;</th>
+    <th>Software&nbsp;&nbsp;&nbsp;</th>
+    <th>Software&nbsp;&nbsp;&nbsp; version&nbsp;&nbsp;&nbsp;</th>
     <th class="nosort">Controls</th>
   </tr>
   </thead>
@@ -50,7 +50,7 @@
     <td><%= assembly.file_type %></td>
     <td><%= assembly.software %></td>
     <td><%= assembly.software_version %></td>
-    <td><%= link_to 'Show', assembly %></td>
+    <td><%= link_to 'Edit', edit_assembly_path(assembly) %></td>
       <% if false  %><td><%= link_to 'Delete assembly', assembly, :confirm => 'Are you sure?', :method => :delete %></td><% end %>
 
   </tr>

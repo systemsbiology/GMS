@@ -8,8 +8,8 @@
     <th>Name</th>
     <th>Pedigree</th>
     <th>Gender</th>
-    <th>Birth Date</th>
-    <th>Death Date</th>
+    <th>Birth Date&nbsp;&nbsp;&nbsp;</th>
+    <th>Death Date&nbsp;&nbsp;&nbsp;</th>
     <th colspan="3" class="nosort">Controls</th>
   </tr>
   </thead>
@@ -20,8 +20,8 @@
     <td style="width: 100px;"><%= link_to person.full_collaborator, person %></td>
     <td style="width: 100px;"><%= link_to person.pedigree.name, person.pedigree if person.pedigree %></td>
     <td style="width: 75px;"><%= person.gender %></td>
-    <td style="width: 50px;"><%= person.dob %></td>
-    <td style="width: 50px;"><%= person.dod %></td>
+    <td style="width: 75px;"><%= person.dob %></td>
+    <td style="width: 75px;"><%= person.dod %></td>
     <td style="width: 100px;"><%= link_to 'Edit', edit_person_path(person) %></td>
 <% if false %>
 <td><%= link_to 'Delete', person, :confirm => 'Are you sure?', :method => :delete %></td><% end %>

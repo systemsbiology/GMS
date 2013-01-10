@@ -5,13 +5,14 @@
     <th class="{sorter: 'digit'}">Name</th>
     <th>ISB ID</th>
     <th>Customer Sample ID</th>
-    <th>Person</th>
-    <th>Pedigree</th>
-    <th>Sample type</th>
-    <th>Status</th>
-    <th>Volume</th>
-    <th>Concentration</th>
-    <th>Quantity</th>
+    <th>Person&nbsp;&nbsp;&nbsp;</th>
+    <th>Pedigree&nbsp;&nbsp;&nbsp;</th>
+    <th>Sample&nbsp; type&nbsp;</th>
+    <th>Status&nbsp;&nbsp;&nbsp;</th>
+    <th>Volume&nbsp;&nbsp;&nbsp;</th>
+    <th>Concentration&nbsp;&nbsp;&nbsp;</th>
+    <th>Quantity&nbsp;&nbsp;&nbsp;</th>
+    <th colspan="3" class="nosort">Controls&nbsp;&nbsp;&nbsp;</th>
   </tr>
   </thead>
   <tbody>
@@ -33,8 +34,11 @@
     <td><%= sample.sample_type.nil? ? 'unknown' : sample.sample_type.name  %></td>
     <td><%= sample.status %></td>
     <td><%= sample.volume %></td>
-    <td><%= sample.concentration %></td>
+    <td style="width:150"><%= sample.concentration %></td>
     <td><%= sample.quantity %></td>
+    <td><%= link_to 'Edit', edit_sample_path(sample) %></td>
+      <% if false  %><td><%= link_to 'Delete sample', sample, :confirm => 'Are you sure?', :method => :delete %></td><% end %>
+
   </tr>
 <% end %>
 </tbody>

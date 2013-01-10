@@ -11,18 +11,19 @@
 <!--    <th>ISB Person ID&nbsp;&nbsp;&nbsp;</th> -->
     <th>Person&nbsp;&nbsp;&nbsp;</th>
     <th>Pedigree</th>
-    <th>Assay type</th>
-    <th>Technology</th>
-    <th>Status</th>
+    <th>Assay type&nbsp;&nbsp;&nbsp;</th>
+    <th>Technology&nbsp;&nbsp;&nbsp;</th>
+    <th>Status&nbsp;&nbsp;&nbsp;</th>
+    <th colspan="3" class="nosort">Controls</th>
   </tr>
   </thead>
   <tbody>
 <% @assays.each do |assay| %>
   <% if assay.sample.nil? then %>
   <tr>
-    <td><%= link_to assay.name, assay %></td>
-    <td></td>
-    <td></td>
+    <td style="width: 100px;"><%= link_to assay.name, assay %></td>
+    <td style="width: 100px;"></td>
+    <td style="width: 100px;"></td>
     <td></td>
     <td></td>
     <td></td>
@@ -32,22 +33,23 @@
   </tr>
   <% else %>
   <tr>
-    <td><%= link_to assay.name, assay %></td>
-    <td><%= link_to "isb_asy_"+assay.id.to_s, assay %></td>
-    <td><%= link_to assay.sample.sample_vendor_id,assay.sample %></td>
+    <td style="width: 100px;"><%= link_to assay.name, assay %></td>
+    <td style="width: 100px;"><%= link_to "isb_asy_"+assay.id.to_s, assay %></td>
+    <td style="width: 100px;"><%= link_to assay.sample.sample_vendor_id,assay.sample %></td>
     <% if assay.sample.person.collaborator_id.nil? then %>
-    <td colspan="1"><%= link_to assay.sample.person.isb_person_id, assay.sample.person  %>
+    <td style="width: 100px;" colspan="1"><%= link_to assay.sample.person.isb_person_id, assay.sample.person  %>
     <%else%>
-    <td colspan="1"><%= link_to assay.sample.person.collaborator_id, assay.sample.person  %>
+    <td style="width: 100px;" colspan="1"><%= link_to assay.sample.person.collaborator_id, assay.sample.person  %>
     <%end%>
 <!--    <td><%= link_to assay.sample.isb_sample_id,assay.sample %></td> -->
 <!--    <td><%= link_to assay.sample.person.isb_person_id,assay.sample.person %></td>-->
 <!--    <td><%= link_to assay.sample.person.collaborator_id, assay.sample.person %></td> -->
     <td><%= link_to assay.sample.person.pedigree.name, assay.sample.person.pedigree%></td>
     <td><%= assay.assay_type %></td>
-    <td><%= assay.technology %></td>
-    <td><%= assay.status %></td>
-      <% if false  %><td><%= link_to 'Delete assay', assay, :confirm => 'Are you sure?', :method => :delete %></td><% end %>
+    <td style="text-align: center;"><%= assay.technology %></td>
+    <td style="width: 50px;"><%= assay.status %></td>
+    <td style="width: 75px; text-align: center;""><%= link_to 'Edit', edit_assay_path(assay) %></td>
+    <% if false  %><td><%= link_to 'Delete assay', assay, :confirm => 'Are you sure?', :method => :delete %></td><% end %>
 
   </tr>
   <% end %>
