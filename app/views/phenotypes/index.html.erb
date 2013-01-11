@@ -1,7 +1,7 @@
 <h1>Listing phenotypes</h1>
 
 <%= link_to 'New Phenotype', new_phenotype_path %>
-<table class="tablesorter">
+<table class="tablesorter" >
   <thead>
   <tr>
     <th>Disease</th>
@@ -16,7 +16,7 @@
     <td><%= link_to(phenotype.disease.name,phenotype.disease) if phenotype.disease %></td>
     <td><%= link_to phenotype.name, phenotype %></td>
     <td><%= phenotype.tag %></td>
-    <td><%= phenotype.description %></td>
+    <td ><%= controller.wrapIt(phenotype.description,40) %></td>
     <% if false %>
     <td><%= link_to 'Show', phenotype %></td>
     <td><%= link_to 'Edit', edit_phenotype_path(phenotype) %></td>
