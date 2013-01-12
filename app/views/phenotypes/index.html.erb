@@ -16,7 +16,7 @@
     <td><%= link_to(phenotype.disease.name,phenotype.disease) if phenotype.disease %></td>
     <td><%= link_to phenotype.name, phenotype %></td>
     <td><%= phenotype.tag %></td>
-    <td ><%= wrapIt(phenotype.description,40) %></td>
+    <td><p style="white-space:pre"><%= word_wrap(phenotype.description,40) unless phenotype.description.nil? %></p></td>
     <% if false %>
     <td><%= link_to 'Show', phenotype %></td>
     <td><%= link_to 'Edit', edit_phenotype_path(phenotype) %></td>
