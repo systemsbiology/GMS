@@ -4,7 +4,7 @@
 <h1>Sequencing Summary</h1>
 <p>Total number of sequencings performed*.</p>
 <%= render "partials/filter_reference" %>
-<table class="tablesorter" style="width: 600px;">
+<table class="tablesorter">
   <thead>
   <tr>
     <th>Pedigree Name</th>
@@ -19,7 +19,7 @@
   <% total = total + count %>
   <tr>
   <td><%= pedigree.name %></td>
-  <td><%= pedigree.description %></td>
+  <td style="white-space: normal;"><%= pedigree.description %></td>
   <td><%= count %></td>
   </tr>
 <% end %>
