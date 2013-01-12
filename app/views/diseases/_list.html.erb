@@ -1,5 +1,5 @@
 <% if diseases.size > 0 %>
-<table class="tablesorter">
+<table class="tablesorter" style="max-width: 80%">
   <thead>
   <tr>
     <th>Name</th>
@@ -12,7 +12,7 @@
   <tr>
     <td><%= link_to disease.name, disease %></td>
     <td><%= link_to disease.omim_id, "http://omim.org/entry/#{disease.omim_id}" %></td>
-    <td><%= if !disease.description.nil? then raw disease.description.gsub(/\(\d+\)/) { |digits| digits.sub!("(",""); digits.sub!(")",""); link_to("(#{digits})", "http://omim.org/entry/#{digits}")} end %></td>
+    <td><p style="white-space:pre"><% if !disease.description.nil? then %><% wrapped = word_wrap(disease.description) %><%= raw wrapped.gsub(/\(\d+\)/) { |digits| digits.sub!("(",""); digits.sub!(")",""); link_to("(#{digits})", "http://omim.org/entry/#{digits}") } %> <% end %></td>
     <% if false %>
     <td><%= link_to 'Show', disease %></td>
     <td><%= link_to 'Edit', edit_disease_path(disease) %></td>
