@@ -1,12 +1,15 @@
 <%= form_for(@sample) do |f| %>
   <%= render "partials/error_messages", :target => @sample %>
 
-  <% sel_person = params[:person_id] %>
-  <% person = Person.find(sel_person) %>
-  <% if sel_person.nil? and @sample.person then sel_person = @sample.person.id end %>
+  <% if params[:person_id] %>
+    <% sel_person = params[:person_id] %>
+    <% person = Person.find(sel_person) %>
+    <% if sel_person.nil? and @sample.person then sel_person = @sample.person.id end %>
+    <% pedigree_id = person.pedigree_id %>
+  <% end %>
   <div class="field">
     <%= f.label :pedigree %><br />
-    <%= collection_select(:pedigree, :id, Pedigree.order("pedigrees.tag"), :id, :name, options = { :selected => person.pedigree_id, :include_blank => "-Select the pedigree this sample belongs to" }) %>
+    <%= collection_select(:pedigree, :id, Pedigree.order("pedigrees.tag"), :id, :name, options = { :selected => pedigree_id, :include_blank => "-Select the pedigree this sample belongs to" }) %>
   </div>
   <script>
 
