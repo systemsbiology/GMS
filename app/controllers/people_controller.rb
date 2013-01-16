@@ -200,13 +200,16 @@ class PeopleController < ApplicationController
       render :action => "upload" and return
     end
 
-    begin
-      disease = Disease.find(params[:disease][:id])
-    rescue
-      flash[:error] = "Disease must be selected"
-      render :action => "upload" and return
+    disease = ''
+    if (params[:disease]) then
+      begin
+        disease = Disease.find(params[:disease][:id])
+      rescue
+        flash[:error] = "Disease must be selected"
+        render :action => "upload" and return
+      end
     end
-   
+
     spreadsheet_type = ''
     begin
       if params[:spreadsheet][:type] 
@@ -640,29 +643,31 @@ class PeopleController < ApplicationController
         p.comments = row[headers["Comments"]]
         p.pedigree_id = pedigree.id
 
-        # add diagnosis for this person if affected 
-        affected_status = row[headers["Affected Status"]]
-	if affected_status.nil? then
-	  diag = Diagnosis.new
-	  diag.errors.add(:disease_id, "could not be set.  No value for Affected Status found in upload spreadsheet.")
-	  errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
-	  errors["#{counter}"]["affected_status"] = diag.errors
-	else
-	  affected_status.downcase!
-	  # other statuses are unaffected and unknown but those aren't handled right now...
-	  # don't really have a way to indicate in the database that the person is known unaffected versus unknown
-          if affected_status == "affected" then
-	    diagnoses.push([disease.id, pedigree.id, p.collaborator_id])
-	  elsif affected_status == "unknown" or affected_status == "unaffected" then
-	    # do nothing - these are valid statuses but not stored in db
-	  else
+        if !disease.nil? then
+          # add diagnosis for this person if affected 
+          affected_status = row[headers["Affected Status"]]
+  	  if affected_status.nil? then
+	    diag = Diagnosis.new
+	    diag.errors.add(:disease_id, "could not be set.  No value for Affected Status found in upload spreadsheet.")
 	    errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
-	    tp = Person.new
-	    tp.errors.add(:affected_status, "value provided not recognized - '#{affected_status}'. Should be 'affected' in order to set status correctly.")
-	    errors["#{counter}"]["affected_status"] = tp.errors
-          end
-	end
-     
+	    errors["#{counter}"]["affected_status"] = diag.errors
+	  else
+	    affected_status.downcase!
+	    # other statuses are unaffected and unknown but those aren't handled right now...
+	    # don't really have a way to indicate in the database that the person is known unaffected versus unknown
+            if affected_status == "affected" then
+	      diagnoses.push([disease.id, pedigree.id, p.collaborator_id])
+	    elsif affected_status == "unknown" or affected_status == "unaffected" then
+	      # do nothing - these are valid statuses but not stored in db
+	    else
+	      errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
+	      tp = Person.new
+	      tp.errors.add(:affected_status, "value provided not recognized - '#{affected_status}'. Should be 'affected' in order to set status correctly.")
+	      errors["#{counter}"]["affected_status"] = tp.errors
+            end
+	  end
+        end
+
         # queue up the relationship information so that we can add it later after confirmation
         mother_id = row[headers["Mother's Subject ID"]]
 	mother_id = mother_id.to_i if (mother_id.is_a? Float)
