@@ -201,12 +201,12 @@ class PeopleController < ApplicationController
     end
 
     disease = ''
-    if (params[:disease]) then
+    if (params[:disease] && params[:disease][:id] && !params[:disease][:id].empty?) then
       begin
         disease = Disease.find(params[:disease][:id])
-      rescue
-        flash[:error] = "Disease must be selected"
-        render :action => "upload" and return
+      #rescue
+      #  flash[:error] = "Disease must be selected params: #{params[:disease].inspect}"
+      #  render :action => "upload" and return
       end
     end
 
