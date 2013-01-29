@@ -137,28 +137,36 @@ class RelationshipsController < ApplicationController
     @relationship = Relationship.find(params[:id])
 
     recip = Relationship.find_by_person_id_and_relation_id_and_relationship_type_and_name(@relationship.relation_id, @relationship.person_id, @relationship.lookup_relationship_type(@relationship.reverse_name), @relationship.reverse_name)
-#    logger.debug("trying ot find person_id #{@relationship.relation_id} with relation_id #{@relationship.person_id} and relationship_reverse #{@relationship.lookup_relationship_type(@relationship.reverse_name)} and name #{@relationship.reverse_name}")
+    logger.debug("trying ot find person_id #{@relationship.relation_id} with relation_id #{@relationship.person_id} and relationship_reverse #{@relationship.lookup_relationship_type(@relationship.reverse_name)} and name #{@relationship.reverse_name}")
     if params[:status] and params[:status][:divorced] then
       if (params[:status][:divorced] == "1" or params[:status][:divorced] == 1) then
         @relationship.divorced = 1
-	recip.divorced = 1
       else
         @relationship.divorced = 0
-	recip.divorced = 0
       end
     else
       @relationship.divorced = 0
-      recip.divorced = 0
     end
 
     respond_to do |format|
       if @relationship.update_attributes(params[:relationship])
         # update recip to the new values
+	logger.debug("relationship is #{@relationship.inspect}")
+	logger.debug("recip is #{recip.inspect}")
+	if recip.nil? then
+	  recip = Relationship.new
+	end
 	recip.person_id = @relationship.relation_id
 	recip.relation_id = @relationship.person_id
 	recip.name = @relationship.reverse_name
         recip.relationship_type = @relationship.lookup_relationship_type(@relationship.reverse_name)
 	recip.relation_order = @relationship.relation_order
+	if @relationship.divorced == 1 then
+	  recip.divorced = 1
+	else
+	  recip.divorced = 0
+	end
+
 	recip.save
 
         format.html { redirect_to(@relationship, :notice => 'Relationship was successfully updated.') }
