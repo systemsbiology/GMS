@@ -193,7 +193,7 @@ class SamplesController < ApplicationController
         format.html { redirect_to(@sample, :notice => "Sample was successfully updated. #{ac_notice}") }
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit" }
+        format.html { render :action => "edit", :notice => "Sample failed updateing .#{ac_notice}" }
         format.xml  { render :xml => @sample.errors, :status => :unprocessable_entity }
       end
     end
