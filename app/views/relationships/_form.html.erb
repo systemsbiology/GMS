@@ -1,10 +1,71 @@
 <%= form_for(@relationship) do |f| %>
   <%= render "partials/error_messages", :target => @relationship %>
+
+  <% sel_person = params[:person_id] || nil %>
+  <% if sel_person.nil? and @relationship.person then sel_person = @relationship.person.id end %>
+  <% person = sel_person.nil? ? nil : Person.find(sel_person)  %>
+  <% pedigree_id = person.nil? ? params[:pedigree_filter].nil? ? params[:pedigree_filter] : nil : person.pedigree_id %>
+  <% sel_relation = params[:relation_id] || nil %>
+  <% if sel_relation.nil? and @relationship.relation then sel_relation = @relationship.relation.id end %>
+
+  <div class="field">
+    <%= f.label :pedigree%><br />
+    <%= collection_select(:pedigree, :id, Pedigree.order("pedigrees.tag"), :id, :name, options = { :selected => pedigree_id, :include_blank => "-Select the pedigree this sample belongs to" }) %>
+  </div>
+  <script>
+
+    $("#pedigree_id").change(function() {
+      var url = '/people/get_drop_down_people_by_pedigree';
+      var request = $.ajax({
+        data: { 'pedigree_id' : $(this).val() },
+        dataType: 'json',
+        type: 'GET',
+        url: url
+        });
+      request.complete(
+      );
+
+      request.done( function(responseData) {
+          $("#person_id").children().remove();
+          $("#relation_id").children().remove();
+          if ($.isEmptyObject(responseData)) {
+            $("#person_id").append('<option value="">-No People in this pedigree. Select Pedigree</option>');
+            $("#relation_id").append('<option value="">-No People in this pedigree. Select Pedigree</option>');
+          } else {
+            $("#person_id").append('<option value="">-Select Person</option>');
+            for (var key in responseData) {
+              $("#person_id").append($('<option>', {
+                value : key,
+                text : responseData[key]
+              }));
+            }
+            $("#relation_id").append('<option value="">-Select Person</option>');
+            for (var key in responseData) {
+              $("#relation_id").append($('<option>', {
+                value : key,
+                text : responseData[key]
+              }));
+            }
+	  }
+
+          <% if !sel_person.nil? %>
+            $("#person_id").val(<%= sel_person %>);
+          <% end %>
+	  <% if !sel_relation.nil? %>
+            $("#relation_id").val(<%= sel_relation %>);
+          <% end %>
+        });
+      request.fail(function(jqXHR, textStatus) {
+        alert("Request failed: "+textStatus);
+      });
+    }
+    ).trigger('change');
+
+  </script>
+
   <div class="field">
     <%= f.label :person %><br />
-    <% selected_person = params[:person].nil? ? @relationship.person.nil? ? '' : @relationship.person.id : params[:person] %>
-    <% @people_choices = Person.has_pedigree(params[:pedigree_filter]) %>
-    <%= f.collection_select(:person_id, @people_choices, :id, :full_identifier, options = { :include_blank => '-Select person', :selected => selected_person}) %>
+    <%= select("person", "id", ["-Select Pedigree"]) %>
   </div>
   <div> is (the) </div>
   <div class="field">
@@ -13,8 +74,7 @@
   </div>
   <div> (of | to | from) Person</div>
   <div class="field">
-    <% selected_relation = @relationship.relation.nil? ? '' : @relationship.relation.id %>
-    <%= f.collection_select(:relation_id, @people_choices, :id, :full_identifier, options = {:include_blank => '-Select person', :selected => selected_relation}) %>
+  <%= select("relation", "id", ["-Select Pedigree"]) %>
   </div>
   <div class="field">
     <%= f.label :relation_order %> (ex: this is the 3rd child of this parent or the 2nd wife of this man)<br />
