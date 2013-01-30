@@ -4,8 +4,9 @@
   <% sel_person = params[:person_id] || nil %>
   <% if sel_person.nil? and @relationship.person then sel_person = @relationship.person.id end %>
   <% person = sel_person.nil? ? nil : Person.find(sel_person)  %>
-  <% pedigree_id = person.nil? ? params[:pedigree_filter].nil? ? params[:pedigree_filter] : nil : person.pedigree_id %>
-  <% sel_relation = params[:relation_id] || nil %>
+  <% pedigree_id = person.nil? ? nil : person.pedigree_id %>
+  <% if params[:pedigree_filter] then pedigree_id = params[:pedigree_filter][:id] end %>
+  <% sel_relation = params[:relationship_relation_id] || nil %>
   <% if sel_relation.nil? and @relationship.relation then sel_relation = @relationship.relation.id end %>
 
   <div class="field">
@@ -26,22 +27,22 @@
       );
 
       request.done( function(responseData) {
-          $("#person_id").children().remove();
-          $("#relation_id").children().remove();
+          $("#relationship_person_id").children().remove();
+          $("#relationship_relation_id").children().remove();
           if ($.isEmptyObject(responseData)) {
-            $("#person_id").append('<option value="">-No People in this pedigree. Select Pedigree</option>');
-            $("#relation_id").append('<option value="">-No People in this pedigree. Select Pedigree</option>');
+            $("#relationship_person_id").append('<option value="">-No People in this pedigree. Select Pedigree</option>');
+            $("#relationship_relation_id").append('<option value="">-No People in this pedigree. Select Pedigree</option>');
           } else {
-            $("#person_id").append('<option value="">-Select Person</option>');
+            $("#relationship_person_id").append('<option value="">-Select Person</option>');
             for (var key in responseData) {
-              $("#person_id").append($('<option>', {
+              $("#relationship_person_id").append($('<option>', {
                 value : key,
                 text : responseData[key]
               }));
             }
-            $("#relation_id").append('<option value="">-Select Person</option>');
+            $("#relationship_relation_id").append('<option value="">-Select Person</option>');
             for (var key in responseData) {
-              $("#relation_id").append($('<option>', {
+              $("#relationship_relation_id").append($('<option>', {
                 value : key,
                 text : responseData[key]
               }));
@@ -49,10 +50,10 @@
 	  }
 
           <% if !sel_person.nil? %>
-            $("#person_id").val(<%= sel_person %>);
+            $("#relationship_person_id").val(<%= sel_person %>);
           <% end %>
 	  <% if !sel_relation.nil? %>
-            $("#relation_id").val(<%= sel_relation %>);
+            $("#relationship_relation_id").val(<%= sel_relation %>);
           <% end %>
         });
       request.fail(function(jqXHR, textStatus) {
@@ -65,7 +66,7 @@
 
   <div class="field">
     <%= f.label :person %><br />
-    <%= select("person", "id", ["-Select Pedigree"]) %>
+    <%= select("relationship","person_id", ["-Select Pedigree"]) %>
   </div>
   <div> is (the) </div>
   <div class="field">
@@ -74,7 +75,7 @@
   </div>
   <div> (of | to | from) Person</div>
   <div class="field">
-  <%= select("relation", "id", ["-Select Pedigree"]) %>
+  <%= select("relationship", "relation_id", ["-Select Pedigree"]) %>
   </div>
   <div class="field">
     <%= f.label :relation_order %> (ex: this is the 3rd child of this parent or the 2nd wife of this man)<br />

@@ -2,6 +2,18 @@ class Relationship < ActiveRecord::Base
   belongs_to :person, :class_name => "Person"
   belongs_to :relation, :class_name => "Person"
   validates_presence_of :person_id, :relation_id, :relationship_type, :name, :relation_order
+  before_save :validate_relationship_ids_differ
+
+  def validate_relationship_ids_differ
+    return false if self.person_id == self.relation_id
+    return true
+  end
+
+  def pedigree_id
+    return nil if self.person.nil?
+    return self.person.pedigree_id
+
+  end
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?

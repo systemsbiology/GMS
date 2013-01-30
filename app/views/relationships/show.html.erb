@@ -79,7 +79,7 @@
   </tbody>
   </table>
 <% end %>
-<%= link_to "Add Relationship to #{person_type} for #{@relationship.person.identifier}", new_relationship_path(:person => @relationship.person, :pedigree_filter => { :id => @relationship.person.pedigree.id } ) %>
+<%= link_to "Add Relationship to #{person_type} for #{@relationship.person.identifier}", new_relationship_path(:person_id => @relationship.person, :pedigree_filter => { :id => @relationship.person.pedigree.id } ) %>
 <br />
 <br />
 <h1>Other Relationships involving <%= relation_type %>: <%= @relationship.relation.identifier %></h1>
@@ -114,5 +114,5 @@
   </table>
 <% end %>
 <% rr = Hash.new; rr[:id] = @relationship.relation.pedigree.id %>
-<%= link_to "Add Relationship to #{relation_type} for #{@relationship.relation.identifier}", new_relationship_path(:person => @relationship.relation, :pedigree_filter => {:id => @relationship.relation.pedigree.id }) %>
+<%= link_to "Add Relationship to #{relation_type} for #{@relationship.relation.identifier}", new_relationship_path(:person_id => @relationship.relation, :pedigree_filter => {:id => @relationship.relation.pedigree.id }) %>
 

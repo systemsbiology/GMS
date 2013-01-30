@@ -47,7 +47,7 @@ class RelationshipsController < ApplicationController
   # POST /relationships.xml
   def create
     @relationship = Relationship.new(params[:relationship])
-
+    #logger.debug("person_id #{@relationship.person_id} relation_id #{@relationship.relation_id} relation #{@relationship.inspect}")
     if @relationship.person_id == @relationship.relation_id then
       @relationship.errors[:base] << "Cannot add a relationship between the same person"
     end
@@ -137,7 +137,11 @@ class RelationshipsController < ApplicationController
     @relationship = Relationship.find(params[:id])
 
     recip = Relationship.find_by_person_id_and_relation_id_and_relationship_type_and_name(@relationship.relation_id, @relationship.person_id, @relationship.lookup_relationship_type(@relationship.reverse_name), @relationship.reverse_name)
-    logger.debug("trying ot find person_id #{@relationship.relation_id} with relation_id #{@relationship.person_id} and relationship_reverse #{@relationship.lookup_relationship_type(@relationship.reverse_name)} and name #{@relationship.reverse_name}")
+
+    #logger.debug("trying ot find person_id #{@relationship.relation_id} with relation_id #{@relationship.person_id} and relationship_reverse #{@relationship.lookup_relationship_type(@relationship.reverse_name)} and name #{@relationship.reverse_name}")
+    if recip.nil? then
+      recip = Relationship.find_by_person_id_and_relation_id(@relationship.relation_id, @relationship.person_id)
+    end
     if params[:status] and params[:status][:divorced] then
       if (params[:status][:divorced] == "1" or params[:status][:divorced] == 1) then
         @relationship.divorced = 1
@@ -151,8 +155,6 @@ class RelationshipsController < ApplicationController
     respond_to do |format|
       if @relationship.update_attributes(params[:relationship])
         # update recip to the new values
-	logger.debug("relationship is #{@relationship.inspect}")
-	logger.debug("recip is #{recip.inspect}")
 	if recip.nil? then
 	  recip = Relationship.new
 	end
@@ -166,8 +168,12 @@ class RelationshipsController < ApplicationController
 	else
 	  recip.divorced = 0
 	end
-
-	recip.save
+        begin 
+  	  recip.save
+	rescue ActiveRecord::RecordNotUnique
+          format.html { redirect_to(@relationship, :notice => 'Relationship was successfully updated.') }
+          format.xml  { head :ok }
+	end
 
         format.html { redirect_to(@relationship, :notice => 'Relationship was successfully updated.') }
         format.xml  { head :ok }
