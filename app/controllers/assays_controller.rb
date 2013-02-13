@@ -113,7 +113,23 @@ class AssaysController < ApplicationController
   def summary_report
     @counts = Assay.include_pedigree.has_reference(params[:reference], 'ASSEMBLY').group('pedigrees.id').count
     @pedigrees = Pedigree.order("name")
+  end
 
+  def ped_info
+    ped_info = Hash.new
+    Assay.all.each do |af|
+      ped = af.pedigree
+      next unless ped
+      logger.debug("ped is #{ped.inspect}")
+      ped_info[af.name] = ped.isb_pedigree_id
+      ped_info[af.isb_assay_id] = ped.isb_pedigree_id
+    end
+
+    respond_to do |format|
+      format.html
+      format.xml {head :ok}
+      format.json { render :json => ped_info }
+    end
 
   end
 end
