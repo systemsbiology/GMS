@@ -8,6 +8,7 @@ require 'iconv'
 class PedigreesController < ApplicationController
   unloadable
   respond_to :json
+  caches_page :all_pedigrees
   
   # GET /pedigrees
   # GET /pedigrees.xml
@@ -133,11 +134,11 @@ class PedigreesController < ApplicationController
 
   # this prints out the JSON pedigree file
   def pedigree_file
-    @pedigree = Pedigree.find(params[:id])
+    @pedigree = Pedigree.find(params[:pedigree_id])
     peddir_exists
     output_file = PEDFILES_DIR + pedigree_output_filename(@pedigree)
-    ped_hash = pedfile(params[:id])
-    parent_rels = pedigree_relationships(params[:id])
+    ped_hash = pedfile(params[:pedigree_id])
+    parent_rels = pedigree_relationships(params[:pedigree_id])
     ped_hash["relationships"] = parent_rels
     json_pedigree = JSON.pretty_generate(ped_hash)
     File.open(output_file, 'w') do |f|
@@ -191,7 +192,27 @@ class PedigreesController < ApplicationController
     end
 
   end
+ 
+  def all_pedigrees
+    @ped_list = Hash.new
+    Pedigree.all.each do |ped|
+      ped_info =pedfile(ped.id)
+      rels = pedigree_relationships(ped.id)
+      ped_info["relationships"] = rels
+      json_ped = JSON.pretty_generate(ped_info)
+      @ped_list[ped.id] = json_ped
+    end
+
+    respond_to do |format|
+    	format.html 
+	format.json {
+		render :json => @ped_list
+	}
+    end
+  end
+
   
+
   def pedigree_datastore
     peddir_exists
 
@@ -262,7 +283,7 @@ class PedigreesController < ApplicationController
   end
 
   def export_madeline_table
-    @pedigree = Pedigree.find(params[:id])
+    @pedigree = Pedigree.find(params[:pedigree_id])
     ordered_ped = ordered_pedigree(@pedigree.id)
     madeline_array = to_madeline(@pedigree,ordered_ped)
     header = madeline_header(@pedigree).split(/\t/)
@@ -302,7 +323,8 @@ class PedigreesController < ApplicationController
   # give a list of founder isb_person_ids
   def founders
     @founders = Hash.new
-    if params[:id] || (params[:pedigree_filter] && !params[:pedigree_filter][:id].blank?) then
+    if params[:id] || (params[:pedigree_filter] && !params[:pedigree_filter][:id].blank?) || params[:pedigree_id] then
+      cur_ped_id = params[:pedigree_id] if params[:pedigree_id]
       cur_ped_id = params[:id] if params[:id]
       cur_ped_id = params[:pedigree_filter][:id] if params[:pedigree_filter]
       @pedigree = Pedigree.find(cur_ped_id)
