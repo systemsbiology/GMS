@@ -63,6 +63,15 @@ class Assay < ActiveRecord::Base
     return false
   end
 
+  def pedigree
+    begin
+      return self.sample.person.pedigree
+    rescue
+      logger.error("Error with pedigree_id call for assay #{self.inspect}")
+      return nil
+    end
+  end
+
   def identifier
     "#{name} - #{vendor} - #{assay_type}"
   end
