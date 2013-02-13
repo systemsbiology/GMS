@@ -100,6 +100,22 @@ class AssemblyFilesController < ApplicationController
     end
   end
 
+  def ped_info
+    ped_info = Hash.new
+    AssemblyFile.all.each do |af|
+      ped_id = af.pedigree_id.to_s
+      ped_info[af.location] = "isb_ped_"+ped_id
+      af_id = "isb_asmfile_"+af.id.to_s
+      ped_info[af_id] = "isb_ped_"+ped_id
+    end
+
+    respond_to do |format|
+      format.html
+      format.xml {head :ok}
+      format.json { render :json => ped_info }
+    end
+  end
+
 
   #HELPER METHODS
 
