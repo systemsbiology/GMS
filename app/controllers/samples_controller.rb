@@ -214,4 +214,21 @@ class SamplesController < ApplicationController
     options = Sample.find_all_by_pedigree_id(params[:pedigree_id]).collect { |x| "\"#{x.id}\" : \"#{x.full_identifier}\""}
     render :text => "{#{options.join(",")}}"
   end
+
+  def ped_info
+    ped_info = Hash.new
+    Sample.all.each do |s|
+      ped = s.pedigree
+      next if ped.nil?
+      ped_info[s.sample_vendor_id] = ped.isb_pedigree_id
+      ped_info[s.isb_sample_id] = ped.isb_pedigree_id
+    end
+
+    respond_to do |format|
+      format.html
+      format.xml {head :ok}
+      format.json { render :json => ped_info }
+    end
+  end
+
 end
