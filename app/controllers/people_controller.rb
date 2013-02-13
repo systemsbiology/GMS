@@ -6,6 +6,7 @@ require 'sample'
 
 class PeopleController < ApplicationController
   respond_to :json
+  caches_action :ped_info
   # GET /people
   # GET /people.xml
   def index
@@ -804,4 +805,23 @@ class PeopleController < ApplicationController
     options = Person.find_all_by_pedigree_id(params[:pedigree_id]).collect { |per| "\"#{per.id}\" : \"#{per.full_identifier}\"" }
     render :text => "{#{options.join(",")}}"
   end
+
+  def ped_info
+    ped_info = Hash.new
+    Person.all.each do |p|
+      ped = p.pedigree
+      logger.error("no pedigree for person #{p.inspect}") if ped.nil?
+      next if ped.nil?
+      ped_info[p.collaborator_id] = ped.isb_pedigree_id
+      ped_info[p.isb_person_id] = ped.isb_pedigree_id
+      ped_info[p.full_identifier] = ped.isb_pedigree_id
+    end
+
+    respond_to do |format|
+      format.html
+      format.xml {head :ok}
+      format.json { render :json => ped_info }
+    end
+  end
+
 end
