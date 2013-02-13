@@ -354,7 +354,6 @@ class Assembly < ActiveRecord::Base
     end
     return false
   end
-end
 
   def check_isb_assembly_id
     if self.isb_assembly_id.nil? or !self.isb_assembly_id.match(/isb_asm/) then
@@ -363,3 +362,13 @@ end
     end
   end
 
+  def pedigree
+    begin
+      return self.assay.sample.person.pedigree
+    rescue
+      logger.error("Error with pedigree_id call for assembly #{self.inspect}")
+      return nil
+    end
+  end
+
+end
