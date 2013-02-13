@@ -127,8 +127,8 @@ class AssembliesController < ApplicationController
 
   def ensure_files_up_to_date
     @assemblies = Array.new
-    if params[:id] then
-      @assemblies.push(Assembly.find(params[:id]))
+    if params[:assembly_id] then
+      @assemblies.push(Assembly.find(params[:assembly_id]))
     else
       @assemblies = Assembly.all
     end
@@ -143,5 +143,21 @@ class AssembliesController < ApplicationController
     end
   end
 
+  def ped_info
+    ped_info = Hash.new
+    Assembly.all.each do |af|
+      ped = af.pedigree
+      logger.error("Assembly #{af.inspect} doesn't have a pedigree??")
+      next if ped.nil?
+      ped_info[af.name] = ped.isb_pedigree_id
+      ped_info[af.isb_assembly_id] = ped.isb_pedigree_id
+    end
+
+    respond_to do |format|
+      format.html
+      format.xml {head :ok}
+      format.json { render :json => ped_info }
+    end
+  end
 
 end
