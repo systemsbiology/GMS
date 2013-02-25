@@ -141,6 +141,7 @@ def pedfile(pedigree_id)
 	    assay_info["assay_id"] = "isb_asy_"+assay.id.to_s
             assay_info["assay_name"] = assay.name
             assay_info["assay_type"] = assay.assay_type
+            assay_info["assay_vendor"] = assay.vendor
             assay_info["assay_technology"] = assay.technology
             assay_info["assay_desc"] = assay.description
 	    assay_info["assay_status"] = assay.status
