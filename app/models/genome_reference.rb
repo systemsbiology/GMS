@@ -4,4 +4,5 @@ class GenomeReference < ActiveRecord::Base
 
   auto_strip_attributes :name, :location, :description, :code
   validates_presence_of :name
+  attr_accessible :name, :build_name, :description, :code, :location
 end

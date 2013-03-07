@@ -51,6 +51,6 @@
 <%= link_to "Back to pedigree #{@assembly.assay.sample.person.pedigree.name}", pedigree_path(@assembly.assay.sample.person.pedigree) %><br/>
 
 
-<%= link_to "Ensure Files are up to date", ensure_files_up_to_date_path(@assembly) %>
+<%= link_to "Ensure Files are up to date", assembly_ensure_files_up_to_date_path(@assembly) %>
 <br /><br />
 <%= render 'assembly_files/list', :assembly_files => @assembly.assembly_files.paginate(:page => 1,:per_page => 100) %>

@@ -3,4 +3,5 @@ class TempObject < ActiveRecord::Base
   # so that a bunch of objects don't get put into the database without being confirmed
   # that they are correct
   validates_presence_of :trans_id
+  attr_accessible :trans_id, :object_type, :object, :added
 end

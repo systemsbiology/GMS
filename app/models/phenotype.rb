@@ -5,5 +5,5 @@ class Phenotype < ActiveRecord::Base
   auto_strip_attributes :name, :tag, :description
   validates_presence_of :name, :tag
   validates_uniqueness_of :name, :tag
-
+  attr_accessible :disease_id, :name, :tag, :phenotype_type, :description
 end

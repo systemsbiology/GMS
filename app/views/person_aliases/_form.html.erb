@@ -17,3 +17,7 @@
     <%= f.submit %>
   </div>
 <% end %>
+
+<% if params[:person_id] %>
+<%= link_to "Back to Person", person_path(params[:person_id]) %>
+<% end %>

@@ -9,9 +9,9 @@
 	    <li><%= link_to "Assemblies", assemblies_path %></li>
             <li><%= link_to "Files", assembly_files_path  %></li>
 	    <br />
-            <li><%= link_to("Receiving Log", url_for(:controller => 'people', :action => 'receiving_report'), :method => "get") %></li>
-            <li><%= link_to("Sequencing Summary", url_for(:controller => 'assays', :action => 'summary_report'), :method => "get") %></li>
-            <li><%= link_to("Founders", url_for(:controller => 'pedigrees', :action => 'founders'), :method => "get") %></li>
+            <li><%= link_to("Receiving Log", receiving_report_people_path) %></li>
+            <li><%= link_to("Sequencing Summary", summary_report_assays_path) %></li>
+            <li><%= link_to("Founders", founders_pedigrees_path) %></li>
 	    <br />
 	    <li><%= link_to("Diseases", diseases_path) %></li>
 	    <li><%= link_to("Phenotypes", phenotypes_path) %></li>
@@ -21,7 +21,7 @@
 	    <li><%= link_to("New Study", new_study_path) %></li>
 	    <li><%= link_to("New Pedigree", new_pedigree_path) %></li>
 	    <li><%= link_to("New Person", new_person_path) %></li>
-	    <li><%= link_to 'Upload People into a Pedigree', upload_path %></li>
+	    <li><%= link_to 'Upload People into a Pedigree', upload_people_path %></li>
 	    <li><%= link_to("New Sample", new_sample_path) %></li>
 	    <li><%= link_to("New Assay",new_assay_path) %></li>
 	    <li><%= link_to("New Assembly", new_assembly_path) %></li>

@@ -14,6 +14,8 @@ class Sample < ActiveRecord::Base
   after_save :check_isb_sample_id, :trigger_person_sample_check
   after_commit :trigger_person_sample_check
 
+  attr_accessible :customer_sample_id, :sample_type_id, :status, :date_submitted, :protocol, :volume, :concentration, :quantity, :date_received, :description, :comments, :pedigree_id
+
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
       if pedigree.kind_of?(Array) then
@@ -79,5 +81,15 @@ class Sample < ActiveRecord::Base
       return "#{isb_sample_id} - #{sample_vendor_id} - #{self.person.identifier}"
     end
   end
+
+  def pedigree
+    begin
+      return self.person.pedigree
+    rescue
+      logger.error("Error with pedigree_id call for sample #{self.inspect}")
+      return nil
+    end
+  end
+
 
 end

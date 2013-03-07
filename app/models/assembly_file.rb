@@ -5,9 +5,11 @@ class AssemblyFile < ActiveRecord::Base
   belongs_to :file_type
 
   auto_strip_attributes :name, :description, :location, :metadata, :software, :software_version, :comments
-  validates_presence_of :name, :genome_reference_id, :assembly, :location, :software, :software_version, :file_date
+  validates_presence_of :name, :genome_reference_id, :assembly_id, :location, :software, :software_version, :file_date
   validates_uniqueness_of :name, :location
   after_save :update_completeness
+
+  attr_accessible :genome_reference_id, :assembly_id, :file_type_id, :name, :description, :location, :file_date, :metadata, :disk_id, :software, :software_version, :record_date, :current, :comments
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
@@ -35,6 +37,14 @@ class AssemblyFile < ActiveRecord::Base
   scope :is_current, lambda {
     { :conditions => [ 'current = ?', '1'] }
   }
+
+  def pedigree_id
+    begin 
+      self.assembly.assay.sample.person.pedigree.id
+    rescue
+      logger.error("Error with pedigree_id call for file #{self.inspect}")
+    end
+  end
 
   def identifier
     "#{name} - #{vendor} - #{self.file_type.type_name}"

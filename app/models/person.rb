@@ -25,6 +25,12 @@ class Person < ActiveRecord::Base
   validates_presence_of :collaborator_id, :gender
   validates_uniqueness_of :collaborator_id, :scope => :pedigree_id
   validates_uniqueness_of :isb_person_id
+  validates :collaborator_id,
+  	:presence => { 
+	:message => "You may not use anything other than strings in the collaborator_id.  Add an alias if this person has multiple collaborator ids"} ,
+	:format   => { :with => /^[a-zA-Z\d\s\-\_]*$/ }
+
+  attr_accessible :collaborator_id, :gender, :dob, :dod, :deceased, :planning_on_sequencing, :complete, :root, :comments, :pedigree_id
 
   def check_sequencing_status 
     if self.samples.empty? then
@@ -62,6 +68,8 @@ class Person < ActiveRecord::Base
     female = Array.new
     parent_relationships.each do |rel|
       parent = rel.relation
+      logger.error("Parent is nil!") if parent.nil?
+      next if parent.nil?
       male.push(rel) if parent.gender == "male"
       female.push(rel) if parent.gender == "female"
     end

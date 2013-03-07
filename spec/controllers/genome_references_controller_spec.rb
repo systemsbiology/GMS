@@ -24,7 +24,9 @@ describe GenomeReferencesController do
   # GenomeReference. As you add validations to GenomeReference, be sure to
   # update the return value of this method accordingly.
   def valid_attributes
-    {}
+    {
+    :name => "hg19"
+    }
   end
 
   describe "GET index" do

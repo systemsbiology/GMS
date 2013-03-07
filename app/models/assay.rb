@@ -2,7 +2,6 @@ class Assay < ActiveRecord::Base
   has_many :assemblies, :dependent => :destroy
   has_one :sample_assay
   has_one :sample, :through => :sample_assay
-  has_one :mediaName
 
   validates_presence_of :name, :assay_type, :technology
   validates_uniqueness_of :name
@@ -11,6 +10,7 @@ class Assay < ActiveRecord::Base
   after_create :check_isb_assay_id
   after_update :check_isb_assay_id
 
+  attr_accessible :name, :assay_type, :technology, :vendor, :status, :description, :date_received, :date_transferred, :dated_backup, :qc_pass_date, :current
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
@@ -50,7 +50,8 @@ class Assay < ActiveRecord::Base
   def check_isb_assay_id
     if self.isb_assay_id.nil? or !self.isb_assay_id.match(/isb_asy/) then
       isb_assay_id = "isb_asy_"+self.id.to_s
-      self.update_attributes(:isb_assay_id => isb_assay_id)
+      self.isb_assay_id = isb_assay_id
+      self.save
     end
   end
 

@@ -1,13 +1,12 @@
 source 'http://rubygems.org'
 
 gem 'rails'
-gem 'rake' , '~> 0.9.2.2'
+gem 'rake' #, '~> 0.9.2.2'
 gem 'builder'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
-
-gem 'mysql'
+gem 'mysql2'
 
 # Use unicorn as the web server
 # gem 'unicorn'
@@ -21,8 +20,11 @@ gem 'ruby-debug19', :require => 'ruby-debug'
 
 gem 'settingslogic'
 
+gem 'strong_parameters'
+
 gem 'will_paginate'
-gem 'jquery-rails', '~> 2.1'
+gem 'jquery-rails'#, '~> 2.1'
+gem 'select2-rails'    # jquery select boxes
 gem 'formtastic'
 gem 'event-calendar', :require => 'event_calendar'
 gem 'simple_navigation'
@@ -41,9 +43,6 @@ gem 'ancestry'
 #gem 'acts_as_audited'
 #, "2.0.0.rc7"
 
-gem 'rspec-rails'
-#, '~> 2.6.0'
-
 gem 'madeline', '~> 0.1.10'
 
 gem 'rubyzip'
@@ -52,6 +51,15 @@ gem 'json_builder'
 
 # create cron jobs to clean the temporary objects from the database
 gem 'whenever'
+
+# testing
+group :test do
+  gem 'factory_girl'
+  gem 'factory_girl_rails'
+  gem 'rspec-rails'
+  gem 'shoulda'
+  gem 'shoulda-matchers'
+end
 
 # Bundle the extra gems:
 # gem 'bj'

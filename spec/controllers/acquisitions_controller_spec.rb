@@ -27,9 +27,24 @@ describe AcquisitionsController do
     {}
   end
 
+  describe "associations" do
+     subject { build(:acquisition) }
+
+     it { should belong_to(:person) }
+     it { should belong_to(:sample) }
+
+  end
+
+  describe "validations" do
+    subject { build(:acquisition) }
+
+    it { should validate_presence_of(:person_id) }
+    it { should validate_presence_of(:sample_id) }
+  end
+
   describe "GET index" do
     it "assigns all acquisitions as @acquisitions" do
-      acquisition = Acquisition.create! valid_attributes
+      acquisition = create(:acquisition)
       get :index
       assigns(:acquisitions).should eq([acquisition])
     end
@@ -37,7 +52,7 @@ describe AcquisitionsController do
 
   describe "GET show" do
     it "assigns the requested acquisition as @acquisition" do
-      acquisition = Acquisition.create! valid_attributes
+      acquisition = create(:acquisition)
       get :show, :id => acquisition.id.to_s
       assigns(:acquisition).should eq(acquisition)
     end
@@ -52,7 +67,7 @@ describe AcquisitionsController do
 
   describe "GET edit" do
     it "assigns the requested acquisition as @acquisition" do
-      acquisition = Acquisition.create! valid_attributes
+      acquisition = create(:acquisition)
       get :edit, :id => acquisition.id.to_s
       assigns(:acquisition).should eq(acquisition)
     end
@@ -61,19 +76,21 @@ describe AcquisitionsController do
   describe "POST create" do
     describe "with valid params" do
       it "creates a new Acquisition" do
+        puts "before create new"
         expect {
-          post :create, :acquisition => valid_attributes
+          post :create, :acquisition => build(:acquisition).attributes
         }.to change(Acquisition, :count).by(1)
+        puts "after create new "
       end
 
       it "assigns a newly created acquisition as @acquisition" do
-        post :create, :acquisition => valid_attributes
+        post :create, :acquisition => build(:acquisition).attributes
         assigns(:acquisition).should be_a(Acquisition)
         assigns(:acquisition).should be_persisted
       end
 
       it "redirects to the created acquisition" do
-        post :create, :acquisition => valid_attributes
+        post :create, :acquisition => build(:acquisition).attributes
         response.should redirect_to(Acquisition.last)
       end
     end
@@ -82,14 +99,14 @@ describe AcquisitionsController do
       it "assigns a newly created but unsaved acquisition as @acquisition" do
         # Trigger the behavior that occurs when invalid params are submitted
         Acquisition.any_instance.stub(:save).and_return(false)
-        post :create, :acquisition => {}
+        post :create, :acquisition => { :person_id => nil }
         assigns(:acquisition).should be_a_new(Acquisition)
       end
 
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
         Acquisition.any_instance.stub(:save).and_return(false)
-        post :create, :acquisition => {}
+        post :create, :acquisition => { :person_id => nil }
         response.should render_template("new")
       end
     end
@@ -97,32 +114,42 @@ describe AcquisitionsController do
 
   describe "PUT update" do
     describe "with valid params" do
+      it "passes through all of the possible parameters" do
+        acquisition = create(:acquisition)
+        put :update, :id => acquisition.id, :acquisition => attributes_for(:acquisition, method: "precipitation")
+        @controller.instance_eval{ acquisition_params }.keys.should eq(['sample_id', 'person_id', 'method'])
+      end
+
+
       it "updates the requested acquisition" do
-        acquisition = Acquisition.create! valid_attributes
+       puts "starting updates the requrested acquisition"
+        acquisition = create(:acquisition)
         # Assuming there are no other acquisitions in the database, this
         # specifies that the Acquisition created on the previous line
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
-        Acquisition.any_instance.should_receive(:update_attributes).with({'these' => 'params'})
-        put :update, :id => acquisition.id, :acquisition => {'these' => 'params'}
+        Acquisition.any_instance.should_receive(:update_attributes!).with("person_id" => '10')
+       puts "before the put "
+        put :update, :id => acquisition.id, :acquisition => { :person_id => '10'}
+        puts "ending the updates teh requested acquisition"
       end
 
       it "assigns the requested acquisition as @acquisition" do
-        acquisition = Acquisition.create! valid_attributes
-        put :update, :id => acquisition.id, :acquisition => valid_attributes
+        acquisition = create(:acquisition)
+        put :update, :id => acquisition.id, :acquisition => build(:acquisition).attributes
         assigns(:acquisition).should eq(acquisition)
       end
 
       it "redirects to the acquisition" do
-        acquisition = Acquisition.create! valid_attributes
-        put :update, :id => acquisition.id, :acquisition => valid_attributes
+        acquisition = create(:acquisition)
+        put :update, :id => acquisition.id, :acquisition => build(:acquisition).attributes
         response.should redirect_to(acquisition)
       end
     end
 
     describe "with invalid params" do
       it "assigns the acquisition as @acquisition" do
-        acquisition = Acquisition.create! valid_attributes
+        acquisition = create(:acquisition)
         # Trigger the behavior that occurs when invalid params are submitted
         Acquisition.any_instance.stub(:save).and_return(false)
         put :update, :id => acquisition.id.to_s, :acquisition => {}
@@ -130,25 +157,25 @@ describe AcquisitionsController do
       end
 
       it "re-renders the 'edit' template" do
-        acquisition = Acquisition.create! valid_attributes
+        acquisition = create(:acquisition)
         # Trigger the behavior that occurs when invalid params are submitted
         Acquisition.any_instance.stub(:save).and_return(false)
         put :update, :id => acquisition.id.to_s, :acquisition => {}
-        response.should render_template("edit")
+        response.should raise_error StandardError
       end
     end
   end
 
   describe "DELETE destroy" do
     it "destroys the requested acquisition" do
-      acquisition = Acquisition.create! valid_attributes
+      acquisition = create(:acquisition)
       expect {
         delete :destroy, :id => acquisition.id.to_s
       }.to change(Acquisition, :count).by(-1)
     end
 
     it "redirects to the acquisitions list" do
-      acquisition = Acquisition.create! valid_attributes
+      acquisition = create(:acquisition)
       delete :destroy, :id => acquisition.id.to_s
       response.should redirect_to(acquisitions_url)
     end

@@ -57,19 +57,25 @@ class AssemblyFilesController < ApplicationController
   # POST /assembly_files
   # POST /assembly_files.xml
   def create
+   puts "params in create are #{params.inspect}"
     @assembly_file = AssemblyFile.new(params[:assembly_file])
 
     respond_to do |format|
-      if @assembly_file.save
+      puts "format is #{format.inspect}\n"
+      if @assembly_file.save!
+        puts "saved assembly!\n"
         format.html { redirect_to(@assembly_file, :notice => 'Assay file was successfully created.') }
         format.xml  { render :xml => @assembly_file, :status => :created, :location => @assembly_file }
         format.json  { render :json => @assembly_file, :status => :created, :location => @assembly_file }
       else
+        puts "failed to save assembly #{@assembly_file.errors.inspect}\n\n"
         format.html { render :action => "new" }
         format.xml  { render :xml => @assembly_file.errors, :status => :unprocessable_entity }
         format.json  { render :json => @assembly_file.errors, :status => :unprocessable_entity }
       end
+
     end
+    puts "ending!\n\n"
   end
 
   # PUT /assembly_files/1

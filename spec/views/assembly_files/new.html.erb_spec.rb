@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "assembly_files/new.html.erb" do
+describe "assembly_files/new" do
   before(:each) do
     assign(:assembly_file, stub_model(AssemblyFile).as_new_record)
   end

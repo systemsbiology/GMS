@@ -43,11 +43,11 @@
 <%= link_to 'Back', pedigrees_path %> | 
 <%= link_to 'Edit', edit_pedigree_path(@pedigree) %> |
 <% par = Hash.new;  par[:pedigree_filter] = Hash.new;  par[:pedigree_filter][:id] = @pedigree.id %>
-<%= link_to "Receiving Log for Pedigree #{@pedigree.name}", receiving_report_path(par) %> |
+<%= link_to "Receiving Log for Pedigree #{@pedigree.name}", receiving_report_people_path(par) %> |
 <% if false %> <%= link_to "Delete pedigree #{@pedigree.name}, all people, and all samples associated", @pedigree, :confirm => "Are you sure you want to delete this pedigree, all of its people, and all of their associated information (including samples)?", :method => :delete %> <% end %>
 <br />
 <br />
-<%= button_to "Download Pedigree File", pedigree_file_path(@pedigree) %>
+<%= button_to "Download Pedigree File", pedigree_pedigree_file_path(@pedigree) %>
 <p><span style="font-weight: bold; text-decoration: underline;">People in this Pedigree</span></p>
 <% if @pedigree.people.size == 0 %>
   <p>No people currently entered for this pedigree</p>
@@ -128,7 +128,7 @@
 
 <% if @pedigree.people.size > 2 %>
   <% unless @pedigree.name.match(/unrelated/) %>
-    <%= link_to "Download madeline table", export_madeline_table_path(@pedigree) %>
+    <%= link_to "Download madeline table", pedigree_export_madeline_table_path(@pedigree) %>
     <% if false %><%= raw @madeline_table %><br /><% end %>
 
     <%= raw(@madeline) %>

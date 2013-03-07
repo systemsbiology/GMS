@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe "assembly_files/edit.html.erb" do
+describe "assembly_files/edit" do
   before(:each) do
     @assembly_file = assign(:assembly_file, stub_model(AssemblyFile))
   end

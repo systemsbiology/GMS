@@ -24,7 +24,10 @@ describe TraitsController do
   # Trait. As you add validations to Trait, be sure to
   # update the return value of this method accordingly.
   def valid_attributes
-    {}
+    {
+    	:person_id => 1,
+	:phenotype_id => 1
+    }
   end
 
   describe "GET index" do

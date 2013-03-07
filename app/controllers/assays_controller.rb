@@ -23,7 +23,7 @@ class AssaysController < ApplicationController
         }
       end
     end
-    
+    puts "assays are #{@assays.inspect}"
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @assays }
@@ -62,8 +62,9 @@ class AssaysController < ApplicationController
   # POST /assays
   # POST /assays.xml
   def create
-    @assay = Assay.new(params[:assay])
-    @assay.status = "created"
+    #@assay = Assay.new(params[:assay])
+    @assay = Assay.new(assay_params)
+    @assay.status = "created" if !@assay.status
     if (params[:sample] and params[:sample][:sample_id]) then
       sample = Sample.find(params[:sample][:sample_id])
       @assay.sample = sample
@@ -88,7 +89,7 @@ class AssaysController < ApplicationController
     @assay = Assay.find(params[:id])
 
     respond_to do |format|
-      if @assay.update_attributes(params[:assay])
+      if @assay.update_attributes(assay_params)
         format.html { redirect_to(@assay, :notice => 'Assay was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -131,5 +132,9 @@ class AssaysController < ApplicationController
       format.json { render :json => ped_info }
     end
 
+  end
+  private
+  def assay_params
+    params.require(:assay).permit(:name, :assay_type, :technology, :description, :vendor, :status, :date_received, :date_transferred, :dated_backup, :qc_pass_date, :current)
   end
 end

@@ -5,6 +5,8 @@ class Trait < ActiveRecord::Base
   auto_strip_attributes :trait_information, :output_order
   validates_presence_of :person_id, :phenotype_id
 
+  attr_accessible :person_id, :phenotype_id, :trait_information, :output_order
+
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
       if pedigree.kind_of?(Array) then

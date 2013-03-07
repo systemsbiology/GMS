@@ -15,6 +15,8 @@ class Assembly < ActiveRecord::Base
   after_create :check_isb_assembly_id
   after_update :check_isb_assembly_id
 
+  attr_accessible :genome_reference_id, :assay_id, :name, :description, :location, :file_type, :file_date, :status, :metadata, :disk_id, :software, :software_version, :record_date, :current, :comments, :coverage_data_date, :qa_data_date, :bed_file_date, :genotype_file_date, :COVERAGE_Alltypes_Fully_Called_Percent, :COVERAGE_Alltypes_Partially_Called_Percent, :COVERAGE_Alltypes_No_Called_Percent, :COVERAGE_Alltypes_Fully_Called_Count, :COVERAGE_Alltypes_Partially_Called_Count, :COVERAGE_Alltypes_No_Called_Count, :COVERAGE_Exon_Any_Called_Count, :COVERAGE_Unclassified_Any_Called_Count, :COVERAGE_Repeat_Simple_Low_Fully_Called_Count, :COVERAGE_Repeat_Int_Young_Fully_Called_Count, :COVERAGE_Repeat_Other_Fully_Called_Count, :COVERAGE_Cnv_Fully_Called_Count, :COVERAGE_Segdup_Fully_Called_Count, :COVERAGE_Exon_Partially_Called_Count, :COVERAGE_Unclassified_Partially_Called_Count, :COVERAGE_Repeat_Simple_Low_Partially_Called_Count, :COVERAGE_Repeat_Int_Young_Partially_Called_Count, :COVERAGE_Repeat_Other_Partially_Called_Count, :COVERAGE_Cnv_Partially_Called_Count, :COVERAGE_Segdup_Partially_Called_Count, :COVERAGE_Exon_No_Called_Count, :COVERAGE_Unclassified_No_Called_Count, :COVERAGE_Repeat_Simple_Low_No_Called_Count, :COVERAGE_Repeat_Int_Young_No_Called_Count, :COVERAGE_Repeat_Other_No_Called_Count, :COVERAGE_Cnv_No_Called_Count, :COVERAGE_Segdup_No_Called_Count
+
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
       if pedigree.kind_of?(Array) then

@@ -20,16 +20,29 @@ require 'spec_helper'
 
 describe AssaysController do
 
-  # This should return the minimal set of attributes required to create a valid
-  # Assay. As you add validations to Assay, be sure to
-  # update the return value of this method accordingly.
-  def valid_attributes
-    {}
+  describe "associations" do
+    subject { build(:assay) }
+
+    it { should have_one(:sample_assay) }
+    it { should have_one(:sample) }
+    it { should have_many(:assemblies) }
+
+  end
+
+  describe "validations" do
+    subject { build(:assay) }
+
+    it { should validate_presence_of(:name) }
+    it { should validate_presence_of(:assay_type) }
+    it { should validate_presence_of(:technology) }
+    
+    it { should validate_uniqueness_of(:name) }
+
   end
 
   describe "GET index" do
     it "assigns all assays as @assays" do
-      assay = Assay.create! valid_attributes
+      assay = create(:assay)
       get :index
       assigns(:assays).should eq([assay])
     end
@@ -37,7 +50,7 @@ describe AssaysController do
 
   describe "GET show" do
     it "assigns the requested assay as @assay" do
-      assay = Assay.create! valid_attributes
+      assay = create(:assay)
       get :show, :id => assay.id.to_s
       assigns(:assay).should eq(assay)
     end
@@ -52,7 +65,7 @@ describe AssaysController do
 
   describe "GET edit" do
     it "assigns the requested assay as @assay" do
-      assay = Assay.create! valid_attributes
+      assay = create(:assay)
       get :edit, :id => assay.id.to_s
       assigns(:assay).should eq(assay)
     end
@@ -62,18 +75,18 @@ describe AssaysController do
     describe "with valid params" do
       it "creates a new Assay" do
         expect {
-          post :create, :assay => valid_attributes
+          post :create, :assay => build(:assay).attributes
         }.to change(Assay, :count).by(1)
       end
 
       it "assigns a newly created assay as @assay" do
-        post :create, :assay => valid_attributes
+        post :create, :assay => build(:assay).attributes
         assigns(:assay).should be_a(Assay)
         assigns(:assay).should be_persisted
       end
 
       it "redirects to the created assay" do
-        post :create, :assay => valid_attributes
+        post :create, :assay => build(:assay).attributes
         response.should redirect_to(Assay.last)
       end
     end
@@ -82,14 +95,14 @@ describe AssaysController do
       it "assigns a newly created but unsaved assay as @assay" do
         # Trigger the behavior that occurs when invalid params are submitted
         Assay.any_instance.stub(:save).and_return(false)
-        post :create, :assay => {}
+        post :create, :assay => { :name => nil }
         assigns(:assay).should be_a_new(Assay)
       end
 
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
         Assay.any_instance.stub(:save).and_return(false)
-        post :create, :assay => {}
+        post :create, :assay => { :name => nil }
         response.should render_template("new")
       end
     end
@@ -97,32 +110,44 @@ describe AssaysController do
 
   describe "PUT update" do
     describe "with valid params" do
+      it "passes through all of the possible parameters" do
+        assay = create(:assay)
+        put :update, :id => assay.id, :assay => attributes_for(:assay, description: "Whee", status: "Passed", date_received: "2012-12-08", date_transferred: "2012-12-09", dated_backup: "2012-12-11", qc_pass_date: "2012-12-10", current: "1"  )
+        @controller.instance_eval{ assay_params }.keys.should eq(['name', 'assay_type', 'technology', 'description', 'vendor', 'status', 'date_received', 'date_transferred', 'dated_backup', 'qc_pass_date', 'current'])
+      end
+
+      it "passes through all of the possible parameters and not additional ones" do
+        assay = create(:assay)
+        put :update, :id => assay.id, :assay => attributes_for(:assay, description: "Whee", status: "Passed", date_received: "2012-12-08", date_transferred: "2012-12-09", dated_backup: "2012-12-11", qc_pass_date: "2012-12-10", current: "1", fake: "fake!"  )
+        @controller.instance_eval{ assay_params }.keys.should eq(['name', 'assay_type', 'technology', 'description', 'vendor', 'status', 'date_received', 'date_transferred', 'dated_backup', 'qc_pass_date', 'current'])
+      end
+
       it "updates the requested assay" do
-        assay = Assay.create! valid_attributes
+        assay = create(:assay)
         # Assuming there are no other assays in the database, this
         # specifies that the Assay created on the previous line
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
-        Assay.any_instance.should_receive(:update_attributes).with({'these' => 'params'})
-        put :update, :id => assay.id, :assay => {'these' => 'params'}
+        Assay.any_instance.should_receive(:update_attributes).with({'name' => 'John Doe'})
+        put :update, :id => assay.id, :assay => {'name' => 'John Doe'}
       end
 
       it "assigns the requested assay as @assay" do
-        assay = Assay.create! valid_attributes
-        put :update, :id => assay.id, :assay => valid_attributes
+        assay = create(:assay)
+        put :update, :id => assay.id, :assay => build(:assay).attributes
         assigns(:assay).should eq(assay)
       end
 
       it "redirects to the assay" do
-        assay = Assay.create! valid_attributes
-        put :update, :id => assay.id, :assay => valid_attributes
+        assay = create(:assay)
+        put :update, :id => assay.id, :assay => build(:assay).attributes
         response.should redirect_to(assay)
       end
     end
 
     describe "with invalid params" do
       it "assigns the assay as @assay" do
-        assay = Assay.create! valid_attributes
+        assay = create(:assay)
         # Trigger the behavior that occurs when invalid params are submitted
         Assay.any_instance.stub(:save).and_return(false)
         put :update, :id => assay.id.to_s, :assay => {}
@@ -130,25 +155,26 @@ describe AssaysController do
       end
 
       it "re-renders the 'edit' template" do
-        assay = Assay.create! valid_attributes
+        assay = create(:assay)
         # Trigger the behavior that occurs when invalid params are submitted
         Assay.any_instance.stub(:save).and_return(false)
         put :update, :id => assay.id.to_s, :assay => {}
-        response.should render_template("edit")
+        #response.should render_template("edit")
+        response.should raise_error StandardError
       end
     end
   end
 
   describe "DELETE destroy" do
     it "destroys the requested assay" do
-      assay = Assay.create! valid_attributes
+      assay = create(:assay)
       expect {
         delete :destroy, :id => assay.id.to_s
       }.to change(Assay, :count).by(-1)
     end
 
     it "redirects to the assays list" do
-      assay = Assay.create! valid_attributes
+      assay = create(:assay)
       delete :destroy, :id => assay.id.to_s
       response.should redirect_to(assays_url)
     end

@@ -14,6 +14,7 @@ class Pedigree < ActiveRecord::Base
   validates_presence_of :name, :tag, :study_id
   validates_uniqueness_of :name, :tag
 
+  attr_accessible :name, :tag, :study_id, :directory, :description, :version, :genotype_vector_date, :quartet_date, :autozygosity_date, :relation_pairing_date
 
   def phenotypes
     self.people.map(&:phenotypes).flatten.uniq

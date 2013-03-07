@@ -33,7 +33,7 @@
 <td colspan="2">
   <b>Status:</b>
   <% rr = Hash.new; rr[:pedigree_filter] = Hash.new; rr[:pedigree_filter][:id] = @sample.person.pedigree.id %>
-  <%= link_to @sample.status, receiving_report_path(rr) %>
+  <%= link_to @sample.status, receiving_report_people_path(rr) %>
 </td>
 <% end %>
 <td>

@@ -1,9 +1,9 @@
 class AcquisitionsController < ApplicationController
+
   # GET /acquisitions
   # GET /acquisitions.xml
   def index
     @acquisitions = Acquisition.all
-
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @acquisitions }
@@ -40,7 +40,8 @@ class AcquisitionsController < ApplicationController
   # POST /acquisitions
   # POST /acquisitions.xml
   def create
-    @acquisition = Acquisition.new(params[:acquisition])
+    #@acquisition = Acquisition.new(params[:acquisition])
+    @acquisition = Acquisition.new(acquisition_params)
 
     respond_to do |format|
       if @acquisition.save
@@ -57,9 +58,8 @@ class AcquisitionsController < ApplicationController
   # PUT /acquisitions/1.xml
   def update
     @acquisition = Acquisition.find(params[:id])
-
     respond_to do |format|
-      if @acquisition.update_attributes(params[:acquisition])
+      if @acquisition.update_attributes!(acquisition_params)
         format.html { redirect_to(@acquisition, :notice => 'Acquisition was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -80,4 +80,10 @@ class AcquisitionsController < ApplicationController
       format.xml  { head :ok }
     end
   end
+
+  private 
+  def acquisition_params
+    params.require(:acquisition).permit(:sample_id, :person_id, :method)
+  end
+
 end

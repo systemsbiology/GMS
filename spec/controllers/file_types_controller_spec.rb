@@ -23,13 +23,22 @@ describe FileTypesController do
   # This should return the minimal set of attributes required to create a valid
   # FileType. As you add validations to FileType, be sure to
   # update the return value of this method accordingly.
-  def valid_attributes
-    {}
+  def valid_attributes 
+  end
+
+  describe "associations" do
+    subject { build(:file_type) }
+    it { should have_many(:assembly_files) }
+  end
+
+  describe "validations" do
+    subject { build(:file_type) }
+    it { should validate_presence_of(:type_name) }
   end
 
   describe "GET index" do
     it "assigns all file_types as @file_types" do
-      file_type = FileType.create! valid_attributes
+      file_type = create(:file_type)
       get :index
       assigns(:file_types).should eq([file_type])
     end
@@ -37,7 +46,7 @@ describe FileTypesController do
 
   describe "GET show" do
     it "assigns the requested file_type as @file_type" do
-      file_type = FileType.create! valid_attributes
+      file_type = create(:file_type)
       get :show, :id => file_type.id.to_s
       assigns(:file_type).should eq(file_type)
     end
@@ -52,7 +61,7 @@ describe FileTypesController do
 
   describe "GET edit" do
     it "assigns the requested file_type as @file_type" do
-      file_type = FileType.create! valid_attributes
+      file_type = create(:file_type)
       get :edit, :id => file_type.id.to_s
       assigns(:file_type).should eq(file_type)
     end
@@ -62,18 +71,18 @@ describe FileTypesController do
     describe "with valid params" do
       it "creates a new FileType" do
         expect {
-          post :create, :file_type => valid_attributes
+          post :create, :file_type => build(:file_type).attributes
         }.to change(FileType, :count).by(1)
       end
 
       it "assigns a newly created file_type as @file_type" do
-        post :create, :file_type => valid_attributes
+        post :create, :file_type => build(:file_type).attributes
         assigns(:file_type).should be_a(FileType)
         assigns(:file_type).should be_persisted
       end
 
       it "redirects to the created file_type" do
-        post :create, :file_type => valid_attributes
+        post :create, :file_type => build(:file_type).attributes
         response.should redirect_to(FileType.last)
       end
     end
@@ -98,7 +107,7 @@ describe FileTypesController do
   describe "PUT update" do
     describe "with valid params" do
       it "updates the requested file_type" do
-        file_type = FileType.create! valid_attributes
+        file_type = create(:file_type)
         # Assuming there are no other file_types in the database, this
         # specifies that the FileType created on the previous line
         # receives the :update_attributes message with whatever params are
@@ -108,32 +117,30 @@ describe FileTypesController do
       end
 
       it "assigns the requested file_type as @file_type" do
-        file_type = FileType.create! valid_attributes
-        put :update, :id => file_type.id, :file_type => valid_attributes
+        file_type = create(:file_type)
+        put :update, :id => file_type.id, :file_type => build(:file_type).attributes
         assigns(:file_type).should eq(file_type)
       end
 
       it "redirects to the file_type" do
-        file_type = FileType.create! valid_attributes
-        put :update, :id => file_type.id, :file_type => valid_attributes
+        file_type = create(:file_type)
+        put :update, :id => file_type.id, :file_type => build(:file_type).attributes
         response.should redirect_to(file_type)
       end
     end
 
     describe "with invalid params" do
       it "assigns the file_type as @file_type" do
-        file_type = FileType.create! valid_attributes
+        file_type = create(:file_type)
         # Trigger the behavior that occurs when invalid params are submitted
-        FileType.any_instance.stub(:save).and_return(false)
         put :update, :id => file_type.id.to_s, :file_type => {}
         assigns(:file_type).should eq(file_type)
       end
 
       it "re-renders the 'edit' template" do
-        file_type = FileType.create! valid_attributes
+        file_type = create(:file_type)
         # Trigger the behavior that occurs when invalid params are submitted
-        FileType.any_instance.stub(:save).and_return(false)
-        put :update, :id => file_type.id.to_s, :file_type => {}
+        put :update, :id => file_type.id, :file_type => { :type_name => ''}
         response.should render_template("edit")
       end
     end
@@ -141,14 +148,14 @@ describe FileTypesController do
 
   describe "DELETE destroy" do
     it "destroys the requested file_type" do
-      file_type = FileType.create! valid_attributes
+      file_type = create(:file_type)
       expect {
         delete :destroy, :id => file_type.id.to_s
       }.to change(FileType, :count).by(-1)
     end
 
     it "redirects to the file_types list" do
-      file_type = FileType.create! valid_attributes
+      file_type = create(:file_type)
       delete :destroy, :id => file_type.id.to_s
       response.should redirect_to(file_types_url)
     end

@@ -1,6 +1,6 @@
 <%= form_for(@relationship) do |f| %>
   <%= render "partials/error_messages", :target => @relationship %>
-
+    
   <% sel_person = params[:person_id] || nil %>
   <% if sel_person.nil? and @relationship.person then sel_person = @relationship.person.id end %>
   <% person = sel_person.nil? ? nil : Person.find(sel_person)  %>

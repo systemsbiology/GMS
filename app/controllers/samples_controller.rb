@@ -75,7 +75,7 @@ class SamplesController < ApplicationController
   # GET /samples/new.xml
   def new
     @sample = Sample.new
-
+    @pedigrees = Pedigree.order("pedigrees.tag")
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @sample }
@@ -85,6 +85,7 @@ class SamplesController < ApplicationController
   # GET /samples/1/edit
   def edit
     @sample = Sample.find(params[:id], :include => { :person => :pedigree} )
+    @pedigrees = Pedigree.order("pedigrees.tag")
   end
 
   # POST /samples
