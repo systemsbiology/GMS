@@ -40,7 +40,7 @@ class FileTypesController < ApplicationController
   # POST /file_types
   # POST /file_types.json
   def create
-    @file_type = FileType.new(params[:file_type])
+    @file_type = FileType.new(file_type_params)
 
     respond_to do |format|
       if @file_type.save
@@ -59,7 +59,7 @@ class FileTypesController < ApplicationController
     @file_type = FileType.find(params[:id])
 
     respond_to do |format|
-      if @file_type.update_attributes(params[:file_type])
+      if @file_type.update_attributes(file_type_params)
         format.html { redirect_to @file_type, notice: 'File type was successfully updated.' }
         format.json { head :ok }
       else
@@ -79,5 +79,10 @@ class FileTypesController < ApplicationController
       format.html { redirect_to file_types_url }
       format.json { head :ok }
     end
+  end
+
+  private
+  def file_type_params
+    params.require(:file_type).permit(:type_name)
   end
 end

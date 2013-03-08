@@ -40,7 +40,7 @@ class GenomeReferencesController < ApplicationController
   # POST /genome_references
   # POST /genome_references.xml
   def create
-    @genome_reference = GenomeReference.new(params[:genome_reference])
+    @genome_reference = GenomeReference.new(genome_reference_params)
 
     respond_to do |format|
       if @genome_reference.save
@@ -59,7 +59,7 @@ class GenomeReferencesController < ApplicationController
     @genome_reference = GenomeReference.find(params[:id])
 
     respond_to do |format|
-      if @genome_reference.update_attributes(params[:genome_reference])
+      if @genome_reference.update_attributes(genome_reference_params)
         format.html { redirect_to(@genome_reference, :notice => 'GenomeReference was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -79,5 +79,10 @@ class GenomeReferencesController < ApplicationController
       format.html { redirect_to(genome_references_url) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+  def genome_reference_params
+    params.require(:genome_reference).permit(:name, :build_name, :description, :code, :location)
   end
 end

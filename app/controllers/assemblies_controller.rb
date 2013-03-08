@@ -65,7 +65,7 @@ class AssembliesController < ApplicationController
   # POST /assembly
   # POST /assembly.xml
   def create
-    @assembly = Assembly.new(params[:assembly])
+    @assembly = Assembly.new(assembly_params)
     @assembly.current = 1  # new assemblies should automatically be current
     dir = params[:assembly][:location]
     if File.exists?(dir) then
@@ -95,7 +95,7 @@ class AssembliesController < ApplicationController
     @assembly = Assembly.find(params[:id])
 
     respond_to do |format|
-      if @assembly.update_attributes(params[:assembly])
+      if @assembly.update_attributes(assembly_params)
         format.html { redirect_to(@assembly, :notice => 'Assembly file was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -158,6 +158,11 @@ class AssembliesController < ApplicationController
       format.xml {head :ok}
       format.json { render :json => ped_info }
     end
+  end
+
+  private 
+  def assembly_params
+    params.require(:assembly).permit(:genome_reference_id, :assay_id, :name, :description, :location, :file_type, :file_date, :status, :metadata, :disk_id, :software, :software_version, :record_date, :current, :comments, :coverage_data_date, :qa_data_date, :bed_file_date, :genotype_file_date, :COVERAGE_Alltypes_Fully_Called_Percent, :COVERAGE_Alltypes_Partially_Called_Percent, :COVERAGE_Alltypes_No_Called_Percent, :COVERAGE_Alltypes_Fully_Called_Count, :COVERAGE_Alltypes_Partially_Called_Count, :COVERAGE_Alltypes_No_Called_Count, :COVERAGE_Exon_Any_Called_Count, :COVERAGE_Unclassified_Any_Called_Count, :COVERAGE_Repeat_Simple_Low_Fully_Called_Count, :COVERAGE_Repeat_Int_Young_Fully_Called_Count, :COVERAGE_Repeat_Other_Fully_Called_Count, :COVERAGE_Cnv_Fully_Called_Count, :COVERAGE_Segdup_Fully_Called_Count, :COVERAGE_Exon_Partially_Called_Count, :COVERAGE_Unclassified_Partially_Called_Count, :COVERAGE_Repeat_Simple_Low_Partially_Called_Count, :COVERAGE_Repeat_Int_Young_Partially_Called_Count, :COVERAGE_Repeat_Other_Partially_Called_Count, :COVERAGE_Cnv_Partially_Called_Count, :COVERAGE_Segdup_Partially_Called_Count, :COVERAGE_Exon_No_Called_Count, :COVERAGE_Unclassified_No_Called_Count, :COVERAGE_Repeat_Simple_Low_No_Called_Count, :COVERAGE_Repeat_Int_Young_No_Called_Count, :COVERAGE_Repeat_Other_No_Called_Count, :COVERAGE_Cnv_No_Called_Count, :COVERAGE_Segdup_No_Called_Count)
   end
 
 end

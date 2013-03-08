@@ -20,16 +20,28 @@ require 'spec_helper'
 
 describe PedigreesController do
 
-  # This should return the minimal set of attributes required to create a valid
-  # Pedigree. As you add validations to Pedigree, be sure to
-  # update the return value of this method accordingly.
-  def valid_attributes
-    {}
+  describe "associations" do
+    subject { build(:pedigree) }
+
+    it { should have_many(:people) }
+    it { should have_many(:memberships) }
+    it { should belong_to(:study) }
+  end
+
+  describe "validations" do
+    subject { build(:pedigree) }
+    
+    it { should validate_presence_of(:name) }
+    it { should validate_presence_of(:tag) }
+    it { should validate_presence_of(:study_id) }
+
+    it { should validate_uniqueness_of(:name) }
+    it { should validate_uniqueness_of(:tag) }
   end
 
   describe "GET index" do
     it "assigns all pedigrees as @pedigrees" do
-      pedigree = Pedigree.create! valid_attributes
+      pedigree = create(:pedigree)
       get :index
       assigns(:pedigrees).should eq([pedigree])
     end
@@ -37,7 +49,7 @@ describe PedigreesController do
 
   describe "GET show" do
     it "assigns the requested pedigree as @pedigree" do
-      pedigree = Pedigree.create! valid_attributes
+      pedigree = create(:pedigree)
       get :show, :id => pedigree.id.to_s
       assigns(:pedigree).should eq(pedigree)
     end
@@ -52,7 +64,7 @@ describe PedigreesController do
 
   describe "GET edit" do
     it "assigns the requested pedigree as @pedigree" do
-      pedigree = Pedigree.create! valid_attributes
+      pedigree = create(:pedigree)
       get :edit, :id => pedigree.id.to_s
       assigns(:pedigree).should eq(pedigree)
     end
@@ -62,18 +74,18 @@ describe PedigreesController do
     describe "with valid params" do
       it "creates a new Pedigree" do
         expect {
-          post :create, :pedigree => valid_attributes
+          post :create, :pedigree => build(:pedigree).attributes
         }.to change(Pedigree, :count).by(1)
       end
 
       it "assigns a newly created pedigree as @pedigree" do
-        post :create, :pedigree => valid_attributes
+        post :create, :pedigree => build(:pedigree).attributes
         assigns(:pedigree).should be_a(Pedigree)
         assigns(:pedigree).should be_persisted
       end
 
       it "redirects to the created pedigree" do
-        post :create, :pedigree => valid_attributes
+        post :create, :pedigree => build(:pedigree).attributes
         response.should redirect_to(Pedigree.last)
       end
     end
@@ -82,14 +94,14 @@ describe PedigreesController do
       it "assigns a newly created but unsaved pedigree as @pedigree" do
         # Trigger the behavior that occurs when invalid params are submitted
         Pedigree.any_instance.stub(:save).and_return(false)
-        post :create, :pedigree => {}
+        post :create, :pedigree => { :name => nil }
         assigns(:pedigree).should be_a_new(Pedigree)
       end
 
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
         Pedigree.any_instance.stub(:save).and_return(false)
-        post :create, :pedigree => {}
+        post :create, :pedigree => { :name => nil }
         response.should render_template("new")
       end
     end
@@ -98,31 +110,31 @@ describe PedigreesController do
   describe "PUT update" do
     describe "with valid params" do
       it "updates the requested pedigree" do
-        pedigree = Pedigree.create! valid_attributes
+        pedigree = create(:pedigree)
         # Assuming there are no other pedigrees in the database, this
         # specifies that the Pedigree created on the previous line
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
-        Pedigree.any_instance.should_receive(:update_attributes).with({'these' => 'params'})
-        put :update, :id => pedigree.id, :pedigree => {'these' => 'params'}
+        Pedigree.any_instance.should_receive(:update_attributes).with({'name' => 'test'})
+        put :update, :id => pedigree.id, :pedigree => {'name' => 'test'}
       end
 
       it "assigns the requested pedigree as @pedigree" do
-        pedigree = Pedigree.create! valid_attributes
-        put :update, :id => pedigree.id, :pedigree => valid_attributes
+        pedigree = create(:pedigree)
+        put :update, :id => pedigree.id, :pedigree => build(:pedigree).attributes
         assigns(:pedigree).should eq(pedigree)
       end
 
       it "redirects to the pedigree" do
-        pedigree = Pedigree.create! valid_attributes
-        put :update, :id => pedigree.id, :pedigree => valid_attributes
+        pedigree = create(:pedigree)
+        put :update, :id => pedigree.id, :pedigree => build(:pedigree).attributes
         response.should redirect_to(pedigree)
       end
     end
 
     describe "with invalid params" do
       it "assigns the pedigree as @pedigree" do
-        pedigree = Pedigree.create! valid_attributes
+        pedigree = create(:pedigree)
         # Trigger the behavior that occurs when invalid params are submitted
         Pedigree.any_instance.stub(:save).and_return(false)
         put :update, :id => pedigree.id.to_s, :pedigree => {}
@@ -130,25 +142,26 @@ describe PedigreesController do
       end
 
       it "re-renders the 'edit' template" do
-        pedigree = Pedigree.create! valid_attributes
+        pedigree = create(:pedigree)
         # Trigger the behavior that occurs when invalid params are submitted
         Pedigree.any_instance.stub(:save).and_return(false)
         put :update, :id => pedigree.id.to_s, :pedigree => {}
-        response.should render_template("edit")
+        #response.should render_template("edit")
+        response.should raise_error StandardError
       end
     end
   end
 
   describe "DELETE destroy" do
     it "destroys the requested pedigree" do
-      pedigree = Pedigree.create! valid_attributes
+      pedigree = create(:pedigree)
       expect {
         delete :destroy, :id => pedigree.id.to_s
       }.to change(Pedigree, :count).by(-1)
     end
 
     it "redirects to the pedigrees list" do
-      pedigree = Pedigree.create! valid_attributes
+      pedigree = create(:pedigree)
       delete :destroy, :id => pedigree.id.to_s
       response.should redirect_to(pedigrees_url)
     end

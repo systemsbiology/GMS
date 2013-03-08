@@ -13,7 +13,8 @@ class Study < ActiveRecord::Base
   def check_study_tag
     if !self.tag.nil? and self.tag.match(/ /) then
       tag = self.tag.gsub!(/ /,"_")
-      self.update_attributes(:tag => tag)
+      self.tag = tag
+      self.save
     end
   end
 end

@@ -60,16 +60,18 @@ class Pedigree < ActiveRecord::Base
   end
 
   def check_pedigree_tag
-    if self.tag.match(/ /) then
+    if self.tag and self.tag.match(/ /) then
       tag = self.tag.gsub!(/ /, "_")
-      self.update_attributes(:tag => tag)
+      self.tag = tag
+      self.save
     end
   end
 
   def check_isb_pedigree_id
     if self.isb_pedigree_id.nil? then
       isb_ped = 'isb_ped_'+self.id.to_s
-      self.update_attributes(:isb_pedigree_id => isb_ped)
+      self.isb_pedigree_id = isb_ped
+      self.save
     end
   end
 

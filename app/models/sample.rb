@@ -52,7 +52,8 @@ class Sample < ActiveRecord::Base
   def check_isb_sample_id
     if self.isb_sample_id.nil? or !self.isb_sample_id.match(/isb_sample/) then
       isb_sample_id = "isb_sample_"+self.id.to_s
-      self.update_attributes(:isb_sample_id => isb_sample_id)
+      self.isb_sample_id = isb_sample_id
+      self.save
     end
   end
 

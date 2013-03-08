@@ -34,16 +34,18 @@ class Person < ActiveRecord::Base
 
   def check_sequencing_status 
     if self.samples.empty? then
-      self.update_attributes(:planning_on_sequencing => false)
+      self.planning_on_sequencing = false
     else 
-      self.update_attributes(:planning_on_sequencing => true)
+      self.planning_on_sequencing = true
     end
+    self.save
   end
 
   def check_isb_person_id
     if self.isb_person_id.nil? then
       isb_person_id = 'isb_ind_'+ self.id.to_s
-      self.update_attributes(:isb_person_id => isb_person_id)
+      self.isb_person_id = isb_person_id
+      self.save
     end
   end
 
@@ -55,7 +57,8 @@ class Person < ActiveRecord::Base
         assay.assemblies.each do |assembly|
 	  af = AssemblyFile.find_all_by_assembly_id_and_file_type_id(assembly.id, [1,8])
 	  if af.count > 0
-	    self.update_attributes(:complete => true)
+	    self.complete = true
+        self.save
 	  end
 	end
       end

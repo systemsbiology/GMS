@@ -85,7 +85,7 @@ class PedigreesController < ApplicationController
   # POST /pedigrees
   # POST /pedigrees.xml
   def create
-    @pedigree = Pedigree.new(params[:pedigree])
+    @pedigree = Pedigree.new(pedigree_params)
 
     @pedigree.version = 1
     respond_to do |format|
@@ -107,7 +107,7 @@ class PedigreesController < ApplicationController
     @pedigree = Pedigree.find(params[:id])
 
     respond_to do |format|
-      if @pedigree.update_attributes(params[:pedigree])
+      if @pedigree.update_attributes(pedigree_params)
         format.html { redirect_to(@pedigree, :notice => 'Pedigree was successfully updated.') }
         format.xml  { head :ok }
         format.json  { head :ok }
@@ -352,6 +352,11 @@ class PedigreesController < ApplicationController
     outfile_name = "Kwanzaa_"+@pedigree.tag # needs a quartet identifier somehow
     # genotype.csv outfilename outfile path
     rc = `lib/genomeMapVariable.pl KWANZAA_DIR`
+  end
+
+  private
+  def pedigree_params
+    params.require(:pedigree).permit(:name, :tag, :study_id, :directory, :description, :version, :genotype_vector_date, :quartet_date, :autozygosity_date, :relation_pairing_date)
   end
 
 end

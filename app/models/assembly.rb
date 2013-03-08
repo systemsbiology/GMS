@@ -266,11 +266,11 @@ class Assembly < ActiveRecord::Base
 
       filename = File.basename(file_path)
       assembly_file.update_attributes( 
-      					"genome_reference_id" => self.genome_reference_id,
+      				"genome_reference_id" => self.genome_reference_id,
 					"assembly_id" => self.id,
-      					"file_type_id" => file_type_id, 
+      				"file_type_id" => file_type_id, 
 					"name" => filename,
-      					"location" => file_path, 
+      				"location" => file_path, 
 					"file_date" => creation_time(file_path),
 					"software" => software,
 					"software_version" => software_version,
@@ -360,7 +360,8 @@ class Assembly < ActiveRecord::Base
   def check_isb_assembly_id
     if self.isb_assembly_id.nil? or !self.isb_assembly_id.match(/isb_asm/) then
       isb_assembly_id = "isb_asm_"+self.id.to_s
-      self.update_attributes(:isb_assembly_id => isb_assembly_id)
+      self.isb_assembly_id = isb_assembly_id
+      self.save
     end
   end
 

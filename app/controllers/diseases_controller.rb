@@ -40,7 +40,7 @@ class DiseasesController < ApplicationController
   # POST /diseases
   # POST /diseases.xml
   def create
-    @disease = Disease.new(params[:disease])
+    @disease = Disease.new(disease_params)
 
     respond_to do |format|
       if @disease.save
@@ -59,7 +59,7 @@ class DiseasesController < ApplicationController
     @disease = Disease.find(params[:id])
 
     respond_to do |format|
-      if @disease.update_attributes(params[:disease])
+      if @disease.update_attributes(disease_params)
         format.html { redirect_to(@disease, :notice => 'Disease was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -79,5 +79,10 @@ class DiseasesController < ApplicationController
       format.html { redirect_to(diseases_url) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+  def disease_params
+    params.require(:disease).permit(:name, :omim_id, :description)
   end
 end

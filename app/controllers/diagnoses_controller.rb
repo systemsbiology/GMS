@@ -41,7 +41,7 @@ class DiagnosesController < ApplicationController
   # POST /diagnoses
   # POST /diagnoses.json
   def create
-    @diagnosis = Diagnosis.new(params[:diagnosis])
+    @diagnosis = Diagnosis.new(diagnosis_params)
 
     respond_to do |format|
       if @diagnosis.save
@@ -60,7 +60,7 @@ class DiagnosesController < ApplicationController
     @diagnosis = Diagnosis.find(params[:id])
 
     respond_to do |format|
-      if @diagnosis.update_attributes(params[:diagnosis])
+      if @diagnosis.update_attributes(diagnosis_params)
         format.html { redirect_to @diagnosis, notice: 'Person disease was successfully updated.' }
         format.json { head :ok }
       else
@@ -81,5 +81,10 @@ class DiagnosesController < ApplicationController
       format.html { redirect_to person_url(person) }
       format.json { head :ok }
     end
+  end
+
+  private
+  def diagnosis_params
+    params.require(:diagnosis).permit(:person_id, :disease_id, :age_of_onset, :disease_information, :output_order)
   end
 end
