@@ -41,7 +41,7 @@ class StudiesController < ApplicationController
   # POST /studies
   # POST /studies.xml
   def create
-    @study = Study.new(params[:study])
+    @study = Study.new(study_params)
 
     respond_to do |format|
       if @study.save
@@ -60,7 +60,7 @@ class StudiesController < ApplicationController
     @study = Study.find(params[:id])
 
     respond_to do |format|
-      if @study.update_attributes(params[:study])
+      if @study.update_attributes(study_params)
         format.html { redirect_to(@study, :notice => 'Study was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -80,5 +80,10 @@ class StudiesController < ApplicationController
       format.html { redirect_to(studies_url) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+  def study_params
+    params.require(:study).permit(:name, :tag, :lead, :collaborator, :collaborating_institution, :description, :contact)
   end
 end

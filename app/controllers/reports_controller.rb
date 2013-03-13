@@ -40,7 +40,7 @@ class ReportsController < ApplicationController
   # POST /reports
   # POST /reports.xml
   def create
-    @report = Report.new(params[:report])
+    @report = Report.new(report_params)
 
     respond_to do |format|
       if @report.save
@@ -59,7 +59,7 @@ class ReportsController < ApplicationController
     @report = Report.find(params[:id])
 
     respond_to do |format|
-      if @report.update_attributes(params[:report])
+      if @report.update_attributes(report_params)
         format.html { redirect_to(@report, :notice => 'Report was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -79,5 +79,10 @@ class ReportsController < ApplicationController
       format.html { redirect_to(reports_url) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+  def report_params
+    params.require(:report_params).permit(:name, :description, :report_type_id)
   end
 end

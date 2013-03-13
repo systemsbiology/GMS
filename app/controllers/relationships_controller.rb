@@ -46,7 +46,7 @@ class RelationshipsController < ApplicationController
   # POST /relationships
   # POST /relationships.xml
   def create
-    @relationship = Relationship.new(params[:relationship])
+    @relationship = Relationship.new(relationship_params)
     #logger.debug("person_id #{@relationship.person_id} relation_id #{@relationship.relation_id} relation #{@relationship.inspect}")
     if @relationship.person_id == @relationship.relation_id then
       @relationship.errors[:base] << "Cannot add a relationship between the same person"
@@ -153,7 +153,7 @@ class RelationshipsController < ApplicationController
     end
 
     respond_to do |format|
-      if @relationship.update_attributes(params[:relationship])
+      if @relationship.update_attributes(relationship_params)
         # update recip to the new values
 	if recip.nil? then
 	  recip = Relationship.new
@@ -194,5 +194,10 @@ class RelationshipsController < ApplicationController
       format.html { redirect_to(relationships_url) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+  def relationship_params
+    params.require(:relationship).permit(:name, :person_id, :relation_id, :relationship_type, :relation_order, :divorced)
   end
 end

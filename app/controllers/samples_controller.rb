@@ -91,7 +91,7 @@ class SamplesController < ApplicationController
   # POST /samples
   # POST /samples.xml
   def create
-    @sample = Sample.new(params[:sample])
+    @sample = Sample.new(sample_params)
 
     if params[:check_dates] then
       if params[:check_dates][:add_date_submitted].to_i != 1 then
@@ -189,8 +189,8 @@ class SamplesController < ApplicationController
     @sample.errors.add(:sample, ac_notice) unless ac_notice.empty?
 
     respond_to do |format|
-      if @sample.update_attributes(params[:sample])
-        #logger.debug("sample is #{@sample.inspect} after params #{params[:sample]}")
+      if @sample.update_attributes(sample_params)
+        #logger.debug("sample is #{@sample.inspect} after params #{sample_params}")
         format.html { redirect_to(@sample, :notice => "Sample was successfully updated. #{ac_notice}") }
         format.xml  { head :ok }
       else
@@ -232,4 +232,8 @@ class SamplesController < ApplicationController
     end
   end
 
+  private
+  def sample_params
+    params.require(:sample).permit(:customer_sample_id, :sample_type_id, :status, :date_submitted, :protocol, :volume, :concentration, :quantity, :date_received, :description, :comments, :pedigree_id)
+  end
 end

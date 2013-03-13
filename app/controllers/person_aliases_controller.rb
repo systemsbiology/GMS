@@ -40,7 +40,7 @@ class PersonAliasesController < ApplicationController
   # POST /person_aliases
   # POST /person_aliases.xml
   def create
-    @person_alias = PersonAlias.new(params[:person_alias])
+    @person_alias = PersonAlias.new(person_alias_params)
 
     respond_to do |format|
       if @person_alias.save
@@ -59,7 +59,7 @@ class PersonAliasesController < ApplicationController
     @person_alias = PersonAlias.find(params[:id])
 
     respond_to do |format|
-      if @person_alias.update_attributes(params[:person_alias])
+      if @person_alias.update_attributes(person_alias_params)
         format.html { redirect_to(@person_alias, :notice => 'Person alias was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -79,5 +79,10 @@ class PersonAliasesController < ApplicationController
       format.html { redirect_to(person_aliases_url) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+  def person_alias_params
+    params.requrie(:person_alias).permit(:person_id, :value, :alias_type)
   end
 end

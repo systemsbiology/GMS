@@ -40,7 +40,7 @@ class SampleAssaysController < ApplicationController
   # POST /sample_assays
   # POST /sample_assays.xml
   def create
-    @sample_assay = SampleAssay.new(params[:sample_assay])
+    @sample_assay = SampleAssay.new(sample_assay_params)
 
     respond_to do |format|
       if @sample_assay.save
@@ -59,7 +59,7 @@ class SampleAssaysController < ApplicationController
     @sample_assay = SampleAssay.find(params[:id])
 
     respond_to do |format|
-      if @sample_assay.update_attributes(params[:sample_assay])
+      if @sample_assay.update_attributes(sample_assay_params)
         format.html { redirect_to(@sample_assay, :notice => 'Sample assay was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -79,5 +79,10 @@ class SampleAssaysController < ApplicationController
       format.html { redirect_to(sample_assays_url) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+  def sample_assay_params
+    params.require(:sample_assay).permit(:sample_id, :assay_id)
   end
 end

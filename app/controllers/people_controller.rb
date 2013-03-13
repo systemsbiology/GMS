@@ -61,7 +61,7 @@ class PeopleController < ApplicationController
   # POST /people
   # POST /people.xml
   def create
-    @person = Person.new(params[:person])
+    @person = Person.new(person_params)
 
     if params[:gender] then
       if params[:gender] != 'unknown' then
@@ -117,7 +117,7 @@ class PeopleController < ApplicationController
   def update
     @person = Person.find(params[:id])
 
-    @values = params[:person]
+    @values = person_params
     if params[:check_dates] then
       if params[:check_dates][:add_dob].to_i != 1 then
         @values.delete_if{|k,v| k.match(/^dob/)}
@@ -138,7 +138,7 @@ class PeopleController < ApplicationController
     end
 
     respond_to do |format|
-      if @person.update_attributes(params[:person])
+      if @person.update_attributes(person_params)
         format.html { redirect_to(@person, :notice => 'Person was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -824,4 +824,8 @@ class PeopleController < ApplicationController
     end
   end
 
+  private
+  def person_params
+    params.require(:people).permit(:collaborator_id, :gender, :dob, :dod, :deceased, :planning_on_sequencing, :complete, :root, :comments, :pedigree_id)
+  end
 end

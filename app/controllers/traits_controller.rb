@@ -41,7 +41,7 @@ class TraitsController < ApplicationController
   # POST /traits
   # POST /traits.xml
   def create
-    @trait = Trait.new(params[:trait])
+    @trait = Trait.new(trait_params)
 
     respond_to do |format|
       if @trait.save
@@ -60,7 +60,7 @@ class TraitsController < ApplicationController
     @trait = Trait.find(params[:id])
 
     respond_to do |format|
-      if @trait.update_attributes(params[:trait])
+      if @trait.update_attributes(trait_params)
         format.html { redirect_to(@trait, :notice => 'Trait was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -80,5 +80,10 @@ class TraitsController < ApplicationController
       format.html { redirect_to(traits_url) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+  def trait_params
+    params.require(:trait).permit(:person_id, :phenotype_id, :trait_information, :output_order)
   end
 end

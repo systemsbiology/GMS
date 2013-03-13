@@ -45,7 +45,7 @@ class MembershipsController < ApplicationController
   # POST /memberships
   # POST /memberships.xml
   def create
-    @membership = Membership.new(params[:membership])
+    @membership = Membership.new(membership_params)
 
     respond_to do |format|
       if @membership.save
@@ -64,7 +64,7 @@ class MembershipsController < ApplicationController
     @membership = Membership.find(params[:id])
 
     respond_to do |format|
-      if @membership.update_attributes(params[:membership])
+      if @membership.update_attributes(membership_params)
         format.html { redirect_to(@membership, :notice => 'Membership was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -84,5 +84,10 @@ class MembershipsController < ApplicationController
       format.html { redirect_to(memberships_url) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+  def membership_params
+    params.require(:membership).permit(:pedigree_id, :person_id, :draw_duplicate)
   end
 end

@@ -40,7 +40,7 @@ class SampleTypesController < ApplicationController
   # POST /sample_types
   # POST /sample_types.xml
   def create
-    @sample_type = SampleType.new(params[:sample_type])
+    @sample_type = SampleType.new(sample_type_params)
 
     respond_to do |format|
       if @sample_type.save
@@ -59,7 +59,7 @@ class SampleTypesController < ApplicationController
     @sample_type = SampleType.find(params[:id])
 
     respond_to do |format|
-      if @sample_type.update_attributes(params[:sample_type])
+      if @sample_type.update_attributes(sample_type_params)
         format.html { redirect_to(@sample_type, :notice => 'Sample type was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -79,5 +79,10 @@ class SampleTypesController < ApplicationController
       format.html { redirect_to(sample_types_url) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+  def sample_type_params
+    params.require(:sample_type).permit(:name, :description, :tissue)
   end
 end

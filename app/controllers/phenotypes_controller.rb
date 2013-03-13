@@ -40,7 +40,7 @@ class PhenotypesController < ApplicationController
   # POST /phenotypes
   # POST /phenotypes.xml
   def create
-    @phenotype = Phenotype.new(params[:phenotype])
+    @phenotype = Phenotype.new(phenotype_params)
 
     respond_to do |format|
       if @phenotype.save
@@ -59,7 +59,7 @@ class PhenotypesController < ApplicationController
     @phenotype = Phenotype.find(params[:id])
 
     respond_to do |format|
-      if @phenotype.update_attributes(params[:phenotype])
+      if @phenotype.update_attributes(phenotype_params)
         format.html { redirect_to(@phenotype, :notice => 'Phenotype was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -79,5 +79,10 @@ class PhenotypesController < ApplicationController
       format.html { redirect_to(phenotypes_url) }
       format.xml  { head :ok }
     end
+  end
+
+  private
+  def phenotype_params
+    params.require(:phenotype).permit(:disease_id, :name, :tag, :phenotype_type, :description)
   end
 end
