@@ -13,17 +13,17 @@ set :rail_env, "production"
 set :rvm_bin_path, "/u5/tools/rvm/bin"
 set :rvm_scripts_path, "/u5/tools/rvm/bin"
 set :rvm_path, "/u5/tools/rvm"
-#set :rvm_ruby_string, ENV['GEM_HOME'].gsub(/.*\//,"")
+#set :rvm_ruby_string, ENV['GEM_HOME'].gsub(/.*\//,"")  # set up which gemset you're using
+set :rvm_ruby_string, "global"
 set :rvm_install_ruby_params, '--1.9'
 set :rvm_install_pkgs, %w[libyaml openssl]
 set :rvm_install_ruby_params, '--with-opt-dir=/u5/tools/rvm/usr'
 
-before 'deploy', 'rvm:install_rvm'
+#before 'deploy', 'rvm:install_rvm'
 #before 'deploy', 'rvm:install_pkgs'
 #before 'deploy', 'rvm:install_ruby'
-before 'deploy', 'rvm:create_gemset'
+#before 'deploy', 'rvm:create_gemset'
 #before 'deploy', 'rvm:import_gemset'
-before 'deploy', 'bundle install'
 require 'rvm/capistrano'
 
 require 'whenever/capistrano'
