@@ -23,6 +23,7 @@ before 'deploy:setup', 'rvm:install_pkgs'
 before 'deploy:setup', 'rvm:install_ruby'
 before 'deploy:setup', 'rvm:create_gemset'
 before 'deploy:setup', 'rvm:import_gemset'
+before 'deploy:setup', 'bundle install'
 require 'rvm/capistrano'
 
 require 'whenever/capistrano'
