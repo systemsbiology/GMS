@@ -18,12 +18,12 @@ set :rvm_install_ruby_params, '--1.9'
 set :rvm_install_pkgs, %w[libyaml openssl]
 set :rvm_install_ruby_params, '--with-opt-dir=/u5/tools/rvm/usr'
 
-before 'deploy:setup', 'rvm:install_rvm'
-before 'deploy:setup', 'rvm:install_pkgs'
-before 'deploy:setup', 'rvm:install_ruby'
-before 'deploy:setup', 'rvm:create_gemset'
-before 'deploy:setup', 'rvm:import_gemset'
-before 'deploy:setup', 'bundle install'
+before 'deploy', 'rvm:install_rvm'
+before 'deploy', 'rvm:install_pkgs'
+before 'deploy', 'rvm:install_ruby'
+before 'deploy', 'rvm:create_gemset'
+before 'deploy', 'rvm:import_gemset'
+before 'deploy', 'bundle install'
 require 'rvm/capistrano'
 
 require 'whenever/capistrano'
