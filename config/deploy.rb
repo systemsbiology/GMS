@@ -10,6 +10,18 @@ set :environment, "production"
 set :whenever_environment, defer { environment }
 set :whenever_identifier, defer { "#{application}_#{environment}" }
 set :rail_env, "production"
+set :rvm_ruby_string, ENV['GEM_HOME'].gsub(/.*\//,"")
+set :rvm_install_ruby_params, '--1.9'
+set :rvm_install_pkgs, %w[libyaml openssl]
+set :rvm_install_ruby_params, '--with-opt-dir=/u5/tools/rvm/usr'
+
+before 'deploy:setup', 'rvm:install_rvm'
+before 'deploy:setup', 'rvm:install_pkgs'
+before 'deploy:setup', 'rvm:install_ruby'
+before 'deploy:setup', 'rvm:create_gemset'
+before 'deploy:setup', 'rvm:import_gemset'
+require 'rvm/capistrano'
+
 require 'whenever/capistrano'
 set :default_environment, {
   'PATH' => "/u5/tools/rvm/gems/ruby-1.9.3-p392/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts:/bin/:/tools/bin:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",

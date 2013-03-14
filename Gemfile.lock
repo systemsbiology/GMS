@@ -121,7 +121,7 @@ GEM
       net-ssh (>= 2.6.5)
     net-sftp (2.1.1)
       net-ssh (>= 2.6.5)
-    net-ssh (2.6.5)
+    net-ssh (2.6.6)
     net-ssh-gateway (1.2.0)
       net-ssh (>= 2.6.5)
     nokogiri (1.5.6)
@@ -192,6 +192,8 @@ GEM
     ruby_core_source (0.1.5)
       archive-tar-minitar (>= 0.5.2)
     rubyzip (0.9.9)
+    rvm-capistrano (1.2.7)
+      capistrano (>= 2.0.0)
     sanitize (2.0.3)
       nokogiri (>= 1.4.4, < 1.6)
     sass (3.2.6)
@@ -250,7 +252,6 @@ DEPENDENCIES
   auto_strip_attributes (~> 1.0)
   builder
   cancan
-  capistrano
   devise
   devise_ldap_authenticatable
   event-calendar
@@ -270,6 +271,7 @@ DEPENDENCIES
   ruby-debug-base19x (~> 0.11.30.pre10)
   ruby-debug19
   rubyzip
+  rvm-capistrano
   select2-rails
   settingslogic
   shoulda
