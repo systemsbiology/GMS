@@ -76,11 +76,9 @@ describe AcquisitionsController do
   describe "POST create" do
     describe "with valid params" do
       it "creates a new Acquisition" do
-        puts "before create new"
         expect {
           post :create, :acquisition => build(:acquisition).attributes
         }.to change(Acquisition, :count).by(1)
-        puts "after create new "
       end
 
       it "assigns a newly created acquisition as @acquisition" do
@@ -122,16 +120,13 @@ describe AcquisitionsController do
 
 
       it "updates the requested acquisition" do
-       puts "starting updates the requrested acquisition"
         acquisition = create(:acquisition)
         # Assuming there are no other acquisitions in the database, this
         # specifies that the Acquisition created on the previous line
         # receives the :update_attributes message with whatever params are
         # submitted in the request.
         Acquisition.any_instance.should_receive(:update_attributes!).with("person_id" => '10')
-       puts "before the put "
         put :update, :id => acquisition.id, :acquisition => { :person_id => '10'}
-        puts "ending the updates teh requested acquisition"
       end
 
       it "assigns the requested acquisition as @acquisition" do

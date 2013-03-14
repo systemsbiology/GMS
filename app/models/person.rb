@@ -30,7 +30,7 @@ class Person < ActiveRecord::Base
 	:message => "You may not use anything other than strings in the collaborator_id.  Add an alias if this person has multiple collaborator ids"} ,
 	:format   => { :with => /^[a-zA-Z\d\s\-\_]*$/ }
 
-  attr_accessible :collaborator_id, :gender, :dob, :dod, :deceased, :planning_on_sequencing, :complete, :root, :comments, :pedigree_id
+  #attr_accessible :collaborator_id, :gender, :dob, :dod, :deceased, :planning_on_sequencing, :complete, :root, :comments, :pedigree_id
 
   def check_sequencing_status 
     if self.samples.empty? then

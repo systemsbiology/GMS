@@ -331,11 +331,17 @@ class PeopleController < ApplicationController
       end
 
       person_obj_array.each do |person_obj|
-        #logger.debug("person obj is #{person_obj.inspect}")
-        if person_obj.valid? then
-          person_obj.save!
-        else
-          @errors.push(["#{person_obj.object_type}",person_obj, person_obj.errors])
+        logger.debug("person obj is #{person_obj.inspect}")
+        begin
+          if person_obj.valid? then
+            puts "is valid!"
+            person_obj.save!
+          else
+            puts "isn't valid"
+            @errors.push(["#{person_temp_object.object_type}",person_obj, person_obj.errors])
+          end
+        rescue NoMethodError => error
+          raise error
         end
       end
 
@@ -644,9 +650,9 @@ class PeopleController < ApplicationController
         p.comments = row[headers["Comments"]]
         p.pedigree_id = pedigree.id
 
-        if !disease.nil? then
-          # add diagnosis for this person if affected 
-          affected_status = row[headers["Affected Status"]]
+    if !disease.nil? and !disease.empty? then
+      # add diagnosis for this person if affected 
+      affected_status = row[headers["Affected Status"]]
   	  if affected_status.nil? then
 	    diag = Diagnosis.new
 	    diag.errors.add(:disease_id, "could not be set.  No value for Affected Status found in upload spreadsheet.")
@@ -656,7 +662,7 @@ class PeopleController < ApplicationController
 	    affected_status.downcase!
 	    # other statuses are unaffected and unknown but those aren't handled right now...
 	    # don't really have a way to indicate in the database that the person is known unaffected versus unknown
-            if affected_status == "affected" then
+        if affected_status == "affected" then
 	      diagnoses.push([disease.id, pedigree.id, p.collaborator_id])
 	    elsif affected_status == "unknown" or affected_status == "unaffected" then
 	      # do nothing - these are valid statuses but not stored in db
@@ -665,14 +671,14 @@ class PeopleController < ApplicationController
 	      tp = Person.new
 	      tp.errors.add(:affected_status, "value provided not recognized - '#{affected_status}'. Should be 'affected' in order to set status correctly.")
 	      errors["#{counter}"]["affected_status"] = tp.errors
-            end
-	  end
         end
+	  end
+    end
 
-        # queue up the relationship information so that we can add it later after confirmation
-        mother_id = row[headers["Mother's Subject ID"]]
+    # queue up the relationship information so that we can add it later after confirmation
+    mother_id = row[headers["Mother's Subject ID"]]
 	mother_id = mother_id.to_i if (mother_id.is_a? Float)
-        father_id = row[headers["Father's Subject ID"]]
+    father_id = row[headers["Father's Subject ID"]]
 	father_id = father_id.to_i if (father_id.is_a? Float)
 	
 	child_order = row[headers["Child Order"]] ? row[headers["Child Order"]].to_i : 1

@@ -16,6 +16,8 @@ gem 'capistrano'
 
 # To use debugger (ruby-debug for Ruby 1.8.7+, ruby-debug19 for Ruby 1.9.2+)
 # gem 'ruby-debug'
+gem 'linecache19', :git => "git://github.com/mark-moseley/linecache"
+gem 'ruby-debug-base19x', "~>0.11.30.pre10"
 gem 'ruby-debug19', :require => 'ruby-debug'
 
 gem 'settingslogic'

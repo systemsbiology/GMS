@@ -20,16 +20,9 @@ require 'spec_helper'
 
 describe AssembliesController do
 
-  # This should return the minimal set of attributes required to create a valid
-  # Assembly. As you add validations to Assembly, be sure to
-  # update the return value of this method accordingly.
-  def valid_attributes
-    {}
-  end
-
   describe "GET index" do
     it "assigns all assemblies as @assemblies" do
-      assembly = Assembly.create! valid_attributes
+      assembly = create(:assembly)
       get :index
       assigns(:assemblies).should eq([assembly])
     end
@@ -37,7 +30,7 @@ describe AssembliesController do
 
   describe "GET show" do
     it "assigns the requested assembly as @assembly" do
-      assembly = Assembly.create! valid_attributes
+      assembly = create(:assembly)
       get :show, :id => assembly.id.to_s
       assigns(:assembly).should eq(assembly)
     end
@@ -52,7 +45,7 @@ describe AssembliesController do
 
   describe "GET edit" do
     it "assigns the requested assembly as @assembly" do
-      assembly = Assembly.create! valid_attributes
+      assembly = create(:assembly)
       get :edit, :id => assembly.id.to_s
       assigns(:assembly).should eq(assembly)
     end
@@ -62,12 +55,12 @@ describe AssembliesController do
     describe "with valid params" do
       it "creates a new Assembly" do
         expect {
-          post :create, :assembly => valid_attributes
+          post :create, :assembly => build(:assembly).attributes
         }.to change(Assembly, :count).by(1)
       end
 
       it "assigns a newly created assembly as @assembly" do
-        post :create, :assembly => valid_attributes
+        post :create, :assembly => build(:assembly).attributes
         assigns(:assembly).should be_a(Assembly)
         assigns(:assembly).should be_persisted
       end
@@ -98,7 +91,7 @@ describe AssembliesController do
   describe "PUT update" do
     describe "with valid params" do
       it "updates the requested assembly" do
-        assembly = Assembly.create! valid_attributes
+        assembly = create(:assembly)
         # Assuming there are no other assemblies in the database, this
         # specifies that the Assembly created on the previous line
         # receives the :update_attributes message with whatever params are
@@ -108,21 +101,21 @@ describe AssembliesController do
       end
 
       it "assigns the requested assembly as @assembly" do
-        assembly = Assembly.create! valid_attributes
-        put :update, :id => assembly.id, :assembly => valid_attributes
+        assembly = create(:assembly)
+        put :update, :id => assembly.id, :assembly => build(:assembly).attributes
         assigns(:assembly).should eq(assembly)
       end
 
       it "redirects to the assembly" do
-        assembly = Assembly.create! valid_attributes
-        put :update, :id => assembly.id, :assembly => valid_attributes
+        assembly = create(:assembly)
+        put :update, :id => assembly.id, :assembly => build(:assembly).attributes
         response.should redirect_to(assembly)
       end
     end
 
     describe "with invalid params" do
       it "assigns the assembly as @assembly" do
-        assembly = Assembly.create! valid_attributes
+        assembly = create(:assembly)
         # Trigger the behavior that occurs when invalid params are submitted
         Assembly.any_instance.stub(:save).and_return(false)
         put :update, :id => assembly.id.to_s, :assembly => {}
@@ -130,7 +123,7 @@ describe AssembliesController do
       end
 
       it "re-renders the 'edit' template" do
-        assembly = Assembly.create! valid_attributes
+        assembly = create(:assembly)
         # Trigger the behavior that occurs when invalid params are submitted
         Assembly.any_instance.stub(:save).and_return(false)
         put :update, :id => assembly.id.to_s, :assembly => {}
@@ -141,14 +134,14 @@ describe AssembliesController do
 
   describe "DELETE destroy" do
     it "destroys the requested assembly" do
-      assembly = Assembly.create! valid_attributes
+      assembly = create(:assembly)
       expect {
         delete :destroy, :id => assembly.id.to_s
       }.to change(Assembly, :count).by(-1)
     end
 
     it "redirects to the assemblies list" do
-      assembly = Assembly.create! valid_attributes
+      assembly = create(:assembly)
       delete :destroy, :id => assembly.id.to_s
       response.should redirect_to(assemblies_url)
     end

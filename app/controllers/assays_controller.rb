@@ -23,7 +23,7 @@ class AssaysController < ApplicationController
         }
       end
     end
-    puts "assays are #{@assays.inspect}"
+
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @assays }
