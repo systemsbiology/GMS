@@ -10,6 +10,7 @@ set :environment, "production"
 set :whenever_environment, defer { environment }
 set :whenever_identifier, defer { "#{application}_#{environment}" }
 set :rail_env, "production"
+set :rvm_bin_path, "/u5/tools/rvm/bin"
 set :rvm_ruby_string, ENV['GEM_HOME'].gsub(/.*\//,"")
 set :rvm_install_ruby_params, '--1.9'
 set :rvm_install_pkgs, %w[libyaml openssl]
