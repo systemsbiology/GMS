@@ -16,7 +16,6 @@ set :rvm_ruby_string, ENV['GEM_HOME'].gsub(/.*\//,"")
 set :rvm_install_ruby_params, '--1.9'
 set :rvm_install_pkgs, %w[libyaml openssl]
 set :rvm_install_ruby_params, '--with-opt-dir=/u5/tools/rvm/usr'
-set :rvm_type, 'ruby-1.9.3-p392'
 
 before 'deploy:setup', 'rvm:install_rvm'
 before 'deploy:setup', 'rvm:install_pkgs'
