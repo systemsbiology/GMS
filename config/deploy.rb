@@ -14,25 +14,26 @@ set :rvm_bin_path, "/u5/tools/rvm/bin"
 set :rvm_scripts_path, "/u5/tools/rvm/bin"
 set :rvm_path, "/u5/tools/rvm"
 #set :rvm_ruby_string, ENV['GEM_HOME'].gsub(/.*\//,"")  # set up which gemset you're using
-set :rvm_ruby_string, "global"
-set :rvm_install_ruby_params, '--1.9'
-set :rvm_install_pkgs, %w[libyaml openssl]
-set :rvm_install_ruby_params, '--with-opt-dir=/u5/tools/rvm/usr'
+#set :rvm_ruby_string, "ruby-1.9.3-p392@global"
+#set :rvm_install_ruby_params, '--1.9'
+#set :rvm_install_pkgs, %w[libyaml openssl]
+#set :rvm_install_ruby_params, '--with-opt-dir=/u5/tools/rvm/usr'
 
 #before 'deploy', 'rvm:install_rvm'
 #before 'deploy', 'rvm:install_pkgs'
 #before 'deploy', 'rvm:install_ruby'
 #before 'deploy', 'rvm:create_gemset'
 #before 'deploy', 'rvm:import_gemset'
-require 'rvm/capistrano'
+#require 'rvm/capistrano'
+require 'bundler/capistrano'
 
 require 'whenever/capistrano'
 set :default_environment, {
-  'PATH' => "/u5/tools/rvm/gems/ruby-1.9.3-p392/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts:/bin/:/tools/bin:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",
-  'RUBY_VERSION' => 'ruby-1.9.3-p392',
-  'GEM_HOME' => '/u5/tools/rvm/gems/ruby-1.9.3-p392',
-  'GEM_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p392',
-  'BUNDLE_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p392'
+  'PATH' => "/u5/tools/rvm/gems/ruby-1.9.3-p392@global/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts:/bin/:/tools/bin:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",
+  'RUBY_VERSION' => 'ruby-1.9.3-p392@global',
+  'GEM_HOME' => '/u5/tools/rvm/gems/ruby-1.9.3-p392@global',
+  'GEM_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p392@global',
+  'BUNDLE_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p392@global'
 }
 
 #set :scm, :subversion
