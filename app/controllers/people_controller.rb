@@ -93,15 +93,15 @@ class PeopleController < ApplicationController
       if @person.save
         # moved into an after_save callback 2012/02/07
         #isb_person_id = "isb_ind_#{@person.id}"
-	#@person.isb_person_id = isb_person_id
-	#@person.save
+        #@person.isb_person_id = isb_person_id
+        #@person.save
 
-#	# create memberships
-#	membership = Membership.new
-#	# this should be params[:pedigree][:id] because that's what the create form passes in
-#	membership.pedigree_id = params[:pedigree][:id]
-#        membership.person_id = @person.id
-#	membership.save
+#        # create memberships
+#        membership = Membership.new
+#        # this should be params[:pedigree][:id] because that's what the create form passes in
+#        membership.pedigree_id = params[:pedigree][:id]
+#            membership.person_id = @person.id
+#        membership.save
 
         format.html { redirect_to(@person, :notice => 'Person was successfully created.') }
         format.xml  { render :xml => @person, :status => :created, :location => @person }
@@ -255,23 +255,29 @@ class PeopleController < ApplicationController
     # person needs to be written first
     rc = write_temp_object(@trans_id, "person",@people) unless @people.nil? or @people.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
+#    logger.debug("rc for people #{@people.inspect} is #{rc.inspect}")
 
     # sample must be written next
     rc = write_temp_object(@trans_id, "sample",@samples) unless @samples.nil? or @samples.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
+#    logger.debug("rc for samples #{@samples.inspect} is #{rc.inspect}")
 
     # rest are arbitrary
     rc = write_temp_object(@trans_id, "membership",@memberships) unless @memberships.nil? or @memberships.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
+#    logger.debug("rc for memberships #{@memberships.inspect} is #{rc.inspect}")
 
     rc = write_temp_object(@trans_id, "acquisition",@acquisitions) unless @acquisitions.nil? or @acquisitions.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
+#    logger.debug("rc for acquisitions #{@acquisitions.inspect} is #{rc.inspect}")
 
     rc = write_temp_object(@trans_id, "diagnosis",@diagnoses) unless @diagnoses.nil? or @diagnoses.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
+#    logger.debug("rc for diagnosis #{@diagnoses.inspect} is #{rc.inspect}")
 
     rc = write_temp_object(@trans_id, "relationship",@relationships) unless @relationships.nil? or @relationships.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
+#    logger.debug("rc for relationship #{@relationships.inspect} is #{rc.inspect}")
 
     respond_to do |format|
       format.html #upload_and_validate.html.erb
@@ -312,13 +318,14 @@ class PeopleController < ApplicationController
     @errors = Array.new
     person_temp_object = TempObject.find_by_trans_id_and_object_type(trans_id, "Person")
     if (person_temp_object.nil?) then
-      logger.error("No temp objects found to enter in database for transaction id #{trans_id}")
+      #logger.error("No temp objects found to enter in database for transaction id #{trans_id}")
       # don't need to return here because this prevents the processing of pedigrees that already
       # have person information entered in the database
     else
       # process the person objects
       begin
         #logger.debug("person_temp_object #{person_temp_object.inspect}")
+        #logger.debug("person_temp_object object #{person_temp_object.object.inspect}")
         person_obj_array = Marshal.load(person_temp_object.object)
         #logger.debug("person_obj_array #{person_obj_array.inspect}")
       rescue ArgumentError => error
@@ -331,13 +338,14 @@ class PeopleController < ApplicationController
       end
 
       person_obj_array.each do |person_obj|
-        logger.debug("person obj is #{person_obj.inspect}")
+        #logger.debug("person obj is #{person_obj.inspect}")
+        #logger.debug("person_obj is a #{person_obj.class.inspect}")
+        #logger.debug("person_obj is a #{person_obj.pedigree_id.class.inspect}")
+
         begin
           if person_obj.valid? then
-            puts "is valid!"
             person_obj.save!
           else
-            puts "isn't valid"
             @errors.push(["#{person_temp_object.object_type}",person_obj, person_obj.errors])
           end
         rescue NoMethodError => error
@@ -370,156 +378,156 @@ class PeopleController < ApplicationController
         end
       end
       obj_array.each do |obj|
-	if obj.class == Array then
-	  if temp_obj.object_type == "Relationship" then
-  	    # this is to deal with Relationship objects because we create a straight array
-	    # for them because we don't know the person.id for the person if it hasn't
-  	    # been created already...
-	    #logger.debug("temp_obj is #{temp_obj.inspect}")
-	    pedigree_id = obj[0]
-	    person_collaborator_id = obj[1]
-	    relation_collaborator_id = obj[2]
-	    rel_name = obj[3]
-	    rel_order = obj[4]
+    if obj.class == Array then
+      if temp_obj.object_type == "Relationship" then
+          # this is to deal with Relationship objects because we create a straight array
+        # for them because we don't know the person.id for the person if it hasn't
+          # been created already...
+        #logger.debug("temp_obj is #{temp_obj.inspect}")
+        pedigree_id = obj[0]
+        person_collaborator_id = obj[1]
+        relation_collaborator_id = obj[2]
+        rel_name = obj[3]
+        rel_order = obj[4]
 
-	    rel = Relationship.new
-	    person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(person_collaborator_id)
-	    if person.nil? then
-	      rel.errors.add(:person_id, "not found for #{person_collaborator_id} in pedigree #{pedigree_id}")
-	      @errors.push(["relationship", rel, rel.errors])
-	      next
-	    end
-	    relation = Person.has_pedigree(pedigree_id).find_by_collaborator_id(relation_collaborator_id)
-	    if relation.nil? then 
-	      rel.errors.add(:person_id, "not found for #{relation_collaborator_id}")
-	      @errors.push(["relationship", rel, rel.errors])
-	      next
-	    end
-	    rel.person = person
-	    rel.relation = relation
+        rel = Relationship.new
+        person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(person_collaborator_id)
+        if person.nil? then
+          rel.errors.add(:person_id, "not found for #{person_collaborator_id} in pedigree #{pedigree_id}")
+          @errors.push(["relationship", rel, rel.errors])
+          next
+        end
+        relation = Person.has_pedigree(pedigree_id).find_by_collaborator_id(relation_collaborator_id)
+        if relation.nil? then 
+          rel.errors.add(:person_id, "not found for #{relation_collaborator_id}")
+          @errors.push(["relationship", rel, rel.errors])
+          next
+        end
+        rel.person = person
+        rel.relation = relation
 
-	    # rel_name is 'undirected' for spouses but lookup_relationship_type requires 'husband' or 'wife'
-	    # so we need to correct it to the proper name depending on the gender of the person
-	    if rel_name == 'undirected' then
+        # rel_name is 'undirected' for spouses but lookup_relationship_type requires 'husband' or 'wife'
+        # so we need to correct it to the proper name depending on the gender of the person
+        if rel_name == 'undirected' then
               if person.gender == "male" then
-	        rel_name = "husband"
+            rel_name = "husband"
               elsif person.gender == "female" then
-	        rel_name = "wife"
-	      else
-	        rel.errors.add(:person, 'gender not specified correctly')
-		@errors.push(["relationship", rel, rel.errors])
-		next
+            rel_name = "wife"
+          else
+            rel.errors.add(:person, 'gender not specified correctly')
+        @errors.push(["relationship", rel, rel.errors])
+        next
               end
-	    end
+        end
 
-	    if rel_name == 'monozygotic twin' then
-	      rel_name = 'monozygotic twin'
-	    end
+        if rel_name == 'monozygotic twin' then
+          rel_name = 'monozygotic twin'
+        end
 
-	    if rel_name == 'dizygotic twin' then
-	      rel_name = 'dizygotic twin'
-	    end
+        if rel_name == 'dizygotic twin' then
+          rel_name = 'dizygotic twin'
+        end
 
-	    rel.name = rel_name
-	    rel.relationship_type = rel.lookup_relationship_type(rel_name)
-	    #logger.debug("relationship type is #{rel.relationship_type} for #{rel.inspect} for person #{person.inspect} and relation #{relation.inspect}")
-	    rel.relation_order = rel_order unless rel_order.nil?
-	    begin
-	      if rel.valid? then
-	        rel.save
+        rel.name = rel_name
+        rel.relationship_type = rel.lookup_relationship_type(rel_name)
+        #logger.debug("relationship type is #{rel.relationship_type} for #{rel.inspect} for person #{person.inspect} and relation #{relation.inspect}")
+        rel.relation_order = rel_order unless rel_order.nil?
+        begin
+          if rel.valid? then
+            rel.save
 
-	        recip = Relationship.new
-	        recip.person = relation
-	        recip.relation = person
-	        recip.name = rel.reverse_name
-	        recip.relationship_type = recip.lookup_relationship_type(rel.reverse_name)
-	        recip.relation_order = rel_order unless rel_order.nil?
-		begin
-	          if recip.valid? then
-	            recip.save
+            recip = Relationship.new
+            recip.person = relation
+            recip.relation = person
+            recip.name = rel.reverse_name
+            recip.relationship_type = recip.lookup_relationship_type(rel.reverse_name)
+            recip.relation_order = rel_order unless rel_order.nil?
+        begin
+              if recip.valid? then
+                recip.save
                   else
-	            @errors.push(["relationship",recip, recip.errors])
-	          end
-		rescue Exception => e
-	          # we don't want to display RecordNotUnique errors to the user here
-	          unless e.class == ActiveRecord::RecordNotUnique then
-		    recip.errors.add(:relationship,e.message)
-	            @errors.push(["relationship",recip, recip.errors])
-		  end
-	        end
-	      else
-	        @errors.push(["relationship",rel, rel.errors])
+                @errors.push(["relationship",recip, recip.errors])
               end
-	    rescue Exception => e
-	      # we don't want to display RecordNotUnique errors to the user here
-	      unless e.class == ActiveRecord::RecordNotUnique then
-	        rel.errors.add(:relationship,e.message)
-	        @errors.push(["relationship",rel, rel.errors])
-	      end
-	    end 
-	  elsif temp_obj.object_type == "Membership" then
-	    ped = Pedigree.find(obj[0])
-	    #logger.debug("processing membership information for pedigree #{ped.inspect}")
-	    person = Person.find_by_collaborator_id_and_pedigree_id(obj[1], obj[0])
-  	    m = Membership.new
-	    if person.nil? then
-	      m.errors.add(:person_id,"not found for #{obj[1]} in pedigree #{obj[0]}")
-	      @errors.push(["membership",m, m.errors])
-	    else
-	      m.person_id = person.id
-	      m.pedigree_id = ped.id
-	      if m.valid? then
-	        m.save
-	      else
-	        @errors.push(["membership", m, m.errors])
-	      end
-	    end
-	  elsif temp_obj.object_type == "Acquisition" then
-	    pedigree_id = obj[0]
-	    person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(obj[1])
-	    sample = Sample.find_by_sample_vendor_id_and_pedigree_id(obj[2], obj[0])
-  	    acq = Acquisition.new
-	    if person.nil? then
-	      acq.errors.add(:person_id,"not found for #{obj[0]}")
-	      @errors.push(["acquisition",acq, acq.errors])
-	    elsif sample.nil? then
-	      acq.errors.add(:sample_id,"not found for #{obj[0]} person #{obj[1]} and sample #{obj[2]}")
-	      @errors.push(["acquisition",acq, acq.errors])
-	    else
-	      acq.person_id = person.id
-	      acq.sample_id = sample.id
-	      if acq.valid? then
-	        acq.save
-	      else
-	        @errors.push(["acquisition", acq, acq.errors])
-	      end
-	    end
-	  elsif temp_obj.object_type == "Diagnosis" then 
-	    disease = Disease.find(obj[0])
-	    pedigree_id = obj[1]
-	    person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(obj[2])
+        rescue Exception => e
+              # we don't want to display RecordNotUnique errors to the user here
+              unless e.class == ActiveRecord::RecordNotUnique then
+            recip.errors.add(:relationship,e.message)
+                @errors.push(["relationship",recip, recip.errors])
+          end
+            end
+          else
+            @errors.push(["relationship",rel, rel.errors])
+              end
+        rescue Exception => e
+          # we don't want to display RecordNotUnique errors to the user here
+          unless e.class == ActiveRecord::RecordNotUnique then
+            rel.errors.add(:relationship,e.message)
+            @errors.push(["relationship",rel, rel.errors])
+          end
+        end 
+      elsif temp_obj.object_type == "Membership" then
+        ped = Pedigree.find(obj[0])
+        #logger.debug("processing membership information for pedigree #{ped.inspect}")
+        person = Person.find_by_collaborator_id_and_pedigree_id(obj[1], obj[0])
+          m = Membership.new
+        if person.nil? then
+          m.errors.add(:person_id,"not found for #{obj[1]} in pedigree #{obj[0]}")
+          @errors.push(["membership",m, m.errors])
+        else
+          m.person_id = person.id
+          m.pedigree_id = ped.id
+          if m.valid? then
+            m.save
+          else
+            @errors.push(["membership", m, m.errors])
+          end
+        end
+      elsif temp_obj.object_type == "Acquisition" then
+        pedigree_id = obj[0]
+        person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(obj[1])
+        sample = Sample.find_by_sample_vendor_id_and_pedigree_id(obj[2], obj[0])
+          acq = Acquisition.new
+        if person.nil? then
+          acq.errors.add(:person_id,"not found for #{obj[0]}")
+          @errors.push(["acquisition",acq, acq.errors])
+        elsif sample.nil? then
+          acq.errors.add(:sample_id,"not found for #{obj[0]} person #{obj[1]} and sample #{obj[2]}")
+          @errors.push(["acquisition",acq, acq.errors])
+        else
+          acq.person_id = person.id
+          acq.sample_id = sample.id
+          if acq.valid? then
+            acq.save
+          else
+            @errors.push(["acquisition", acq, acq.errors])
+          end
+        end
+      elsif temp_obj.object_type == "Diagnosis" then 
+        disease = Disease.find(obj[0])
+        pedigree_id = obj[1]
+        person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(obj[2])
             diagnosis = Diagnosis.new
-	    if person.nil? then
-	      diagnosis.errors.add(:person_id,"not found for disease #{obj[0]} pedigree #{pedigree_id} collaborator_id #{obj[2]}")
-	      @errors.push(["diagnosis",diagnosis, diagnosis.errors])
-	    else
-  	      diagnosis.person_id = person.id
-	      diagnosis.disease_id = disease.id
-	      if diagnosis.valid? then
-	        diagnosis.save
-	      else
-	        @errors.push(["diagnosis",diagnosis, diagnosis.errors])
-	      end
-	    end
-	  end
-	else
-	  if obj.valid? then
-	  #logger.debug("saving object #{obj.inspect}")
-	    obj.save
-	  else
-	    @errors.push(["#{temp_obj.object_type}",obj, obj.errors])
-	  end
-	end # end if obj.class = array
+        if person.nil? then
+          diagnosis.errors.add(:person_id,"not found for disease #{obj[0]} pedigree #{pedigree_id} collaborator_id #{obj[2]}")
+          @errors.push(["diagnosis",diagnosis, diagnosis.errors])
+        else
+            diagnosis.person_id = person.id
+          diagnosis.disease_id = disease.id
+          if diagnosis.valid? then
+            diagnosis.save
+          else
+            @errors.push(["diagnosis",diagnosis, diagnosis.errors])
+          end
+        end
+      end
+    else
+      if obj.valid? then
+      #logger.debug("saving object #{obj.inspect}")
+        obj.save
+      else
+        @errors.push(["#{temp_obj.object_type}",obj, obj.errors])
+      end
+    end # end if obj.class = array
       end # end obj_array.each do
 
       # need to delete the temp_object now that we've added it
@@ -528,7 +536,7 @@ class PeopleController < ApplicationController
       rescue Exception => exc
         temp_obj.errors.add(:object_type, "could not be destroyed")
         @errors.push(["temp_object", temp_obj.errors])
-	logger.error("temp_object #{temp_obj.inspect} could not be destroyed!!  #{exc.message}")
+    logger.error("temp_object #{temp_obj.inspect} could not be destroyed!!  #{exc.message}")
       end
 
     end # end temp_objects.each do
@@ -584,10 +592,10 @@ class PeopleController < ApplicationController
       if row[0] == "Sequencing Sample ID" then
         # check all of the headers exist
         headers.each do |col, index|
-	  if row[index] != col then
+      if row[index] != col then
             flash[:error] = "Spreadsheet provided has an incorrect column.  <b>\"#{row[index]}\"</b> in column number #{index} should be <b>\"#{col}\"</b>.  Please check the format of your spreadsheet."
-	    render :action => "upload" and return(0)
-	  end
+        render :action => "upload" and return(0)
+      end
         end
 
         flag = 1
@@ -596,200 +604,200 @@ class PeopleController < ApplicationController
 
       if flag == 1 then
         counter+=1
-	if row[2].nil? and ! row[3].nil? then
-		p = Person.new
-		p.errors.add(:customer_sample_id, "cannot be blank.")
-	          errors["#{counter}"] = Hash.new
-        	  errors["#{counter}"]["person"] = p.errors
-	          printable_row = Array.new
-        	  row.each do |cell|
-	            if cell.class == Spreadsheet::Formula then
-        	      printable_row << cell.value
-	            else 
-        	      printable_row << cell
-	            end
-        	  end
-	          errors["#{counter}"]["row"] = "<table><tr><td>"+printable_row.join("</td><td>")+"</tr></table>"
-	end
+        if row[2].nil? and ! row[3].nil? then
+            p = Person.new
+            p.errors.add(:customer_sample_id, "cannot be blank.")
+            errors["#{counter}"] = Hash.new
+            errors["#{counter}"]["person"] = p.errors
+            printable_row = Array.new
+            row.each do |cell|
+                if cell.class == Spreadsheet::Formula then
+                    printable_row << cell.value
+                else 
+                    printable_row << cell
+                end
+            end
+            errors["#{counter}"]["row"] = "<table><tr><td>"+printable_row.join("</td><td>")+"</tr></table>"
+        end
         next if row[2].nil? # skip empty rows at end of list
         next if row[0] == "A"  # skip header column list
-	if row[headers["Customer Subject ID"]].nil? then
-	  flash[:error] = "Spreadsheet provided is not of the proper type.  Can't find Customer Subject ID column."
+        if row[headers["Customer Subject ID"]].nil? then
+          flash[:error] = "Spreadsheet provided is not of the proper type.  Can't find Customer Subject ID column."
           render :action => "upload" and return(0)
-	end
-	if row[headers["Customer Sample ID"]].nil? then
-	  flash[:error] = "Spreadsheet provided is not a FGG Manifest.  Can't find the Customer Sample ID column."
-	  render :action => "upload" and return(0)
-	end
+        end
+        if row[headers["Customer Sample ID"]].nil? then
+          flash[:error] = "Spreadsheet provided is not a FGG Manifest.  Can't find the Customer Sample ID column."
+          render :action => "upload" and return(0)
+        end
         next if row[headers["Customer Subject ID"]] == "NA19240" # skip example row
 
         # create the person information 
-	# need to check both customer_subject_id and customer_sample_id in case they're
-	# trying to switch which one is which in the database... /facepalm
-	customer_subject_id = row[headers["Customer Subject ID"]]
-	if (customer_subject_id.is_a? Float) then 
-	  customer_subject_id = customer_subject_id.to_i
-	end
+        # need to check both customer_subject_id and customer_sample_id in case they're
+        # trying to switch which one is which in the database... /facepalm
+        customer_subject_id = row[headers["Customer Subject ID"]]
+        if (customer_subject_id.is_a? Float) then 
+          customer_subject_id = customer_subject_id.to_i
+        end
 
-  	customer_sample_id = row[headers["Customer Sample ID"]]
+        customer_sample_id = row[headers["Customer Sample ID"]]
 
         p = Person.has_pedigree(pedigree.id).find_by_collaborator_id(customer_subject_id) 
-	if (p.nil?) then
-	  p = Person.has_pedigree(pedigree.id).find_by_collaborator_id(customer_sample_id)
-	end
-	p = Person.new if p.nil?
+        if (p.nil?) then
+            p = Person.has_pedigree(pedigree.id).find_by_collaborator_id(customer_sample_id)
+        end
+        p = Person.new if p.nil?
         p.collaborator_id = customer_subject_id
-	if row[headers["Gender"]].nil? then
-	  p.errors.add(:gender, "Must provide a gender for person #{customer_sample_id}")
-	else
-          p.gender = row[headers["Gender"]].downcase  # downcase it to make sure Female and FEMALE and female are the same...
-	  if p.gender != "male" and p.gender != "female" and p.gender != "unknown" then
-	    p.errors.add(:gender,"invalid selection #{row[headers["Gender"]]}")
-          end
-	end
+        if row[headers["Gender"]].nil? then
+            p.errors.add(:gender, "Must provide a gender for person #{customer_sample_id}")
+        else
+            p.gender = row[headers["Gender"]].downcase  # downcase it to make sure Female and FEMALE and female are the same...
+            if p.gender != "male" and p.gender != "female" and p.gender != "unknown" then
+                p.errors.add(:gender,"invalid selection #{row[headers["Gender"]]}")
+            end
+        end
         p.comments = row[headers["Comments"]]
         p.pedigree_id = pedigree.id
 
-    if !disease.nil? and !disease.empty? then
-      # add diagnosis for this person if affected 
-      affected_status = row[headers["Affected Status"]]
-  	  if affected_status.nil? then
-	    diag = Diagnosis.new
-	    diag.errors.add(:disease_id, "could not be set.  No value for Affected Status found in upload spreadsheet.")
-	    errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
-	    errors["#{counter}"]["affected_status"] = diag.errors
-	  else
-	    affected_status.downcase!
-	    # other statuses are unaffected and unknown but those aren't handled right now...
-	    # don't really have a way to indicate in the database that the person is known unaffected versus unknown
-        if affected_status == "affected" then
-	      diagnoses.push([disease.id, pedigree.id, p.collaborator_id])
-	    elsif affected_status == "unknown" or affected_status == "unaffected" then
-	      # do nothing - these are valid statuses but not stored in db
-	    else
-	      errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
-	      tp = Person.new
-	      tp.errors.add(:affected_status, "value provided not recognized - '#{affected_status}'. Should be 'affected' in order to set status correctly.")
-	      errors["#{counter}"]["affected_status"] = tp.errors
-        end
-	  end
-    end
-
-    # queue up the relationship information so that we can add it later after confirmation
-    mother_id = row[headers["Mother's Subject ID"]]
-	mother_id = mother_id.to_i if (mother_id.is_a? Float)
-    father_id = row[headers["Father's Subject ID"]]
-	father_id = father_id.to_i if (father_id.is_a? Float)
-	
-	child_order = row[headers["Child Order"]] ? row[headers["Child Order"]].to_i : 1
-	r = Relationship.new
-	if mother_id == father_id then
-	  unless mother_id.nil? or mother_id.to_s.match('NA') or mother_id.to_s.empty? then
-            relationships.push([pedigree.id, mother_id, customer_subject_id, 'mother', child_order])
-	    r.errors.add(:parent_id, "Father ID '#{father_id}' and mother ID '#{mother_id}' are the same.  Only entering one relationship.")
-	  end
-	else
-	  unless mother_id.nil? or mother_id.to_s.match('NA') or mother_id.to_s.empty? then
-            relationships.push([pedigree.id, mother_id, customer_subject_id, 'mother', child_order])
-	  end
-	  unless father_id.nil? or father_id.to_s.match('NA') or father_id.to_s.empty? then
-            relationships.push([pedigree.id, father_id, customer_subject_id, 'father', child_order]) 
-	  end
+        if !disease.nil? and !disease.empty? then
+            # add diagnosis for this person if affected 
+            affected_status = row[headers["Affected Status"]]
+            if affected_status.nil? then
+                diag = Diagnosis.new
+                diag.errors.add(:disease_id, "could not be set.  No value for Affected Status found in upload spreadsheet.")
+                errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
+                errors["#{counter}"]["affected_status"] = diag.errors
+            else
+                affected_status.downcase!
+                # other statuses are unaffected and unknown but those aren't handled right now...
+                # don't really have a way to indicate in the database that the person is known unaffected versus unknown
+                if affected_status == "affected" then
+                    diagnoses.push([disease.id, pedigree.id, p.collaborator_id])
+                elsif affected_status == "unknown" or affected_status == "unaffected" then
+                    # do nothing - these are valid statuses but not stored in db
+                else
+                    errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
+                    tp = Person.new
+                    tp.errors.add(:affected_status, "value provided not recognized - '#{affected_status}'. Should be 'affected' in order to set status correctly.")
+                    errors["#{counter}"]["affected_status"] = tp.errors
+                end
+            end
         end
 
-	mz_twin_id = row[headers["Monozygotic Twin Subject ID"]]
-	mz_twin_id = mz_twin_id.to_i if (mz_twin_id.is_a? Float)
-	if (!mz_twin_id.nil? and !mz_twin_id.empty? and !mz_twin_id.to_s.match('NA')) then
-          relationships.push([pedigree.id, customer_subject_id, mz_twin_id, 'monozygotic twin','1'])
+        # queue up the relationship information so that we can add it later after confirmation
+        mother_id = row[headers["Mother's Subject ID"]]
+        mother_id = mother_id.to_i if (mother_id.is_a? Float)
+        father_id = row[headers["Father's Subject ID"]]
+        father_id = father_id.to_i if (father_id.is_a? Float)
+    
+        child_order = row[headers["Child Order"]] ? row[headers["Child Order"]].to_i : 1
+        r = Relationship.new
+        if mother_id == father_id then
+            unless mother_id.nil? or mother_id.to_s.match('NA') or mother_id.to_s.empty? then
+                relationships.push([pedigree.id, mother_id, customer_subject_id, 'mother', child_order])
+                r.errors.add(:parent_id, "Father ID '#{father_id}' and mother ID '#{mother_id}' are the same.  Only entering one relationship.")
+            end
+        else
+            unless mother_id.nil? or mother_id.to_s.match('NA') or mother_id.to_s.empty? then
+                relationships.push([pedigree.id, mother_id, customer_subject_id, 'mother', child_order])
+            end
+            unless father_id.nil? or father_id.to_s.match('NA') or father_id.to_s.empty? then
+                relationships.push([pedigree.id, father_id, customer_subject_id, 'father', child_order]) 
+            end
         end
 
-	spouse_id =  row[headers["Spouse Subject ID"]]
-	spouse_id = spouse_id.to_i if (spouse_id.is_a? Float)
-	if !spouse_id.nil? and !spouse_id.to_s.match('NA') then
-  	  spouse_order = row[headers["Spouse Order"]]
-	  spouse_order = spouse_order.to_i if (spouse_order.is_a? Float)
-  	  spouse_order = 1 if (spouse_order.nil? or spouse_order.to_s.match('NA'))
-          #this person has a spouse and they are the X spouse that they've had
-	  relationships.push([pedigree.id, customer_subject_id, spouse_id, 'undirected', spouse_order])
+        mz_twin_id = row[headers["Monozygotic Twin Subject ID"]]
+        mz_twin_id = mz_twin_id.to_i if (mz_twin_id.is_a? Float)
+        if (!mz_twin_id.nil? and !mz_twin_id.empty? and !mz_twin_id.to_s.match('NA')) then
+            relationships.push([pedigree.id, customer_subject_id, mz_twin_id, 'monozygotic twin','1'])
+        end
 
-          if r.errors.size > 0 then 
-	    errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
-	    errors["#{counter}"]["relationships"] = r.errors
-	  end
+        spouse_id =  row[headers["Spouse Subject ID"]]
+        spouse_id = spouse_id.to_i if (spouse_id.is_a? Float)
+        if !spouse_id.nil? and !spouse_id.to_s.match('NA') then
+            spouse_order = row[headers["Spouse Order"]]
+            spouse_order = spouse_order.to_i if (spouse_order.is_a? Float)
+            spouse_order = 1 if (spouse_order.nil? or spouse_order.to_s.match('NA'))
+            #this person has a spouse and they are the X spouse that they've had
+            relationships.push([pedigree.id, customer_subject_id, spouse_id, 'undirected', spouse_order])
+
+            if r.errors.size > 0 then 
+                errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
+                errors["#{counter}"]["relationships"] = r.errors
+            end
         end
 
         vendor_id = row[headers["Sequencing Sample ID"]]
         if !vendor_id.nil? then  
-          # create the sample information
-	  s = Sample.find(:first, :conditions => {:sample_vendor_id => vendor_id, :pedigree_id =>pedigree.id}) || Sample.new
-          source = row[headers["Sample Source"]]
-          s.customer_sample_id = customer_sample_id # don't check for duplicates, just add it and they can change it later
+            # create the sample information
+            s = Sample.find(:first, :conditions => {:sample_vendor_id => vendor_id, :pedigree_id =>pedigree.id}) || Sample.new
+            source = row[headers["Sample Source"]]
+            s.customer_sample_id = customer_sample_id # don't check for duplicates, just add it and they can change it later
 
-          sample_type = SampleType.find_by_name(source)
-          if sample_type.nil? then
-            s.errors.add(:sample_type_id, "Cannot find sample_type for #{source} for sample for person #{p.collaborator_id}.  Add this as a sample type before importing this spreadsheet")
-            errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
-            errors["#{counter}"]["sample"] = s.errors
-	    next
-          end
-          s.sample_type_id = sample_type.id
+            sample_type = SampleType.find_by_name(source)
+            if sample_type.nil? then
+                s.errors.add(:sample_type_id, "Cannot find sample_type for #{source} for sample for person #{p.collaborator_id}.  Add this as a sample type before importing this spreadsheet")
+                errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
+                errors["#{counter}"]["sample"] = s.errors
+                next
+            end
+            s.sample_type_id = sample_type.id
 
-	  # need to add sample tumor processing here TODO
+            # need to add sample tumor processing here TODO
 
-          if (!vendor_id.match("-DNA_") and vendor_id.match("GS")) then
-            plate_id,plate_well = vendor_id.split(/_/,2)
-            vendor_id = plate_id+"-DNA_"+plate_well
-          end
-          vendor_id = vendor_id
-          s.sample_vendor_id = vendor_id
-	  s.pedigree_id = pedigree.id
+            if (!vendor_id.match("-DNA_") and vendor_id.match("GS")) then
+                plate_id,plate_well = vendor_id.split(/_/,2)
+                vendor_id = plate_id+"-DNA_"+plate_well
+            end
+            vendor_id = vendor_id
+            s.sample_vendor_id = vendor_id
+            s.pedigree_id = pedigree.id
 
-	  acquisitions.push([pedigree.id, customer_subject_id, vendor_id])
+            acquisitions.push([pedigree.id, customer_subject_id, vendor_id])
  
-	  # handle volume, concentration, quantity
-          volume = row[headers["Volume"]]
-	  concentration = row[headers["Concentration"]]
-	  quantity = row[headers["Quantity"]]
-	  s.volume = volume unless volume.nil? or volume.blank?
-	  s.concentration = concentration unless concentration.nil? or concentration.blank?
-	  s.quantity = quantity unless quantity.nil? or quantity.blank?
+            # handle volume, concentration, quantity
+            volume = row[headers["Volume"]]
+            concentration = row[headers["Concentration"]]
+            quantity = row[headers["Quantity"]]
+            s.volume = volume unless volume.nil? or volume.blank?
+            s.concentration = concentration unless concentration.nil? or concentration.blank?
+            s.quantity = quantity unless quantity.nil? or quantity.blank?
 
-	  # handle sample status
-          status = row[headers["Sample Status"]]
-	  if status.nil? or status.blank? then
-            s.status = 'submitted'
-	  else 
-	    s.status = status
-	  end
+            # handle sample status
+            status = row[headers["Sample Status"]]
+            if status.nil? or status.blank? then
+                s.status = 'submitted'
+            else 
+                s.status = status
+            end
 
-          if s.valid?
-            samples << s
-	    p.planning_on_sequencing = 1
-          else
-            errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
-            errors["#{counter}"]["sample"] = s.errors
-          end
-	else
-	    p.planning_on_sequencing = 0
+            if s.valid?
+                samples << s
+                p.planning_on_sequencing = 1
+            else
+                errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
+                errors["#{counter}"]["sample"] = s.errors
+            end
+        else
+            p.planning_on_sequencing = 0
         end # end if !vendor_id.nil?
 
         if p.valid?
           people << p
         else
-          errors["#{counter}"] = Hash.new
-          errors["#{counter}"]["person"] = p.errors
-          printable_row = Array.new
-          row.each do |cell|
-            if cell.class == Spreadsheet::Formula then
-              printable_row << cell.value
-            else 
-              printable_row << cell
+            errors["#{counter}"] = Hash.new
+            errors["#{counter}"]["person"] = p.errors
+            printable_row = Array.new
+            row.each do |cell|
+                if cell.class == Spreadsheet::Formula then
+                    printable_row << cell.value
+                else 
+                    printable_row << cell
+                end
             end
-          end
-          errors["#{counter}"]["row"] = "<table><tr><td>"+printable_row.join("</td><td>")+"</tr></table>"
+            errors["#{counter}"]["row"] = "<table><tr><td>"+printable_row.join("</td><td>")+"</tr></table>"
         end
 
-	# queue up membership information /sigh
+        #   queue up membership information /sigh
         memberships.push([pedigree.id, p.collaborator_id])
 
       end # end if flag
@@ -802,7 +810,12 @@ class PeopleController < ApplicationController
       render :action => "upload" and return(0)
     end
 
-    #logger.debug("relationships is #{relationships}")
+    #logger.debug("people are #{people.inspect}")
+    #logger.debug("samples are #{samples.inspect}")
+    #logger.debug("relationships is #{relationships.inspect}")
+    #logger.debug("memberships are #{memberships.inspect}")
+    #logger.debug("acquisitions are #{acquisitions.inspect}")
+    #logger.debug("errors are #{errors.inspect}")
 
     return 1, people, samples, relationships, memberships, diagnoses, acquisitions, errors
   end # end process fgi manifest definition
