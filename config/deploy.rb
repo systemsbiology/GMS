@@ -11,10 +11,10 @@ set :whenever_environment, defer { environment }
 set :whenever_identifier, defer { "#{application}_#{environment}" }
 set :rail_env, "production"
 
-#set :rvm_bin_path, "/u5/tools/rvm/bin"
-#set :rvm_scripts_path, "/u5/tools/rvm/bin"
-#set :rvm_path, "/u5/tools/rvm"
-#set :rake, "bundle exec rake"
+set :rvm_bin_path, "/u5/tools/rvm/bin"
+set :rvm_scripts_path, "/u5/tools/rvm/bin"
+set :rvm_path, "/u5/tools/rvm"
+set :rake, "bundle exec rake"
 #set :rvm_ruby_string, ENV['GEM_HOME'].gsub(/.*\//,"")  # set up which gemset you're using
 #set :rvm_ruby_string, "ruby-1.9.3-p392@global"
 #set :rvm_install_ruby_params, '--1.9'
@@ -26,14 +26,11 @@ set :rail_env, "production"
 #before 'deploy', 'rvm:install_ruby'
 #before 'deploy', 'rvm:create_gemset'
 #before 'deploy', 'rvm:import_gemset'
-#require 'rvm/capistrano'
 set :bundle_gemfile, "Gemfile"
 set :bundle_dir, fetch(:shared_path)+"/bundle"
 set :bundle_flags, "--deployment"
 
-require 'bundler/capistrano'
-before 'bundle:install', "bundle:list"
-require 'whenever/capistrano'
+#before 'bundle:install', "bundle:list"
 set :default_environment, {
   'PATH' => "/u5/tools/rvm/gems/ruby-1.9.3-p392@global/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts:/bin/:/tools/bin:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",
   'RUBY_VERSION' => 'ruby-1.9.3-p392@global',
@@ -244,5 +241,10 @@ end
 # end
 #
 after 'deploy:update_code', 'deploy:symlink_db'
-#after "deploy:update_code", "rvm:trust_rvmrc"
 after 'deploy:update_code', 'deploy:run_all_exports'
+
+require 'rvm/capistrano'
+require 'bundler/capistrano'
+require 'whenever/capistrano'
+
+#after "deploy:update_code", "rvm:trust_rvmrc"
