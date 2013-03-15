@@ -1,7 +1,7 @@
 source 'http://rubygems.org'
 
 gem 'rails'
-gem 'rake', '10.0.3'
+gem 'rake'
 gem 'builder'
 
 # Bundle edge Rails instead:
@@ -48,11 +48,11 @@ gem 'ancestry'
 gem 'madeline', '~> 0.1.10'
 
 gem 'rubyzip'
-gem 'auto_strip_attributes', "~> 1.0"
+gem 'auto_strip_attributes'#, "~> 1.0"
 gem 'json_builder'
 
 # create cron jobs to clean the temporary objects from the database
-gem 'whenever', '~>0.8.2'
+gem 'whenever'
 
 # testing
 group :test do

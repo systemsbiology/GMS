@@ -25,6 +25,10 @@ set :rvm_path, "/u5/tools/rvm"
 #before 'deploy', 'rvm:create_gemset'
 #before 'deploy', 'rvm:import_gemset'
 #require 'rvm/capistrano'
+set :bundle_gemfile, "Gemfile"
+set :bundle_dir, fetch(:shared_path)+"/bundle"
+set :bundle_flags, "--deployment"
+
 require 'bundler/capistrano'
 before 'bundle:install', "bundle:list"
 require 'whenever/capistrano'
