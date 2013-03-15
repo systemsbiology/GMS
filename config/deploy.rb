@@ -11,9 +11,9 @@ set :whenever_environment, defer { environment }
 set :whenever_identifier, defer { "#{application}_#{environment}" }
 set :rail_env, "production"
 
-set :rvm_bin_path, "/u5/tools/rvm/bin"
-set :rvm_scripts_path, "/u5/tools/rvm/bin"
-set :rvm_path, "/u5/tools/rvm"
+#set :rvm_bin_path, "/u5/tools/rvm/bin"
+#set :rvm_scripts_path, "/u5/tools/rvm/bin"
+#set :rvm_path, "/u5/tools/rvm"
 #set :rake, "bundle exec rake"
 #set :rvm_ruby_string, ENV['GEM_HOME'].gsub(/.*\//,"")  # set up which gemset you're using
 #set :rvm_ruby_string, "ruby-1.9.3-p392@global"
@@ -234,15 +234,15 @@ end
 
  end # end data
 
- namespace :rvm do
-   desc 'Trust rvmrc file'
-   task :trust_rvmrc do
-     puts "current release is #{current_release} release_path is #{release_path}"
-     run "rvm rvmrc trust #{current_release}"
-     run "rvm rvmrc trust #{release_path}"
-   end
- end
-
+# namespace :rvm do
+#   desc 'Trust rvmrc file'
+#   task :trust_rvmrc do
+#     puts "current release is #{current_release} release_path is #{release_path}"
+#     run "rvm rvmrc trust #{current_release}"
+#     run "rvm rvmrc trust #{release_path}"
+#   end
+# end
+#
 after 'deploy:update_code', 'deploy:symlink_db'
-after "deploy:update_code", "rvm:trust_rvmrc"
+#after "deploy:update_code", "rvm:trust_rvmrc"
 after 'deploy:update_code', 'deploy:run_all_exports'
