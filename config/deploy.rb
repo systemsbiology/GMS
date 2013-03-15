@@ -24,9 +24,9 @@ set :rvm_path, "/u5/tools/rvm"
 #before 'deploy', 'rvm:install_ruby'
 #before 'deploy', 'rvm:create_gemset'
 #before 'deploy', 'rvm:import_gemset'
-#require 'rvm/capistrano'
+require 'rvm/capistrano'
 require 'bundler/capistrano'
-
+before 'bundle:install', "bundle:list"
 require 'whenever/capistrano'
 set :default_environment, {
   'PATH' => "/u5/tools/rvm/gems/ruby-1.9.3-p392@global/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts:/bin/:/tools/bin:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",
@@ -48,6 +48,13 @@ server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
 
 # if you're still using the script/reaper helper you will need
 # these http://github.com/rails/irs_process_scripts
+
+namespace :bundle do
+  desc "list gems"
+  task :list do 
+    run "cd #{deploy_to}/current && bundle list"
+  end
+end
 
 # If you are using Passenger mod_rails uncomment this:
  namespace :deploy do

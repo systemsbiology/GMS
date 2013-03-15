@@ -1,7 +1,7 @@
 source 'http://rubygems.org'
 
 gem 'rails'
-gem 'rake'
+gem 'rake', '10.0.3'
 gem 'builder'
 
 # Bundle edge Rails instead:
