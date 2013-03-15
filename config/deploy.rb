@@ -24,7 +24,7 @@ set :rvm_path, "/u5/tools/rvm"
 #before 'deploy', 'rvm:install_ruby'
 #before 'deploy', 'rvm:create_gemset'
 #before 'deploy', 'rvm:import_gemset'
-require 'rvm/capistrano'
+#require 'rvm/capistrano'
 require 'bundler/capistrano'
 before 'bundle:install', "bundle:list"
 require 'whenever/capistrano'
@@ -52,7 +52,7 @@ server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
 namespace :bundle do
   desc "list gems"
   task :list do 
-    run "cd #{deploy_to}/current && bundle list"
+    run "cd #{deploy_to}/current && bundle list --verbose"
   end
 end
 
