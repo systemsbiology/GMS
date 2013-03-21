@@ -20,13 +20,6 @@ require 'spec_helper'
 
 describe AcquisitionsController do
 
-  # This should return the minimal set of attributes required to create a valid
-  # Acquisition. As you add validations to Acquisition, be sure to
-  # update the return value of this method accordingly.
-  def valid_attributes
-    {}
-  end
-
   describe "associations" do
      subject { build(:acquisition) }
 

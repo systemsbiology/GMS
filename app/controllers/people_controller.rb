@@ -658,7 +658,7 @@ class PeopleController < ApplicationController
         p.comments = row[headers["Comments"]]
         p.pedigree_id = pedigree.id
 
-        if !disease.nil? and !disease.empty? then
+        if !disease.nil? and !disease.blank? then
             # add diagnosis for this person if affected 
             affected_status = row[headers["Affected Status"]]
             if affected_status.nil? then

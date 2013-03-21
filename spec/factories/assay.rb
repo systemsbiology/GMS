@@ -4,5 +4,6 @@ FactoryGirl.define do
     a.assay_type "1"
     a.technology "CGI Standard"
     a.vendor "Complete Genomics"
+    sample
   end
 end

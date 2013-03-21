@@ -146,8 +146,8 @@ class Assembly < ActiveRecord::Base
   end
 
   def add_assembly_files(files=self.check_add_assembly_files)
-    #print "self at front of adda_ssembly_files #{self.inspect} #{self.location}\n\n"
-    #print "self sample #{self.assay.sample.inspect}\n\n"
+    logger.debug "self at front of adda_ssembly_files #{self.inspect} #{self.location}\n\n"
+    logger.debug "self sample #{self.assay.sample.inspect}\n\n"
     if files.size == 0 then
       logger.error("add_assembly_files didn't get any results from check_add_assembly_files")
       return []
@@ -156,8 +156,8 @@ class Assembly < ActiveRecord::Base
     files.each do |file_path, file_hash|
       file_type = file_hash["type"]
       file_vendor = file_hash["vendor"]
-#      puts "file type is #{file_type} and path is #{file_path}"
-#      puts FileType.find_by_type_name(file_type).id
+      logger.debug "file type is #{file_type} and path is #{file_path}"
+      logger.debug FileType.find_by_type_name(file_type)
       file_type_id = FileType.find_by_type_name(file_type).id
       # header returns the top of the file, use variables in environment.rb to 
       # figure out what the names of the fields are that we're looking for
@@ -177,7 +177,7 @@ class Assembly < ActiveRecord::Base
 	software_version = "UNKNOWN"
       end
 
-       puts "file #{file_path} file_vendor #{file_vendor} file_type_id #{file_type_id} check #{check} software #{software} software_version #{software_version}\n"
+       logger.debug "file #{file_path} file_vendor #{file_vendor} file_type_id #{file_type_id} check #{check} software #{software} software_version #{software_version}\n"
 
       if check == 0 then
         logger.error("skipping file #{file_path} because it contains incorrect values for this filetype")

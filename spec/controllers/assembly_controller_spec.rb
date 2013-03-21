@@ -66,7 +66,7 @@ describe AssembliesController do
       end
 
       it "redirects to the created assembly" do
-        post :create, :assembly => valid_attributes
+        post :create, :assembly => build(:assembly).attributes 
         response.should redirect_to(Assembly.last)
       end
     end

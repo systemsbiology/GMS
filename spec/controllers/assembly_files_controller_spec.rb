@@ -20,13 +20,6 @@ require 'spec_helper'
 
 describe AssemblyFilesController do
 
-  # This should return the minimal set of attributes required to create a valid
-  # AssemblyFile. As you add validations to AssemblyFile, be sure to
-  # update the return value of this method accordingly.
-  def valid_attributes
-    {}
-  end
-
   # This should return the minimal set of values that should be in the session
   # in order to pass any filters (e.g. authentication) defined in
   # AssemblyFilesController. Be sure to keep this updated too.
@@ -50,7 +43,7 @@ describe AssemblyFilesController do
 
   describe "GET show" do
     it "assigns the requested assembly_file as @assembly_file" do
-      assembly_file = AssemblyFile.create! valid_attributes
+      assembly_file = create(:assembly_file)
       get :show, {:id => assembly_file.to_param}, valid_session
       assigns(:assembly_file).should eq(assembly_file)
     end
@@ -65,7 +58,7 @@ describe AssemblyFilesController do
 
   describe "GET edit" do
     it "assigns the requested assembly_file as @assembly_file" do
-      assembly_file = AssemblyFile.create! valid_attributes
+      assembly_file = create(:assembly_file)
       get :edit, {:id => assembly_file.to_param}, valid_session
       assigns(:assembly_file).should eq(assembly_file)
     end
@@ -75,18 +68,18 @@ describe AssemblyFilesController do
     describe "with valid params" do
       it "creates a new AssemblyFile" do
         expect {
-          post :create, {:assembly_file => valid_attributes}, valid_session
+          post :create, {:assembly_file => build(:assembly_file).attributes }, valid_session
         }.to change(AssemblyFile, :count).by(1)
       end
 
       it "assigns a newly created assembly_file as @assembly_file" do
-        post :create, {:assembly_file => valid_attributes}, valid_session
+        post :create, {:assembly_file => build(:assembly_file).attributes}, valid_session
         assigns(:assembly_file).should be_a(AssemblyFile)
         assigns(:assembly_file).should be_persisted
       end
 
       it "redirects to the created assembly_file" do
-        post :create, {:assembly_file => valid_attributes}, valid_session
+        post :create, {:assembly_file => build(:assembly_file).attributes}, valid_session
         response.should redirect_to(AssemblyFile.last)
       end
     end
@@ -111,7 +104,7 @@ describe AssemblyFilesController do
   describe "PUT update" do
     describe "with valid params" do
       it "updates the requested assembly_file" do
-        assembly_file = AssemblyFile.create! valid_attributes
+        assembly_file = create(:assembly_file)
         # Assuming there are no other assembly_files in the database, this
         # specifies that the AssemblyFile created on the previous line
         # receives the :update_attributes message with whatever params are
@@ -121,21 +114,21 @@ describe AssemblyFilesController do
       end
 
       it "assigns the requested assembly_file as @assembly_file" do
-        assembly_file = AssemblyFile.create! valid_attributes
-        put :update, {:id => assembly_file.to_param, :assembly_file => valid_attributes}, valid_session
+        assembly_file = create(:assembly_file)
+        put :update, {:id => assembly_file.to_param, :assembly_file => build(:assembly_file).attributes}, valid_session
         assigns(:assembly_file).should eq(assembly_file)
       end
 
       it "redirects to the assembly_file" do
-        assembly_file = AssemblyFile.create! valid_attributes
-        put :update, {:id => assembly_file.to_param, :assembly_file => valid_attributes}, valid_session
+        assembly_file = create(:assembly_file)
+        put :update, {:id => assembly_file.to_param, :assembly_file => build(:assembly_file).attributes}, valid_session
         response.should redirect_to(assembly_file)
       end
     end
 
     describe "with invalid params" do
       it "assigns the assembly_file as @assembly_file" do
-        assembly_file = AssemblyFile.create! valid_attributes
+        assembly_file = create(:assembly_file)
         # Trigger the behavior that occurs when invalid params are submitted
         AssemblyFile.any_instance.stub(:save).and_return(false)
         put :update, {:id => assembly_file.to_param, :assembly_file => {}}, valid_session
@@ -143,7 +136,7 @@ describe AssemblyFilesController do
       end
 
       it "re-renders the 'edit' template" do
-        assembly_file = AssemblyFile.create! valid_attributes
+        assembly_file = create(:assembly_file)
         # Trigger the behavior that occurs when invalid params are submitted
         AssemblyFile.any_instance.stub(:save).and_return(false)
         put :update, {:id => assembly_file.to_param, :assembly_file => {}}, valid_session
@@ -154,14 +147,14 @@ describe AssemblyFilesController do
 
   describe "DELETE destroy" do
     it "destroys the requested assembly_file" do
-      assembly_file = AssemblyFile.create! valid_attributes
+      assembly_file = create(:assembly_file)
       expect {
         delete :destroy, {:id => assembly_file.to_param}, valid_session
       }.to change(AssemblyFile, :count).by(-1)
     end
 
     it "redirects to the assembly_files list" do
-      assembly_file = AssemblyFile.create! valid_attributes
+      assembly_file = create(:assembly_file)
       delete :destroy, {:id => assembly_file.to_param}, valid_session
       response.should redirect_to(assembly_files_url)
     end

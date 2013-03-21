@@ -12,7 +12,7 @@ FactoryGirl.define do
     af.software "cgatools"
     af.software_version "1.1.1.10"
     af.file_date "2011-12-20"
+    var_annotation
     assembly
-    file_type
   end
 end
