@@ -152,10 +152,11 @@ class PeopleController < ApplicationController
   # DELETE /people/1.xml
   def destroy
     @person = Person.find(params[:id])
+    pedigree = @person.pedigree
     @person.destroy
 
     respond_to do |format|
-      format.html { redirect_to(people_url) }
+      format.html { redirect_to(pedigree_url(pedigree)) }
       format.xml  { head :ok }
     end
   end

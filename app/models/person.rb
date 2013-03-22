@@ -20,6 +20,7 @@ class Person < ActiveRecord::Base
   has_many :samples, :through => :acquisitions, :dependent => :destroy
   has_many :diagnoses, :dependent => :destroy
   has_many :diseases, :through => :diagnoses
+  has_many :reciprocal_relationships, :class_name => "Relationship", :foreign_key => "relation_id", :dependent => :destroy
 
   auto_strip_attributes :collaborator_id
   validates_presence_of :collaborator_id, :gender
@@ -28,7 +29,7 @@ class Person < ActiveRecord::Base
   validates :collaborator_id,
     :presence => { 
 	:message => "You may not use anything other than strings in the collaborator_id.  Add an alias if this person has multiple collaborator ids"} ,
-	:format   => { :with => /^[a-zA-Z\d\s\-\_]*$/ }
+	:format   => { :with => /^[a-zA-Z\d\s\-\_\.]*$/ }
 
   attr_accessible :collaborator_id, :gender, :dob, :dod, :deceased, :planning_on_sequencing, :complete, :root, :comments, :pedigree_id
 
@@ -206,6 +207,7 @@ class Person < ActiveRecord::Base
   end
 
   def destroy_relationships
+
     self.parents.each do |parent|
       parent.destroy
     end
