@@ -146,6 +146,7 @@ def pedfile(pedigree_id)
             assay_info["assay_desc"] = assay.description
 	    assay_info["assay_status"] = assay.status
 	    assay_info["assay_updated"] = assay.updated_at
+            assay_info["assay_media_id"] = assay.media_id
 	    assay_info["assemblies"] = Array.new
 
 	    assay.assemblies.each do |assembly|
