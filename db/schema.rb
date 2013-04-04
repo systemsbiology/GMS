@@ -196,7 +196,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
     t.datetime "updated_at"
     t.datetime "genotype_vector_date"
     t.datetime "quartet_date"
-    t.datetime "auotzygosity_date"
+    t.datetime "autozygosity_date"
     t.datetime "relation_pairing_date"
   end
 
@@ -223,7 +223,6 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
 
   create_table "person_aliases", :force => true do |t|
     t.integer  "person_id"
-    t.string   "name"
     t.string   "value"
     t.string   "alias_type"
     t.datetime "created_at"
@@ -235,6 +234,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
   create_table "phenotypes", :force => true do |t|
     t.integer  "disease_id"
     t.string   "name"
+    t.string   "tag"
     t.string   "phenotype_type"
     t.text     "description"
     t.datetime "created_at"
@@ -321,7 +321,7 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
   create_table "temp_objects", :force => true do |t|
     t.integer   "trans_id"
     t.string    "object_type"
-    t.text      "object"
+    t.binary    "object"
     t.timestamp "added",       :null => false
     t.datetime  "created_at"
     t.datetime  "updated_at"
