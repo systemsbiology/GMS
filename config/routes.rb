@@ -1,5 +1,7 @@
 Gms::Application.routes.draw do
   resources :assembly_files
+    get 'ped_info', :on => :collection
+  end
 
   root :to => 'welcome#index'
   resources :file_types
