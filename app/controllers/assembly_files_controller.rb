@@ -116,7 +116,6 @@ class AssemblyFilesController < ApplicationController
     end
 
     respond_to do |format|
-      format.html
       format.xml {head :ok}
       format.json { render :json => ped_info }
     end
