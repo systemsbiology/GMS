@@ -1,7 +1,18 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# Examples:
-#
-#   cities = City.create([{ :name => 'Chicago' }, { :name => 'Copenhagen' }])
-#   Mayor.create(:name => 'Daley', :city => cities.first)
+SampleType.create("description"=>nil, "name"=>"saliva", "tissue"=>nil)
+SampleType.create("description"=>nil, "name"=>"blood", "tissue"=>nil)
+SampleType.create("description"=>nil, "name"=>"skin", "tissue"=>nil)
+SampleType.create("description"=>nil, "name"=>"cell line", "tissue"=>nil)
+SampleType.create("description"=>nil, "name"=>"lymphoblasts", "tissue"=>nil)
+SampleType.create("description"=>nil, "name"=>"tissue", "tissue"=>nil)
+SampleType.create("description"=>nil, "name"=>"tumor", "tissue"=>nil)
+SampleType.create("description"=>nil, "name"=>"unknown", "tissue"=>nil)
+FileType.create("type_name"=>"VAR-ANNOTATION")
+FileType.create("type_name"=>"GENE-ANNOTATION")
+FileType.create("type_name"=>"GENE-VAR-SUMMARY-REPORT")
+FileType.create("type_name"=>"NCRNA-ANNOTATION")
+FileType.create("type_name"=>"CNV-SEGMENTS")
+FileType.create("type_name"=>"JUNCTIONS")
+FileType.create("type_name"=>"SUMMARY")
+FileType.create("type_name"=>"VCF-SNP-ANNOTATION")
+FileType.create("type_name"=>"VCF-INDEL-ANNOTATION")
+FileType.create("type_name"=>"SVEVENTS")
