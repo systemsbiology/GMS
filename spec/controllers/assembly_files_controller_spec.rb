@@ -20,18 +20,12 @@ require 'spec_helper'
 
 describe AssemblyFilesController do
 
-  # This should return the minimal set of values that should be in the session
-  # in order to pass any filters (e.g. authentication) defined in
-  # AssemblyFilesController. Be sure to keep this updated too.
-  def valid_session
-    {}
-  end
-
-  @assembly_file = FactoryGirl.build(:assembly_file)
-  puts "assembly file is #{assembly_file.inspect}"
-  
-  describe "belong to assembly" do
-    it { shoulder belong_to(:assembly) }
+  describe "associations" do
+    subject { build(:assembly_file) }
+    
+    it { should belong_to(:assay) }
+    it { should belong_to(:genome_reference) }
+    it { should belong_to(:file_type) }
   end
 
   describe "GET index" do

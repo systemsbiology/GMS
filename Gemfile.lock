@@ -74,6 +74,7 @@ GEM
     factory_girl_rails (4.2.1)
       factory_girl (~> 4.2.0)
       railties (>= 3.0.0)
+    fakefs (0.4.2)
     formtastic (2.2.1)
       actionpack (>= 3.0)
     github-markdown (0.5.3)
@@ -257,6 +258,7 @@ DEPENDENCIES
   event-calendar
   factory_girl
   factory_girl_rails
+  fakefs
   formtastic
   gollum
   jquery-rails

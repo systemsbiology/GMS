@@ -4,7 +4,7 @@ namespace :export do
   ## SAMPLES
   #########################################################################################################
 
-  desc "Export all pedigrees to a single tab delimited file"
+  desc "Export all samples to a single tab delimited file"
   task :export_all_samples => :environment do
     all_output = Array.new
     all_output.push(["Pedigree ID","Pedigree Tag","ISB Person ID","ISB Collaborator ID","Person Gender","Person Samples", "Person Vendor Sample IDs", "Sample Types"].join("\t"))
@@ -260,6 +260,67 @@ namespace :export do
     end
     return af_output
   end
+
+  #########################################################################################################
+  ## ASSEMBLY FILES WITH STATUS
+  #########################################################################################################
+  desc "Export assembly file information for each pedigree"
+  task :export_assembly_files_status, [:pedigree_id] => :environment do |t, args|
+    pedigree_id = args[:pedigree_id]
+    raise "No pedigree id provided" unless pedigree_id
+    output = Array.new
+      output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Affected","ISB Sample ID","ISB Sample Vendor ID","Sample Type","ISB Assay ID", "Assay Name", "ISB Assembly ID","Assembly Name","ISB Assembly File ID","Assembly File Type","Assembly File Location","Date of Assembly File"].join("\t"))
+    output = output+ assembly_files_by_status_pedigree(pedigree_id)
+    filename = "gms_export_assembly_file_status_pedigree_#{pedigree_id}.txt"
+    create_file(output, filename)
+  end
+
+  desc "Export a combined file with assembly file information for each pedigree"
+  task :export_all_assembly_files_status => :environment do
+    output = Array.new
+      output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Affected","ISB Sample ID","ISB Sample Vendor ID","Sample Type","ISB Assay ID", "Assay Name", "ISB Assembly ID","Assembly Name","ISB Assembly File ID","Assembly File Type","Assembly File Location","Date of Assembly File"].join("\t"))
+    Pedigree.all.each do |ped|
+      output = output+ assembly_files_by_status_pedigree(ped.id)
+    end
+    filename = "gms_export_assembly_file_status_pedigrees.txt"
+    create_file(output, filename)
+  end
+
+  desc "Export individual pedigree assembly file information, process all pedigrees"
+  task :export_individual_assembly_files_status => :environment do
+    Pedigree.all.each do |ped|
+      output = Array.new
+      output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Affected","ISB Sample ID","ISB Sample Vendor ID","Sample Type","ISB Assay ID", "Assay Name", "ISB Assembly ID","Assembly Name","ISB Assembly File ID","Assembly File Type","Assembly File Location","Date of Assembly File"].join("\t"))
+      output = output+ assembly_files_by_status_pedigree(ped.id)
+      filename = "gms_export_assembly_file_status_pedigree_#{ped.id}.txt"
+      create_file(output, filename)
+    end
+  end
+
+ 
+  def assembly_files_by_status_pedigree(ped_id)
+    raise "No pedigree id provided to assembly_files_by_status_pedigree" unless ped_id
+    ped = Pedigree.find(ped_id)
+    af_output = Array.new
+    ped.people.each do |person|
+      person.samples.each do |sample|
+        next if sample.assays.nil?
+        affected = 'N'
+        affected = 'Y' if person.diseases.size > 0
+        sample.assays.each do |assay|
+	  assay.assemblies.each do |assembly|
+	    assembly.varfiles.each do |file|
+	      sample_type = sample.sample_type.nil? ? 'unknown' : sample.sample_type.name 
+	      output = [ped.study.tag, ped.isb_pedigree_id, ped.tag, person.isb_person_id, person.collaborator_id, person.gender, affected, sample.isb_sample_id, sample.sample_vendor_id, sample_type, "isb_asy_#{assay.id}", assay.name, "isb_asm_#{assembly.id}", assembly.name, "isb_asmfile_#{file.id}", file.file_type.type_name, file.location, file.file_date]
+	      af_output.push(output.join("\t"))
+	    end
+	  end
+	end
+      end
+    end
+    return af_output
+  end
+
 
 
   ##########################################################################################################

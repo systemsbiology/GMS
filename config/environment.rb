@@ -47,6 +47,7 @@ FILE_TYPES = {
 		'highConfidenceJunctions' => { 'type' => 'JUNCTIONS', 'vendor' => 'CGI' },
 		'summary-' 		  => { 'type' => 'SUMMARY', 'vendor' => 'CGI'},
 		'highConfidenceSvEvents'  => {'type' => 'SVEVENTS', 'vendor' => 'CGI' },
+        'masterVarBeta-'  => { 'type' => 'VAR-OLPL', 'vendor' => 'CGI'},
 		# VCF FILES
 		'.snp.filtered.vcf' 	  => { 'type' => 'VCF-SNP-ANNOTATION', 'vendor' => 'VCF' },
 		'.indel.vcf' 		  => { 'type' => 'VCF-INDEL-ANNOTATION', 'vendor' => 'VCF' },
