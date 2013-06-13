@@ -71,23 +71,23 @@ class Assembly < ActiveRecord::Base
   # look on disk for the assembly files specified in the config under PEDIGREE_ROOT
   def find_assembly_files
     start_dir = self.location
-    #logger.debug("checking in location #{start_dir}")
+    logger.debug("checking in location #{start_dir}")
     files = Hash.new
     if ! File.directory? start_dir then
       errors.add(:location, "Directory #{start_dir} does not exist on the system.")
       abort("Directory #{start_dir} does not exist on the system for #{self.inspect}")
     end
-    #logger.debug("start dir is #{start_dir}")
+    logger.debug("start dir is #{start_dir}")
     Find.find(start_dir) do |path|
       filename = File.basename(path).split("/").last
       FILE_TYPES.each { |filepart, filehash| 
-	type = filehash["type"]
-	vendor = filehash["vendor"]
+	    type = filehash["type"]
+	    vendor = filehash["vendor"]
         if filename.match(filepart) then 
-          #logger.debug( "filename is #{filename}")
+          logger.debug( "filename is #{filename}")
           files[type] = Hash.new
-	  files[type]["path"] = path
-	  files[type]["vendor"] = vendor
+	      files[type]["path"] = path
+	      files[type]["vendor"] = vendor
         end
       }
     end
@@ -373,5 +373,11 @@ class Assembly < ActiveRecord::Base
       return nil
     end
   end
+
+  # return an array.  Should only have one entry
+  def varfiles
+    return self.assembly_files.where(["file_type_id = ?", "1"])
+  end
+
 
 end

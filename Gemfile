@@ -61,6 +61,7 @@ group :test do
   gem 'rspec-rails'
   gem 'shoulda'
   gem 'shoulda-matchers'
+  gem 'fakefs', :require => "fakefs/safe"
 end
 
 # Bundle the extra gems:
