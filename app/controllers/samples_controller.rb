@@ -92,7 +92,7 @@ class SamplesController < ApplicationController
   # POST /samples.xml
   def create
     @sample = Sample.new(sample_params)
-
+    logger.debug("creating a new sample #{@sample.inspect}")
     if params[:check_dates] then
       if params[:check_dates][:add_date_submitted].to_i != 1 then
         @sample.date_submitted = nil
@@ -234,6 +234,6 @@ class SamplesController < ApplicationController
 
   private
   def sample_params
-    params.require(:sample).permit(:customer_sample_id, :sample_type_id, :status, :date_submitted, :protocol, :volume, :concentration, :quantity, :date_received, :description, :comments, :pedigree_id)
+    params.require(:sample).permit(:customer_sample_id, :sample_type_id, :status, :date_submitted, :protocol, :volume, :concentration, :quantity, :date_received, :description, :comments, :pedigree_id, :sample_vendor_id)
   end
 end

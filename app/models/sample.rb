@@ -14,7 +14,7 @@ class Sample < ActiveRecord::Base
   after_save :check_isb_sample_id, :trigger_person_sample_check
   after_commit :trigger_person_sample_check
 
-  attr_accessible :customer_sample_id, :sample_type_id, :status, :date_submitted, :protocol, :volume, :concentration, :quantity, :date_received, :description, :comments, :pedigree_id
+  attr_accessible :customer_sample_id, :sample_type_id, :status, :date_submitted, :protocol, :volume, :concentration, :quantity, :date_received, :description, :comments, :pedigree_id, :sample_vendor_id
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
