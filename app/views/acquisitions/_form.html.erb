@@ -1,17 +1,21 @@
 <%= form_for(@acquisition) do |f| %>
   <%= render "partials/error_messages", :target => @acquisition %>
 
-  <div class="field">
-    <%= f.label :id %><br />
-    <%= f.text_field :id %>
-  </div>
-  <div class="field">
-    <%= f.label :person_id %><br />
-    <%= f.text_field :person_id %>
-  </div>
+  <% if params[:pedigree_id] then %>
+    <% cur_pedigree_id = params[:pedigree_id] %>
+  <% else %>
+    <% cur_pedigree_id = @acquistion.nil? ? nil : @acquistiion.person.nil? ? nil : @acquistion.person.pedigree.nil? ? nil : @acquisition.person.pedigree.id %>
+  <% end %>
+  <% if params[:sample_id] then %>
+     <% cur_sample_id = params[:sample_id] %>
+  <% else %>
+     <% cur_sample_id = @acquisition.sample_id %>
+  <% end %>
+  <% @sample = @acquisition.sample %>
+  <%= render "partials/pedigree_person_select", :pedigrees => @pedigrees, :f => f %>
   <div class="field">
     <%= f.label :sample_id %><br />
-    <%= f.text_field :sample_id %>
+    <%= collection_select(:acquisition, :sample_id, Sample.all, :id, :identifier, options = {:include_blank => '-Select the sample that is associated with this person', :selected => cur_sample_id}) %>
   </div>
   <div class="field">
     <%= f.label :method %><br />

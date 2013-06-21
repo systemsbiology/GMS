@@ -10,40 +10,45 @@ namespace :ingenuity do
 
     ingenuity = Array.new
     begin
-      File.open(args[:file], "r") do |f|
+        File.open(args[:file], "r") do |f|
         while (line = f.gets)
-	  # columns should be Barcode (assembly id), Name (some pseudo random well number and pedigree number?),
-	  # description (roughly space delimited), subject id (GS0XXXX-DNA_XXX), Files (semicolon delmited)
-	  columns = line.split("\t")
-	  # easiest one to find in the system is going to be assembly
-	  assembly_id = columns[0]
-	  next if assembly_id.match("Barcode")
-#          puts "finding assembly #{assembly_id}"
-          asm = Assembly.find_by_name(assembly_id)
-	  asm = Assembly.find(:all, :conditions => ["name LIKE ?", "#{assembly_id}%"]) if asm.nil?
-	  raise "More than one assembly found with #{assembly_id}" if asm.instance_of?(Array) && asm.size > 1
-	  if asm.instance_of?(Array)
-	    asm = asm.first
-	  end
-	  if asm.nil? then
-	    # second best find is by name since most of the ones that are not found by barcode have a 
-	    # sample id in the name column
-	    sample = Sample.find_by_sample_vendor_id(columns[1])
-	    if sample.nil? then
-	      puts "Didn't find #{assembly_id}"
-	    else 
-#	      puts "found sample #{sample.inspect}"
-              # getting the last assembly should be proper since that should be the current one
-              asm = sample.assays.last.assemblies.last 
-#	      puts "found asm #{asm.inspect} for sample #{sample.inspect}"
-	      ingenuity.push(asm)
-	    end
-	  else
-#	    puts "found asm #{asm.inspect}"
-            ingenuity.push(asm)
-          end
+	        # columns should be Barcode (assembly id), Name (some pseudo random well number and pedigree number?),
+	        # description (roughly space delimited), subject id (GS0XXXX-DNA_XXX), Files (semicolon delmited)
+	        columns = line.split("\t")
+	        # easiest one to find in the system is going to be assembly
+	        assembly_id = columns[0]
+	        next if assembly_id.match("Barcode")
+            assembly_id.gsub!("_masterVar","")
+            if (!assembly_id.match("-ASM")) then
+                puts "adding ASM to end"
+                assembly_id = assembly_id+'-ASM'
+            end
+            puts "finding assembly #{assembly_id}"
+            asm = Assembly.find_by_name(assembly_id)
+	        asm = Assembly.find(:all, :conditions => ["name LIKE ?", "#{assembly_id}%"]) if asm.nil?
+	        raise "More than one assembly found with #{assembly_id}" if asm.instance_of?(Array) && asm.size > 1
+	        if asm.instance_of?(Array)
+	            asm = asm.first
+	        end
+	        if asm.nil? then
+	            # second best find is by name since most of the ones that are not found by barcode have a 
+	            # sample id in the name column
+	            sample = Sample.find_by_sample_vendor_id(columns[1])
+	            if sample.nil? then
+	                puts "Didn't find #{assembly_id} or #{columns[1]}"
+	            else 
+#	                puts "found sample #{sample.inspect}"
+                    # getting the last assembly should be proper since that should be the current one
+                    asm = sample.assays.last.assemblies.last 
+#	                puts "found asm #{asm.inspect} for sample #{sample.inspect}"
+	                ingenuity.push(asm)
+	            end
+	        else
+#	            puts "found asm #{asm.inspect}"
+                ingenuity.push(asm)
+            end
         end
-      end
+    end
     rescue => err
       puts "Exception: #{err}"
     end

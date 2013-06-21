@@ -7,12 +7,12 @@
 
 <p>
   <b>Person:</b>
-  <%= @acquisition.person_id %>
+  <%= @acquisition.person.full_identifier %>
 </p>
 
 <p>
   <b>Sample:</b>
-  <%= @acquisition.sample_id %>
+  <%= @acquisition.sample.identifier %>
 </p>
 
 <p>
@@ -20,6 +20,6 @@
   <%= @acquisition.method %>
 </p>
 
-
+<%= link_to 'Delete link between person and sample', @acquisition, :confirm => 'Are you sure?', :method => :delete %> | 
 <%= link_to 'Edit', edit_acquisition_path(@acquisition) %> |
-<%= link_to 'Back', acquisitions_path %>
+<%= link_to 'Back', :controller => 'samples', :action => "index", :problems => 1 %>

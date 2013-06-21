@@ -1,11 +1,17 @@
 class AcquisitionsController < ApplicationController
+  respond_to :json
 
   # GET /acquisitions
   # GET /acquisitions.xml
   def index
-    @acquisitions = Acquisition.all
     respond_to do |format|
-      format.html # index.html.erb
+      format.html {
+        @acquisitions = Acquisition.has_pedigree(params[:pedigree_filter]).find(:all, :include => { :person => :pedigree}, :order => ['pedigrees.tag'])
+                                   .paginate(:page => params[:page], :per_page => 100)
+      }
+      format.any {
+        @acquisitions = Acquisition.has_pedigree(params[:pedigree_filter])
+      }
       format.xml  { render :xml => @acquisitions }
     end
   end
@@ -25,6 +31,7 @@ class AcquisitionsController < ApplicationController
   # GET /acquisitions/new.xml
   def new
     @acquisition = Acquisition.new
+    @pedigrees = Pedigree.order("pedigrees.tag")
 
     respond_to do |format|
       format.html # new.html.erb
@@ -35,6 +42,7 @@ class AcquisitionsController < ApplicationController
   # GET /acquisitions/1/edit
   def edit
     @acquisition = Acquisition.find(params[:id])
+    @pedigrees = Pedigree.order("pedigrees.tag")
   end
 
   # POST /acquisitions
@@ -42,12 +50,17 @@ class AcquisitionsController < ApplicationController
   def create
     #@acquisition = Acquisition.new(params[:acquisition])
     @acquisition = Acquisition.new(acquisition_params)
+    if params[:person] and params[:person][:id]
+      @acquisition.person_id = params[:person][:id]
+    end
 
     respond_to do |format|
       if @acquisition.save
+        logger.debug("saving!")
         format.html { redirect_to(@acquisition, :notice => 'Acquisition was successfully created.') }
         format.xml  { render :xml => @acquisition, :status => :created, :location => @acquisition }
       else
+        logger.debug("Not saving! #{@acquisition.inspect}")
         format.html { render :action => "new" }
         format.xml  { render :xml => @acquisition.errors, :status => :unprocessable_entity }
       end

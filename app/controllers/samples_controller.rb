@@ -34,7 +34,8 @@ class SamplesController < ApplicationController
     elsif params[:person] then
       @samples = Sample.has_person(params[:person])
         .order_by_pedigree.paginate :page => params[:page], :per_page => 100
-      
+    elsif params[:problems] then
+      @samples = Sample.where( Acquisition.where( Acquisition.arel_table[:sample_id].eq(Sample.arel_table[:id]) ).exists.not ).paginate(:page => params[:page], :per_page => 10)
     else
       
       respond_to do |format|
