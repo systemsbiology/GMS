@@ -846,6 +846,6 @@ class PeopleController < ApplicationController
 
   private
   def person_params
-    params.require(:people).permit(:collaborator_id, :gender, :dob, :dod, :deceased, :planning_on_sequencing, :complete, :root, :comments, :pedigree_id)
+    params.require(:person).permit(:collaborator_id, :gender, :dob, :dod, :deceased, :planning_on_sequencing, :complete, :root, :comments, :pedigree_id)
   end
 end
