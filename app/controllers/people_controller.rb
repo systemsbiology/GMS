@@ -822,7 +822,7 @@ class PeopleController < ApplicationController
   end # end process fgi manifest definition
 
   def get_drop_down_people_by_pedigree
-    options = Person.find_all_by_pedigree_id(params[:pedigree_id]).collect { |per| "\"#{per.id}\" : \"#{per.full_identifier}\"" }
+    options = Person.has_pedigree(params[:pedigree_id]).collect { |per| "\"#{per.id}\" : \"#{per.full_identifier}\"" }
     render :text => "{#{options.join(",")}}"
   end
 

@@ -12,10 +12,10 @@
       var url = '/people/get_drop_down_people_by_pedigree';
       var request = $.ajax({
         data: { 'pedigree_id' : $(this).val() },
-    dataType: 'json',
-        type: 'GET',
-    url: url
-    });
+            dataType: 'json',
+            type: 'GET',
+            url: url
+      });
       request.complete(
       );
 
