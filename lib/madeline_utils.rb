@@ -43,6 +43,7 @@ def to_madeline(pedigree, people)
     results.push(cp)
   end # end people.each
 
+  logger.debug("results before childless marriages #{results.inspect}")
   childless_marriages = pedigree.find_childless_marriages # hash of person_id = person_id
   childless_marriages.each do |father_id, mother_id|
     father_ident = Person.find(father_id).madeline_identifier
@@ -108,7 +109,7 @@ def create_row(person, familyID, diseases, phenotypes, twin_letter, twin_count)
     if (person.deceased) then
       current_person.push('Y')
     else
-      if (!person.dod.nil? and person.dod < Time.now) then # if person died before today
+      if (!person.dod.nil? and person.dod < Time.now.to_date) then # if person died before today
         current_person.push('Y')
       else
         current_person.push('.')
@@ -126,7 +127,7 @@ def create_row(person, familyID, diseases, phenotypes, twin_letter, twin_count)
     # if we run into one person that is divorced multiple times then we'll need
     # to recode ordered_pedigree and this to go by relationships instead of by people
     if (person.divorced?) then
-      logger.debug("#{person.divorced?} is true? for person #{person.inspect}")
+      #logger.debug("#{person.divorced?} is true? for person #{person.inspect}")
       current_person.push('D')
     else
       current_person.push('.')

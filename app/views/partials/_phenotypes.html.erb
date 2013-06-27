@@ -13,7 +13,7 @@
   <tr>
     <td><%= link_to phenotype.name, phenotype %></td>
     <td><%= link_to(phenotype.disease.name,phenotype.disease) if phenotype.disease %></td>
-    <td><%= phenotype.description %></td>
+    <td><span style="white-space:pre"><%= word_wrap(phenotype.description,100) if phenotype.description %></span></td>
     <% if false %>
     <td><%= link_to 'Show', phenotype %></td>
     <td><%= link_to 'Edit', edit_phenotype_path(phenotype) %></td>

@@ -232,5 +232,5 @@
 <% end %>
 <br />
 
-<%= link_to "Add Relationship for current person #{@person.identifier}", new_relationship_path(:person => @person, :pedigree_filter => {:id => @person.pedigree}) %>
+<%= link_to "Add Relationship for current person #{@person.identifier}", new_relationship_path(:person_id => @person, :pedigree_filter => {:id => @person.pedigree}) %>
 <br /><br />

@@ -71,20 +71,21 @@ class Assembly < ActiveRecord::Base
   # look on disk for the assembly files specified in the config under PEDIGREE_ROOT
   def find_assembly_files
     start_dir = self.location
-    logger.debug("checking in location #{start_dir}")
+    #logger.debug("self is #{self.inspect}")
+    #logger.debug("checking in location #{start_dir}")
     files = Hash.new
     if ! File.directory? start_dir then
       errors.add(:location, "Directory #{start_dir} does not exist on the system.")
       abort("Directory #{start_dir} does not exist on the system for #{self.inspect}")
     end
-    logger.debug("start dir is #{start_dir}")
+    #logger.debug("start dir is #{start_dir}")
     Find.find(start_dir) do |path|
       filename = File.basename(path).split("/").last
       FILE_TYPES.each { |filepart, filehash| 
 	    type = filehash["type"]
 	    vendor = filehash["vendor"]
         if filename.match(filepart) then 
-          logger.debug( "filename is #{filename}")
+          #logger.debug( "filename is #{filename}")
           files[type] = Hash.new
 	      files[type]["path"] = path
 	      files[type]["vendor"] = vendor
@@ -146,8 +147,8 @@ class Assembly < ActiveRecord::Base
   end
 
   def add_assembly_files(files=self.check_add_assembly_files)
-    logger.debug "self at front of adda_ssembly_files #{self.inspect} #{self.location}\n\n"
-    logger.debug "self sample #{self.assay.sample.inspect}\n\n"
+    #logger.debug "self at front of adda_ssembly_files #{self.inspect} #{self.location}\n\n"
+    #logger.debug "self sample #{self.assay.sample.inspect}\n\n"
     if files.size == 0 then
       logger.error("add_assembly_files didn't get any results from check_add_assembly_files")
       return []
@@ -156,8 +157,8 @@ class Assembly < ActiveRecord::Base
     files.each do |file_path, file_hash|
       file_type = file_hash["type"]
       file_vendor = file_hash["vendor"]
-      logger.debug "file type is #{file_type} and path is #{file_path}"
-      logger.debug FileType.find_by_type_name(file_type)
+      #logger.debug "file type is #{file_type} and path is #{file_path} and file_vendor is #{file_vendor}"
+      #logger.debug FileType.find_by_type_name(file_type)
       file_type_id = FileType.find_by_type_name(file_type).id
       # header returns the top of the file, use variables in environment.rb to 
       # figure out what the names of the fields are that we're looking for
@@ -165,19 +166,19 @@ class Assembly < ActiveRecord::Base
       header = file_header(file_path, file_vendor)
       if file_vendor == "CGI" then
         check = check_cgi_header(header, file_type, file_path)
-	software = header[CGI_SOFTWARE_PROGRAM]
-	software_version = header[CGI_SOFTWARE_VERSION]
+	    software = header[CGI_SOFTWARE_PROGRAM]
+	    software_version = header[CGI_SOFTWARE_VERSION]
       elsif file_vendor == "VCF" then
         check = check_vcf_header(header, file_type, file_path)
-	if file_type == "VCF-INDEL-ANNOTATION" then
-	  software = header[VCF_SOURCE]
-	else
-	  software = "UnifiedGenotyper"
-	end
-	software_version = "UNKNOWN"
+	    if file_type == "VCF-INDEL-ANNOTATION" then
+	        software = header[VCF_SOURCE]
+	    else
+	        software = "UnifiedGenotyper"
+	    end
+	    software_version = "UNKNOWN"
       end
 
-       logger.debug "file #{file_path} file_vendor #{file_vendor} file_type_id #{file_type_id} check #{check} software #{software} software_version #{software_version}\n"
+       #logger.debug "file #{file_path} file_vendor #{file_vendor} file_type_id #{file_type_id} check #{check} software #{software} software_version #{software_version}\n"
 
       if check == 0 then
         logger.error("skipping file #{file_path} because it contains incorrect values for this filetype")
@@ -238,21 +239,26 @@ class Assembly < ActiveRecord::Base
 
       if file_vendor == "CGI" then
         check = check_cgi_header(header, file_type, file_path)
-	software = header[CGI_SOFTWARE_PROGRAM]
-	software_version = header[CGI_SOFTWARE_VERSION]
+	    software = header[CGI_SOFTWARE_PROGRAM]
+	    software_version = header[CGI_SOFTWARE_VERSION]
       elsif file_vendor == "VCF" then
         check = check_vcf_header(header, file_type, file_path)
-	if file_type == "VCF-INDEL-ANNOTATION" then
-	  software = header[VCF_SOURCE]
-	else
-	  software = "UnifiedGenotyper" # this is hardcoded for now to not need to parse an INFO field...
-	end
-	software_version = "UNKNOWN"
+	    if file_type == "VCF-INDEL-ANNOTATION" then
+	        software = header[VCF_SOURCE]
+	    else
+	        software = "UnifiedGenotyper" # this is hardcoded for now to not need to parse an INFO field...
+	    end
+	    software_version = "UNKNOWN"
       end
 
       if check == 0 then
         logger.error("skipping file #{file_path} because it contains incorrect values for this filetype")
 	asm_file_errors.push("#{file_path} cannot be added to assembly because it contains incorrect values for this filetype")
+        next
+      end
+      if software_version.nil? || software.nil? then
+        logger.error("skipping file #{file_path} because it did not set software or software_version")
+        asm_file_errors.push("#{file_path} cannot be added to assembly because it did not set software or software_version")
         next
       end
 

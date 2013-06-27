@@ -62,6 +62,9 @@ class PeopleController < ApplicationController
   # POST /people.xml
   def create
     @person = Person.new(person_params)
+    logger.debug("person_param #{person_params.inspect}")
+    logger.debug("params #{params.inspect}")
+
 
     if params[:gender] then
       if params[:gender] != 'unknown' then
@@ -88,7 +91,8 @@ class PeopleController < ApplicationController
       render :action => "new" and return
     end
     @person.pedigree = pedigree
-
+    @person.pedigree_id = params[:pedigree][:id]
+    logger.debug("person is #{@person.inspect}")
     respond_to do |format|
       if @person.save
         # moved into an after_save callback 2012/02/07

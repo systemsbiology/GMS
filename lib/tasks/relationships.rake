@@ -257,6 +257,7 @@ namespace :relationships do
   # currently this has to be run at least twice to get all of the missing
   # child relationships.  the first run gets the same sex parents and the
   # second run gets the opposite sex parents.  I could probably fix it, but why? ;)
+  # this does not find cases where there are no relationships at all
   def get_missing_offspring 
     puts "in missing_offspring"
     # get all of the parent relationships and add them to the hash
@@ -295,30 +296,30 @@ namespace :relationships do
     check_parent.each do |person, children|
       puts "person #{person} #{check_parent[person]}"
       children.each do |child, name|
-       puts "child #{child} #{check_parent[child]} name #{name}"
-        if check_child[child].nil? then
-	  puts "making child entry #{child}"
-	  add[child] = Hash.new
-	  add[child][person] = 'child'
-	else 
-          if check_parent[person][child] and check_child[child][person] then
-	     puts "found reciprocal relationships for #{person} and #{child}"
-  	  elsif check_parent[person][child] and check_child[child][person].nil? then
-            puts "missing child relationship between #{child} and #{person}"
-	    puts "add child #{add[child]}"
-	    if add[child].nil? then
-	      add[child] = Hash.new
-	    end
-	    add[child][person] = 'child'
-	  elsif check_parent[person][child].nil? and check_child[child][person] then
-            puts "missing parent relationship between #{person} and #{child}"
-             if add[person].nil? then
-	       add[person] = Hash.new
-	     end
-	     add[person][child] = 'parent'
-	  end
-	end # end if check_child[child].nil?
-	puts "****************"
+         puts "child #{child} #{check_parent[child]} name #{name}"
+         if check_child[child].nil? then
+	        puts "making child entry #{child}"
+	        add[child] = Hash.new
+	        add[child][person] = 'child'
+	     else 
+            if check_parent[person][child] and check_child[child][person] then
+	           puts "found reciprocal relationships for #{person} and #{child}"
+  	        elsif check_parent[person][child] and check_child[child][person].nil? then
+                puts "missing child relationship between #{child} and #{person}"
+	            puts "add child #{add[child]}"
+	            if add[child].nil? then
+	                add[child] = Hash.new
+	            end
+	            add[child][person] = 'child'
+	        elsif check_parent[person][child].nil? and check_child[child][person] then
+                puts "missing parent relationship between #{person} and #{child}"
+                if add[person].nil? then
+	              add[person] = Hash.new
+	            end
+	            add[person][child] = 'parent'
+	        end
+	     end # end if check_child[child].nil?
+	     puts "****************"
       end #end children each
       puts "##################################"
     end # end check_parent each

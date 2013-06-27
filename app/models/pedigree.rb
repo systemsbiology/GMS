@@ -48,14 +48,20 @@ class Pedigree < ActiveRecord::Base
     cmhash = Hash.new
     ordered_people.each do |person|
       next if person.nil?
+      #logger.debug("find_childless_marriages person #{person.inspect}")
+      #logger.debug("preson spouses #{person.spouses}")
+      #logger.debug("prson offspring #{person.offspring}")
       if (person.spouses.size > 0 and person.offspring.empty?) then
+        #logger.debug("person is a candidate! #{person.spouses.size} #{person.offspring.empty?}")
         unless (cm.include?(person.id)) then
+          #logger.debug("adding person to cm!")
           cm.push(person.id)
           cm.push(person.spouses.first.relation.id)
           cmhash[person.id] = person.spouses.first.relation.id
         end
       end
     end
+    #logger.debug("find_childless_marriages #{cmhash.inspect}")
     return cmhash
   end
 
