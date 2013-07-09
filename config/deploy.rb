@@ -16,7 +16,7 @@ set :rvm_scripts_path, "/u5/tools/rvm/bin"
 set :rvm_path, "/u5/tools/rvm"
 set :rake, "bundle exec rake"
 #set :rvm_ruby_string, ENV['GEM_HOME'].gsub(/.*\//,"")  # set up which gemset you're using
-#set :rvm_ruby_string, "ruby-1.9.3-p448@global"
+set :rvm_ruby_string, "ruby-1.9.3-p448@global"
 #set :rvm_install_ruby_params, '--1.9'
 #set :rvm_install_pkgs, %w[libyaml openssl]
 #set :rvm_install_ruby_params, '--with-opt-dir=/u5/tools/rvm/usr'
