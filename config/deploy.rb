@@ -16,7 +16,7 @@ set :rvm_scripts_path, "/u5/tools/rvm/bin"
 set :rvm_path, "/u5/tools/rvm"
 set :rake, "bundle exec rake"
 #set :rvm_ruby_string, ENV['GEM_HOME'].gsub(/.*\//,"")  # set up which gemset you're using
-#set :rvm_ruby_string, "ruby-1.9.3-p392@global"
+#set :rvm_ruby_string, "ruby-1.9.3-p448@global"
 #set :rvm_install_ruby_params, '--1.9'
 #set :rvm_install_pkgs, %w[libyaml openssl]
 #set :rvm_install_ruby_params, '--with-opt-dir=/u5/tools/rvm/usr'
@@ -32,11 +32,11 @@ set :bundle_flags, "--deployment"
 
 #before 'bundle:install', "bundle:list"
 set :default_environment, {
-  'PATH' => "/u5/tools/rvm/gems/ruby-1.9.3-p392@global/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts:/bin/:/tools/bin:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",
-  'RUBY_VERSION' => 'ruby-1.9.3-p392@global',
-  'GEM_HOME' => '/u5/tools/rvm/gems/ruby-1.9.3-p392@global',
-  'GEM_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p392@global',
-  'BUNDLE_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p392@global'
+  'PATH' => "/u5/tools/rvm/gems/ruby-1.9.3-p448@global/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts:/bin/:/tools/bin:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",
+  'RUBY_VERSION' => 'ruby-1.9.3-p448@global',
+  'GEM_HOME' => '/u5/tools/rvm/gems/ruby-1.9.3-p448@global',
+  'GEM_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p448@global',
+  'BUNDLE_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p448@global'
 }
 
 #set :scm, :subversion
