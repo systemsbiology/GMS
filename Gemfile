@@ -45,7 +45,7 @@ gem 'ancestry'
 #gem 'acts_as_audited'
 #, "2.0.0.rc7"
 
-gem 'madeline', '~> 0.1.10'
+gem 'madeline', '~> 0.1.11'
 
 gem 'rubyzip'
 gem 'auto_strip_attributes'#, "~> 1.0"
