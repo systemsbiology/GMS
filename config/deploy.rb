@@ -78,7 +78,7 @@ end
    end
 
    task :check_gem, :roles => :app do
-     run("cd #{deploy_to}/current; bundle install madeline")
+     run("cd #{deploy_to}/current; gem install madeline")
    end
 
    desc "Export files"
