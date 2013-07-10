@@ -55,7 +55,7 @@ server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
 namespace :bundle do
   desc "list gems"
   task :list do 
-    run "cd #{deploy_to}/current && cat Gemfile"
+    run "cd #{release_path} && cat Gemfile"
   end
 end
 
