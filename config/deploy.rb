@@ -80,9 +80,9 @@ end
    desc "Export files"
    task :run_all_exports, :roles => :app do
      run("cd #{release_path}; bundle exec rake export:export_all_assemblies")
-     run("cd #{release_path}/current; bundle exec rake export:export_all_assembly_files")
-     run("cd #{release_path}/current; bundle exec rake export:export_all_individuals")
-     run("cd #{release_path}/current; bundle exec rake export:export_all_samples")
+     run("cd #{release_path}; bundle exec rake export:export_all_assembly_files")
+     run("cd #{release_path}; bundle exec rake export:export_all_individuals")
+     run("cd #{release_path}; bundle exec rake export:export_all_samples")
    end
 
  end
