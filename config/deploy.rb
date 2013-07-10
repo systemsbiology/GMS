@@ -30,7 +30,7 @@ set :bundle_gemfile, "Gemfile"
 set :bundle_dir, fetch(:shared_path)+"/bundle"
 set :bundle_flags, "--deployment"
 
-#before 'bundle:install', "bundle:list"
+before 'bundle:install', "bundle:list"
 set :default_environment, {
   'PATH' => "/u5/tools/rvm/gems/ruby-1.9.3-p448@global/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts:/bin/:/tools/bin:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",
   'RUBY_VERSION' => 'ruby-1.9.3-p448@global',
