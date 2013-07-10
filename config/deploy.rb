@@ -246,7 +246,7 @@ end
 #
 after 'deploy:update_code', 'deploy:check_gem'
 after 'deploy:update_code', 'deploy:symlink_db'
-after 'deploy:update_code', 'deploy:run_all_exports'
+after 'deploy', 'deploy:run_all_exports'
 
 require 'rvm/capistrano'
 require 'bundler/capistrano'
