@@ -91,3 +91,17 @@ separate hard disk than the web server is installed on.
 
 You should now be able to start MySQL and start the Apache webserver and go to the
 URL where you installed GMS and it should show you an index page.
+
+----------------------------------------
+
+Capistrano set up requires that you have a shared directory in your deployment area.  
+The shared directory should have config, logs, pids, system.  Capistrano will create
+the bundle directory in there with the current deploy file.  The config needs to have
+the database.yml file that's appropriate for connecting to your database.  The other
+directories just have to be there (though logs may need production.log).  The config
+directory of GMS requires that you specify a user.
+
+config/user.rb
+set :user, "dmauldin"
+
+
