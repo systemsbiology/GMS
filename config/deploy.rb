@@ -77,10 +77,6 @@ end
      run "ln -nfs #{deploy_to}/shared/config/database.yml #{release_path}/config/database.yml"
    end
 
-   task :check_gem, :roles => :app do
-     run("cd #{deploy_to}/current; gem install madeline")
-   end
-
    desc "Export files"
    task :run_all_exports, :roles => :app do
      run("cd #{release_path}; bundle exec rake export:export_all_assemblies")
@@ -244,7 +240,6 @@ end
 #   end
 # end
 #
-after 'deploy:update_code', 'deploy:check_gem'
 after 'deploy:update_code', 'deploy:symlink_db'
 after 'deploy', 'deploy:run_all_exports'
 
