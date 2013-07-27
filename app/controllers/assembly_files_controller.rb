@@ -57,8 +57,7 @@ class AssemblyFilesController < ApplicationController
   # POST /assembly_files
   # POST /assembly_files.xml
   def create
-   puts "params in create are #{params.inspect}"
-    @assembly_file = AssemblyFile.new(params[:assembly_file])
+    @assembly_file = AssemblyFile.new(assembly_file_params)
 
     respond_to do |format|
       puts "format is #{format.inspect}\n"
@@ -81,7 +80,7 @@ class AssemblyFilesController < ApplicationController
   # PUT /assembly_files/1
   # PUT /assembly_files/1.xml
   def update
-    @assembly_file = AssemblyFile.find(params[:id])
+    @assembly_file = AssemblyFile.find(assembly_file_params)
 
     respond_to do |format|
       if @assembly_file.update_attributes(params[:assembly_file])
@@ -127,6 +126,11 @@ class AssemblyFilesController < ApplicationController
     def find_all_by_pedigree_id(pedigree_id)
     @assembly_files = AssemblyFile.find(:all, :include => { :assembly => {:assay => { :sample => { :person => :pedigree } } } },
                                         :conditions => [ 'pedigrees.id = ?', pedigree_id ])
+  end
+
+  private
+  def assembly_file_params
+    params.require(:assembly_file).permit(:genome_reference_id, :name, :assembly_id, :description, :location, :file_type_id, :metadata, :software, :software_version, :file_date, :current, :comments)
   end
 
 end
