@@ -50,22 +50,22 @@ class Assembly < ActiveRecord::Base
   def ensure_files_up_to_date
     files = find_assembly_files
     #logger.debug("files #{files}")
+    update_files = check_update_assembly_files(files)
+    #logger.debug("update files #{update_files}")
+    errors = update_assembly_files(update_files)
+    if errors.size > 0 then
+      return errors
+    end
     add_files = check_add_assembly_files(files)
     #logger.debug( "add files #{add_files}")
     errors = add_assembly_files(add_files)
     #logger.debug("errors #{errors}")
     if errors.size > 0 then
       return errors
-    end
-    update_files = check_update_assembly_files(files)
-    #logger.debug("update files #{update_files}")
-    errors = update_assembly_files(update_files)
-    if errors.size > 0 then
-      return errors
     else
       return []
     end
-    
+ 
   end
 
   # look on disk for the assembly files specified in the config under PEDIGREE_ROOT

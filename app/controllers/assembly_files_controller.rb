@@ -80,10 +80,10 @@ class AssemblyFilesController < ApplicationController
   # PUT /assembly_files/1
   # PUT /assembly_files/1.xml
   def update
-    @assembly_file = AssemblyFile.find(assembly_file_params)
+    @assembly_file = AssemblyFile.find(params[:id])
 
     respond_to do |format|
-      if @assembly_file.update_attributes(params[:assembly_file])
+      if @assembly_file.update_attributes(assembly_file_params)
         format.html { redirect_to(@assembly_file, :notice => 'Assay file was successfully updated.') }
         format.xml  { head :ok }
       else
