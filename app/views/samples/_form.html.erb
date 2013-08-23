@@ -12,7 +12,7 @@
   </div>
   <div class="field">
     <%= f.label :status %><br />
-    <%= f.collection_select(:status, ["pending", "submitted", "sequenced", "failed qc"], :downcase, :titleize, { :include_blank => "-Select Sample Status", :selected => @sample.status || '' }) %>
+    <%= f.collection_select(:status, ["Pending", "Submitted", "Sequenced", "Failed QC"], :titleize, :titleize, { :include_blank => "-Select Sample Status", :selected => @sample.status || '' }) %>
   </div>
   <div class="field">
     Vendor Sample ID (ex: GS0001-DNA_A01 or SS6002729) <br />

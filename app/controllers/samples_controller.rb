@@ -141,6 +141,7 @@ class SamplesController < ApplicationController
   # PUT /samples/1.xml
   def update
     @sample = Sample.find(params[:id])
+    @pedigrees = Pedigree.order("pedigrees.tag")
 
     ac_notice = ''
     if (params[:person] and params[:person][:id]) then
@@ -195,7 +196,7 @@ class SamplesController < ApplicationController
         format.html { redirect_to(@sample, :notice => "Sample was successfully updated. #{ac_notice}") }
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit", :notice => "Sample failed updateing .#{ac_notice}" }
+        format.html { render :action => "edit", :notice => "Sample failed updating .#{ac_notice}" }
         format.xml  { render :xml => @sample.errors, :status => :unprocessable_entity }
       end
     end
