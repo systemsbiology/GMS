@@ -155,6 +155,10 @@ class Assembly < ActiveRecord::Base
     end
     asm_file_errors = Array.new
     files.each do |file_path, file_hash|
+      if (file_path.match(/~\z/)) then
+        logger.debug("Skipping file #{file_path} because it contains a tilda")
+        next
+      end
       file_type = file_hash["type"]
       file_vendor = file_hash["vendor"]
       #logger.debug "file type is #{file_type} and path is #{file_path} and file_vendor is #{file_vendor}"
@@ -195,7 +199,7 @@ class Assembly < ActiveRecord::Base
       end
 
       filename = File.basename(file_path)
-      if filename.match(/~$/) then
+      if filename.match(/~\z/) then
         logger.error("Skipping a file with a tilda when adding assembly files.  filename #{filename}")
         next
       end
