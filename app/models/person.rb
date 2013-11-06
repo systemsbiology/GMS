@@ -194,9 +194,9 @@ class Person < ActiveRecord::Base
 
   def madeline_identifier
     if self.person_aliases.size > 0 then
-      return "#{collaborator_id};#{self.person_aliases.map(&:value).join(";")}"
+      return "#{collaborator_id.gsub(/ /,'_')};#{self.person_aliases.map(&:value).join(";").gsub(/ /,'_')}"
     else
-      return "#{collaborator_id}"
+      return "#{collaborator_id.gsub(/ /,'_')}"
     end
   end
 
