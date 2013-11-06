@@ -66,6 +66,7 @@ Gms::Application.routes.draw do
     get 'pedigree_datastore', :on => :collection
     get 'export_madeline_table'
     get 'export_madeline_pdf', :on => :collection
+    get 'export_all_madeline_tables', :on => :collection
     get 'founders'
     get 'founders', :on => :collection
     get 'kwanzaa', :on => :collection

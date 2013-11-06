@@ -65,8 +65,13 @@
 <% end %>
 </p>
 
+<%= link_to "Download Madeline tables for this study", export_all_madeline_tables_pedigrees_path(:study => @study) %>
+<br />
+<br />
 <%= link_to 'Add Pedigree', new_pedigree_path(:study => @study) %>
 <br />
 
 <%= link_to 'Edit Study', edit_study_path(@study) %> |
 <%= link_to 'Back to Study Index', studies_path %>
+<br />
+<br />
