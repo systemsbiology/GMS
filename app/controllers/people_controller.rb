@@ -241,7 +241,7 @@ class PeopleController < ApplicationController
     sheet1 = book.worksheet 0
 
     if spreadsheet_type == 'fgg manifest' then
-      ret_code, @people, @samples, @relationships, @memberships, @diagnoses, @acquisitions, @errors = process_fgg_manifest(sheet1, pedigree, disease)
+      ret_code, @people, @samples, @relationships, @memberships, @diagnoses, @acquisitions, @errors, @aliases, @phenotypes = process_fgg_manifest(sheet1, pedigree, disease)
     else
       flash[:error] = "Spreadsheet type not understood. Try this action again."
       render :action => "upload" and return
@@ -283,6 +283,14 @@ class PeopleController < ApplicationController
     rc = write_temp_object(@trans_id, "relationship",@relationships) unless @relationships.nil? or @relationships.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 #    logger.debug("rc for relationship #{@relationships.inspect} is #{rc.inspect}")
+
+    rc = write_temp_object(@trans_id, "aliases",@aliases) unless @aliases.nil? or @aliases.empty?
+    flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
+    logger.debug("rc for alias #{@aliases.inspect} is #{rc.inspect}")
+
+    rc = write_temp_object(@trans_id, "phenotypes",@phenotypes) unless @phenotypes.nil? or @phenotypes.empty?
+    flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
+    logger.debug("rc for phenotype #{@phenotypes.inspect} is #{rc.inspect}")
 
     respond_to do |format|
       format.html #upload_and_validate.html.erb
@@ -524,6 +532,43 @@ class PeopleController < ApplicationController
             @errors.push(["diagnosis",diagnosis, diagnosis.errors])
           end
         end
+      elsif temp_obj.object_type == "Aliases" then
+        person = Person.has_pedigree(obj[0]).find_by_collaborator_id(obj[1])
+        if obj[2].kind_of?(Array) then
+            obj[2].each do |ali|
+                pa = PersonAlias.new
+                pa.person_id = person.id
+                pa.value = ali
+                pa.alias_type = "collaborator_id"
+                if pa.valid? then
+                    pa.save
+                else
+                    @errors.push(["person_alias",pa, pa.errors])
+                end
+            end
+        else
+            pa = PersonAlias.new
+            pa.person_id = person.id
+            pa.value = obj[2]
+            pa.alias_type = "collaborator_id"
+            if pa.valid? then
+                pa.save
+            else
+                @errors.push(["person_alias",pa, pa.errors])
+            end
+        end
+      elsif temp_obj.object_type == "Phenotypes" then
+        phenotype = Phenotype.find(obj[0])
+        person = Person.has_pedigree(obj[1]).find_by_collaborator_id(obj[2])
+        trait = Trait.new
+        trait.person_id = person.id
+        trait.phenotype_id = phenotype.id
+        trait.trait_information = obj[3]
+        if trait.valid? then
+          trait.save
+        else
+            @errors.push(["trait",trait,trait.errors])
+        end
       end
     else
       if obj.valid? then
@@ -541,7 +586,7 @@ class PeopleController < ApplicationController
       rescue Exception => exc
         temp_obj.errors.add(:object_type, "could not be destroyed")
         @errors.push(["temp_object", temp_obj.errors])
-    logger.error("temp_object #{temp_obj.inspect} could not be destroyed!!  #{exc.message}")
+        logger.error("temp_object #{temp_obj.inspect} could not be destroyed!!  #{exc.message}")
       end
 
     end # end temp_objects.each do
@@ -565,6 +610,8 @@ class PeopleController < ApplicationController
     diagnoses = Array.new
     acquisitions = Array.new
     errors = Hash.new
+    aliases = Array.new
+    phenotypes = Array.new
     counter = 0
     flag = 0
     headers = nil
@@ -587,6 +634,8 @@ class PeopleController < ApplicationController
       headers =  YAML.load(header_file)[1.0]
       #elsif sheet.name == "Sample Information v3.5" then
       #  headers =  YAML.load(header_file)[3.5]
+    elsif sheet.name == "FGG Information v1.1" then
+      headers = YAML.load(header_file)[1.1]
     else
       logger.error("Unhandled Sample Information version #{sheet.name} for FGG Manifest.  Check to make sure that the spreadsheet you submitted is a FGG Manifest spreadsheet.  If it is, then please add new version to the YAML and re-run.")
       flash[:error] = "Unhandled Sample Information version #{sheet.name} for FGG Manifest.  Check to make sure that the spreadsheet you submitted is a FGG Manifest spreadsheet.  If it is, then please add new version to the YAML and re-run."
@@ -597,10 +646,10 @@ class PeopleController < ApplicationController
       if row[0] == "Sequencing Sample ID" then
         # check all of the headers exist
         headers.each do |col, index|
-      if row[index] != col then
-            flash[:error] = "Spreadsheet provided has an incorrect column.  <b>\"#{row[index]}\"</b> in column number #{index} should be <b>\"#{col}\"</b>.  Please check the format of your spreadsheet."
-        render :action => "upload" and return(0)
-      end
+            if row[index] != col then
+                flash[:error] = "Spreadsheet provided has an incorrect column.  <b>\"#{row[index]}\"</b> in column number #{index} should be <b>\"#{col}\"</b>.  Please check the format of your spreadsheet."
+                render :action => "upload" and return(0)
+            end
         end
 
         flag = 1
@@ -652,6 +701,14 @@ class PeopleController < ApplicationController
         end
         p = Person.new if p.nil?
         p.collaborator_id = customer_subject_id
+
+        if headers["Subject Aliases"] and !row[headers["Subject Aliases"]].nil? then
+            person_aliases = Array.new
+            person_aliases = row[headers["Subject Aliases"]]
+            person_aliases = person_aliases.split(/;/) if person_aliases.match(';')
+            aliases.push([pedigree.id, p.collaborator_id, person_aliases])
+        end
+
         if row[headers["Gender"]].nil? then
             p.errors.add(:gender, "Must provide a gender for person #{customer_sample_id}")
         else
@@ -684,8 +741,30 @@ class PeopleController < ApplicationController
                     tp = Person.new
                     tp.errors.add(:affected_status, "value provided not recognized - '#{affected_status}'. Should be 'affected' in order to set status correctly.")
                     errors["#{counter}"]["affected_status"] = tp.errors
+                    errors["#{counter}"]["line"] = row
                 end
             end
+        end
+
+        if headers["Subject Phenotypes"] and !row[headers["Subject Phenotypes"]].nil? then
+            all_phenotypes = row[headers["Subject Phenotypes"]].split(/;/)
+            all_phenotypes.each do |pheno|
+                if pheno.match(/=/) then
+                  (pheno, pheno_info) = pheno.split(/=/)
+                end
+                phenotype = Phenotype.find_by_name(pheno)
+                if phenotype.nil? then
+                    phenotype = Phenotype.find_by_tag(pheno)
+                end
+                if phenotype.nil? or phenotype.to_s.match('NA') then
+                    phen = Phenotype.new
+                    phen.errors.add(:name, "could not be found.  Upload value of #{pheno} not in database. Please create in database before uploading spreadsheet.")
+                    errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
+                    errors["#{counter}"]["phenotype"] = phen.errors
+                    next
+                end
+                phenotypes.push([phenotype.id, pedigree.id, p.collaborator_id, pheno_info])
+           end
         end
 
         # queue up the relationship information so that we can add it later after confirmation
@@ -710,10 +789,28 @@ class PeopleController < ApplicationController
             end
         end
 
-        mz_twin_id = row[headers["Monozygotic Twin Subject ID"]]
-        mz_twin_id = mz_twin_id.to_i if (mz_twin_id.is_a? Float)
-        if (!mz_twin_id.nil? and !mz_twin_id.empty? and !mz_twin_id.to_s.match('NA')) then
-            relationships.push([pedigree.id, customer_subject_id, mz_twin_id, 'monozygotic twin','1'])
+        if headers["Monozygotic Twin Subject ID"] then
+            mz_twin_id = row[headers["Monozygotic Twin Subject ID"]]
+            mz_twin_id = mz_twin_id.to_i if (mz_twin_id.is_a? Float)
+            if (!mz_twin_id.nil? and !mz_twin_id.empty? and !mz_twin_id.to_s.match('NA')) then
+                relationships.push([pedigree.id, customer_subject_id, mz_twin_id, 'monozygotic twin','1'])
+            end
+        elsif headers["Twin Subject ID"] and !row[headers["Twin Subject ID"]].nil? then
+            if !row[headers["Twin Subject ID"]].nil? and !row[headers["Twin Type"]].nil? then 
+                if (row[headers["Twin Type"]] != 'mz' and row[headers["Twin Type"]] != 'dz' and row[headers["Twin Type"]] != 'monozygotic' and row[headers["Twin Type"]] != 'dizygotic' ) then
+                    r.errors.add(:parent_id, "Twin Type must be 'mz', 'dz', 'monozygotic', or 'dizygotic'")
+                else
+                    twin_id = row[headers["Twin Subject ID"]]
+                    twin_type = row[headers["Twin Type"]]
+                    if (twin_type == "mz" or twin_type == "monozygotic") then twin_type = "monozygotic twin" end
+                    if (twin_type == "dz" or twin_type == "dizygotic") then twin_type = "dizygotic twin" end
+                    if (!twin_id.nil? and !twin_id.empty? and !twin_id.to_s.match('NA')) then
+                        relationships.push([pedigree.id, customer_subject_id, twin_id, twin_type, '1'])
+                    end
+                end
+            else 
+                r.errors.add(:parent_id, "Twin Subject ID requires a Twin Type")
+            end
         end
 
         spouse_id =  row[headers["Spouse Subject ID"]]
@@ -822,7 +919,7 @@ class PeopleController < ApplicationController
     #logger.debug("acquisitions are #{acquisitions.inspect}")
     #logger.debug("errors are #{errors.inspect}")
 
-    return 1, people, samples, relationships, memberships, diagnoses, acquisitions, errors
+    return 1, people, samples, relationships, memberships, diagnoses, acquisitions, errors, aliases, phenotypes
   end # end process fgi manifest definition
 
   def get_drop_down_people_by_pedigree

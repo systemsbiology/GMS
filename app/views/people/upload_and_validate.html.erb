@@ -15,6 +15,7 @@
 <li>
 Problems in line number <%= error[0] %>:<br/>
 <%= raw error[1]["row"] %>
+<%= raw error[1]["line"] %>
 <% error[1].each_pair do |type, entry| %>
   <% next if type == "row" %>
   <p><b><%= type %>:</b>
@@ -51,6 +52,28 @@ Problems in line number <%= error[0] %>:<br/>
 <% end %>
 </table>
 <% end %>
+<% if @aliases.empty? %>
+<p><b>No aliases Found.</b>  If you were expecting there to be aliases, then this is an error!</p>
+<% else %>
+<h3>Aliases Found</h3>
+<table class="tablesorter">
+  <thead>
+     <th>Pedigree ID</th>
+     <th>Collaborator ID</th>
+     <th>Aliases</th>
+   </thead>
+   <tbody>
+   <% @aliases.each do |palias| %>
+     <tr>
+       <td><%= palias[0] %></td>
+       <td><%= palias[1] %></td>
+       <td><%= if palias[2].kind_of?(Array) then palias[2].join(";") else palias[2] end %></td>
+     </tr>
+   <% end %>
+   </tbody>
+</table>
+<% end %>
+
 <% if @samples.empty? %>
 <p><b>No Samples Found</b>.  If you were expecting there to be samples, then this is an error!</p>
 <% else %>
@@ -86,6 +109,27 @@ Problems in line number <%= error[0] %>:<br/>
 </table>
 
 <% end %>
+<% unless @phenotypes.empty? %>
+<h3>Phenotypes Found</h3>
+<table class="tablesorter">
+  <thead>
+    <th>phenotype</th>
+    <th>pedigree</th>
+    <th>person</th>
+    <th>info</th>
+  </thead>
+  <% @phenotypes.each do |phen| %>
+  <tr>
+    <td><%= Phenotype.find(phen[0]).name %></td>
+    <td><%= phen[1] %></td>
+    <td><%= phen[2] %></td>
+    <td><%= phen[3] %></td>
+  </tr>
+  <% end %>
+</table>
+
+<% end %>
+
 <h3>Memberships Found</h3>
 <table class="tablesorter">
   <thead>
@@ -120,6 +164,7 @@ Problems in line number <%= error[0] %>:<br/>
   <% end %>
 </table>
 <br />
+<% if @errors.empty? then %>
 <h1>Save</h1>
 <p>If this data looks correct and you wish to submit to the database, click Save.</p>
 <p>If there are no 'Successes' then this will just check and add the relationship information.</p>
@@ -127,6 +172,9 @@ Problems in line number <%= error[0] %>:<br/>
 <%= form_tag('/people/confirm') %>
 <%= hidden_field_tag 'trans_id', @trans_id %>
 <%= submit_tag "Save" %>
+<% else %>
+<h1>You may not save this data until you correct the errors listed above</h1>
+<% end %>
 </form>
 <br />
 <br />

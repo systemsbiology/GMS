@@ -19,3 +19,27 @@
   Concentration: 17
   Quantity: 18
   Sample Status: 19
+1.1:
+  Sequencing Sample ID: 0
+  Sequencing Technology: 1
+  Customer Sample ID: 2
+  Customer Subject ID: 3
+  Subject Aliases: 4
+  Gender: 5
+  Sample Type: 6
+  Sample Source: 7
+  Tumor Status: 8
+  Subject Phenotypes: 9
+  Mother's Subject ID: 10
+  Father's Subject ID: 11
+  Twin Subject ID: 12
+  Twin Type: 13
+  Affected Status: 14
+  Comments: 15
+  Spouse Subject ID: 16
+  Spouse Order: 17
+  Child Order: 18
+  Volume: 19
+  Concentration: 20
+  Quantity: 21
+  Sample Status: 22
