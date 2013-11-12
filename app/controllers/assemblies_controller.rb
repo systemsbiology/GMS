@@ -147,7 +147,7 @@ class AssembliesController < ApplicationController
     ped_info = Hash.new
     Assembly.all.each do |af|
       ped = af.pedigree
-      logger.error("Assembly #{af.inspect} doesn't have a pedigree??")
+      logger.error("Assembly #{af.inspect} doesn't have a pedigree??") if ped.nil?
       next if ped.nil?
       ped_info[af.name] = ped.isb_pedigree_id
       ped_info[af.isb_assembly_id] = ped.isb_pedigree_id
