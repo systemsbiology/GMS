@@ -560,7 +560,10 @@ class PeopleController < ApplicationController
       elsif temp_obj.object_type == "Phenotypes" then
         phenotype = Phenotype.find(obj[0])
         person = Person.has_pedigree(obj[1]).find_by_collaborator_id(obj[2])
-        trait = Trait.new
+        trait = Trait.find_by_person_id_and_phenotype_id_and_trait_information(person.id, phenotype.id,obj[3])
+        if t.nil? then
+          trait = Trait.new
+        end
         trait.person_id = person.id
         trait.phenotype_id = phenotype.id
         trait.trait_information = obj[3]
@@ -694,19 +697,52 @@ class PeopleController < ApplicationController
         end
 
         customer_sample_id = row[headers["Customer Sample ID"]]
-
+        # use customer subject_id to find the person with the correct pedigree
         p = Person.has_pedigree(pedigree.id).find_by_collaborator_id(customer_subject_id) 
+        # use the customer_sample_id to find the person with the correct pedigree
         if (p.nil?) then
             p = Person.has_pedigree(pedigree.id).find_by_collaborator_id(customer_sample_id)
         end
+        # use the customer_subject_id but don't trust that there's an entry in the 
+        # memberships table since this sometimes errs out, but then test that
+        # the pedigree id is the same
+        if (p.nil?) then
+            ps = Person.find_by_collaborator_id(customer_subject_id)
+            logger.debug("pedigree #{pedigree.inspect}")
+            if (!ps.nil? and ps.pedigree_id == pedigree.id) then
+               p = ps
+            end
+        end
+        # as above except use the customer_sample_id
+        if (p.nil?) then
+            ps = Person.find_by_collaborator_id(customer_sample_id)
+            if (!ps.nil? and ps.pedigree_id == pedigree.id) then
+               p = ps
+            end
+        end
+        logger.debug("creating new p") if p.nil?
         p = Person.new if p.nil?
         p.collaborator_id = customer_subject_id
 
         if headers["Subject Aliases"] and !row[headers["Subject Aliases"]].nil? then
             person_aliases = Array.new
-            person_aliases = row[headers["Subject Aliases"]]
-            person_aliases = person_aliases.split(/;/) if person_aliases.match(';')
-            aliases.push([pedigree.id, p.collaborator_id, person_aliases])
+            person_alias = row[headers["Subject Aliases"]]
+            logger.debug("person_alias #{person_alias}")
+            if person_alias.match(';') then
+              person_aliases = person_alias.split(/;/)
+            else
+              person_aliases.push(person_alias)
+            end
+            logger.debug("person_aliases #{person_aliases.inspect}")
+            new_aliases = Array.new
+            person_aliases.each do |pa|
+              peral = PersonAlias.find_by_person_id_and_value_and_alias_type(p.id, pa, "collaborator_id")
+              if peral.nil? then 
+                new_aliases.push(pa)
+              end
+            end
+            logger.debug("new aliasses #{new_aliases.inspect}")
+            aliases.push([pedigree.id, p.collaborator_id, new_aliases]) unless new_aliases.nil?
         end
 
         if row[headers["Gender"]].nil? then
@@ -747,8 +783,8 @@ class PeopleController < ApplicationController
         end
 
         if headers["Subject Phenotypes"] and !row[headers["Subject Phenotypes"]].nil? then
-            all_phenotypes = row[headers["Subject Phenotypes"]].split(/;/)
-            all_phenotypes.each do |pheno|
+           all_phenotypes = row[headers["Subject Phenotypes"]].split(/;/)
+           all_phenotypes.each do |pheno|
                 if pheno.match(/=/) then
                   (pheno, pheno_info) = pheno.split(/=/)
                 end
@@ -886,6 +922,8 @@ class PeopleController < ApplicationController
         if p.valid?
           people << p
         else
+            logger.debug("p is not valid #{p.inspect}")
+            logger.debug("p.errors #{p.errors.inspect}")
             errors["#{counter}"] = Hash.new
             errors["#{counter}"]["person"] = p.errors
             printable_row = Array.new
@@ -896,6 +934,7 @@ class PeopleController < ApplicationController
                     printable_row << cell
                 end
             end
+            logger.debug("set error #{counter} to #{printable_row.inspect}")
             errors["#{counter}"]["row"] = "<table><tr><td>"+printable_row.join("</td><td>")+"</tr></table>"
         end
 
