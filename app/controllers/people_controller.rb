@@ -106,7 +106,7 @@ class PeopleController < ApplicationController
 #        membership.pedigree_id = params[:pedigree][:id]
 #            membership.person_id = @person.id
 #        membership.save
-
+        expire_action :action => :ped_info
         format.html { redirect_to(@person, :notice => 'Person was successfully created.') }
         format.xml  { render :xml => @person, :status => :created, :location => @person }
       else

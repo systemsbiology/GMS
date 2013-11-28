@@ -3,6 +3,7 @@ require 'will_paginate/array'
 class SamplesController < ApplicationController
   unloadable
   respond_to :json
+  cache_sweeper :sample_sweeper
 
   # GET /samples
   # GET /samples.xml
