@@ -27,6 +27,8 @@ Gms::Application.routes.draw do
   resources :samples do
     get 'get_drop_down_samples_by_pedigree', :on => :collection
     get 'ped_info', :on => :collection
+    get 'ingenuity_upload', :on => :collection
+    post 'ingenuity_missing_samples',:on => :collection
   end
   resources :sample_types
   resources :acquisitions
