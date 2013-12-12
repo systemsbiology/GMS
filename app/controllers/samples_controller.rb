@@ -1,4 +1,6 @@
 require 'will_paginate/array'
+require 'ingenuity'
+require 'download_zip'
 
 class SamplesController < ApplicationController
   unloadable
@@ -232,6 +234,23 @@ class SamplesController < ApplicationController
       format.html
       format.xml {head :ok}
       format.json { render :json => ped_info }
+    end
+  end
+
+  # provides a blank upload form
+  def ingenuity_upload
+  end
+
+  def ingenuity_missing_samples
+    uploaded_file = params[:file]
+    logger.debug("#{uploaded_file.inspect}")
+    file = Tempfile.new(uploaded_file.original_filename)
+    file.write(uploaded_file.read.force_encoding("UTF-8"))
+    outfilename = check_ingenuity(file)
+    zipname = Pathname.new(outfilename.gsub(/.txt/,'.zip')).basename
+    logger.debug("filename #{outfilename} zipname #{zipname}")
+    respond_to do |format|
+      format.html { download_zip("#{zipname}",{"ingenuity_add.txt" => outfilename})}
     end
   end
 
