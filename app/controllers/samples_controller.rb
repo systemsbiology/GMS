@@ -244,6 +244,7 @@ class SamplesController < ApplicationController
   def ingenuity_missing_samples
     uploaded_file = params[:file]
     logger.debug("#{uploaded_file.inspect}")
+    if uploaded_file and uploaded_file.original_filename then
     file = Tempfile.new(uploaded_file.original_filename)
     file.write(uploaded_file.read.force_encoding("UTF-8"))
     outfilename = check_ingenuity(file)
@@ -251,6 +252,12 @@ class SamplesController < ApplicationController
     logger.debug("filename #{outfilename} zipname #{zipname}")
     respond_to do |format|
       format.html { download_zip("#{zipname}",{"ingenuity_add.txt" => outfilename})}
+    end
+    else
+      respond_to do |format|
+        flash[:error] = "You must supply a file to process."
+        format.html { render :action => "ingenuity_upload" }
+      end
     end
   end
 
