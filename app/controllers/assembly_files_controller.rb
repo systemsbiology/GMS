@@ -2,6 +2,7 @@ require 'will_paginate'
 require 'will_paginate/array'
 
 class AssemblyFilesController < ApplicationController
+  caches_action :ped_info
   # GET /assembly_files
   # GET /assembly_files.xml
   def index
