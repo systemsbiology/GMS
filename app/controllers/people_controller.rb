@@ -325,7 +325,7 @@ class PeopleController < ApplicationController
   # gets all objects of that trans_is and saves them to the db
   def confirm
     trans_id = params[:trans_id]
-
+    @pedigree_id = ''
 
     #process Person objects first
     @errors = Array.new
@@ -354,7 +354,7 @@ class PeopleController < ApplicationController
         #logger.debug("person obj is #{person_obj.inspect}")
         #logger.debug("person_obj is a #{person_obj.class.inspect}")
         #logger.debug("person_obj is a #{person_obj.pedigree_id.class.inspect}")
-
+        @pedigree_id = person_obj.pedigree_id
         begin
           if person_obj.valid? then
             person_obj.save!
@@ -499,7 +499,8 @@ class PeopleController < ApplicationController
         pedigree_id = obj[0]
         person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(obj[1])
         sample = Sample.find_by_sample_vendor_id_and_pedigree_id(obj[2], obj[0])
-          acq = Acquisition.new
+        logger.debug("acquisition debug says pedigree #{pedigree_id.inspect} person #{person.inspect} sample #{sample.inspect}")
+        acq = Acquisition.new
         if person.nil? then
           acq.errors.add(:person_id,"not found for #{obj[0]}")
           @errors.push(["acquisition",acq, acq.errors])
@@ -561,7 +562,8 @@ class PeopleController < ApplicationController
         phenotype = Phenotype.find(obj[0])
         person = Person.has_pedigree(obj[1]).find_by_collaborator_id(obj[2])
         trait = Trait.find_by_person_id_and_phenotype_id_and_trait_information(person.id, phenotype.id,obj[3])
-        if t.nil? then
+        #logger.debug("phenotypes debug person #{person.inspect} trait #{trait.inspect}")
+        if trait.nil? then
           trait = Trait.new
         end
         trait.person_id = person.id
