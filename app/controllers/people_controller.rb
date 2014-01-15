@@ -398,6 +398,7 @@ class PeopleController < ApplicationController
           # been created already...
         #logger.debug("temp_obj is #{temp_obj.inspect}")
         pedigree_id = obj[0]
+        @pedigree_id = pedigree_id
         person_collaborator_id = obj[1]
         relation_collaborator_id = obj[2]
         rel_name = obj[3]
@@ -480,6 +481,7 @@ class PeopleController < ApplicationController
         end 
       elsif temp_obj.object_type == "Membership" then
         ped = Pedigree.find(obj[0])
+        @pedigree_id = ped.id
         #logger.debug("processing membership information for pedigree #{ped.inspect}")
         person = Person.find_by_collaborator_id_and_pedigree_id(obj[1], obj[0])
           m = Membership.new
@@ -497,6 +499,7 @@ class PeopleController < ApplicationController
         end
       elsif temp_obj.object_type == "Acquisition" then
         pedigree_id = obj[0]
+        @pedigree_id = pedigree_id
         person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(obj[1])
         sample = Sample.find_by_sample_vendor_id_and_pedigree_id(obj[2], obj[0])
         logger.debug("acquisition debug says pedigree #{pedigree_id.inspect} person #{person.inspect} sample #{sample.inspect}")
@@ -519,6 +522,7 @@ class PeopleController < ApplicationController
       elsif temp_obj.object_type == "Diagnosis" then 
         disease = Disease.find(obj[0])
         pedigree_id = obj[1]
+        @pedigree_id = pedigree_id
         person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(obj[2])
             diagnosis = Diagnosis.new
         if person.nil? then
@@ -535,6 +539,7 @@ class PeopleController < ApplicationController
         end
       elsif temp_obj.object_type == "Aliases" then
         person = Person.has_pedigree(obj[0]).find_by_collaborator_id(obj[1])
+        @pedigree_id = person.pedigree_id
         if obj[2].kind_of?(Array) then
             obj[2].each do |ali|
                 pa = PersonAlias.new
@@ -561,6 +566,7 @@ class PeopleController < ApplicationController
       elsif temp_obj.object_type == "Phenotypes" then
         phenotype = Phenotype.find(obj[0])
         person = Person.has_pedigree(obj[1]).find_by_collaborator_id(obj[2])
+        @pedigree_id = person.pedigree_id
         trait = Trait.find_by_person_id_and_phenotype_id_and_trait_information(person.id, phenotype.id,obj[3])
         #logger.debug("phenotypes debug person #{person.inspect} trait #{trait.inspect}")
         if trait.nil? then
