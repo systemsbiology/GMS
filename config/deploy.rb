@@ -77,6 +77,11 @@ end
      run "ln -nfs #{deploy_to}/shared/config/database.yml #{release_path}/config/database.yml"
    end
 
+   desc "Symlinks the jquery.min"
+   task :symlink_jquery, :roles => :app do
+     run "ln -nfs #{release_path}/public/javascripts/jquery.js #{release_path}/public/javascripts/jquery.min.js"
+   end
+
    desc "Export files"
    task :run_all_exports, :roles => :app do
      run("cd #{release_path}; bundle exec rake export:export_all_assemblies")
