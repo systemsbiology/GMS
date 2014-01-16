@@ -120,9 +120,10 @@ class PeopleController < ApplicationController
   # PUT /people/1.xml
   def update
     @person = Person.find(params[:id])
-
     @values = person_params
+
     if params[:check_dates] then
+        logger.debug("check dates is present in params #{params.inspect}")
       if params[:check_dates][:add_dob].to_i != 1 then
         @values.delete_if{|k,v| k.match(/^dob/)}
       end
@@ -137,12 +138,13 @@ class PeopleController < ApplicationController
     # update the pedigree of the person
     if (params[:pedigree] and params[:pedigree][:id])
       pedigree = Pedigree.find(params[:pedigree][:id])
+      @values["pedigree_id"] = pedigree.id
       @person.pedigree = pedigree
       @person.save
     end
 
     respond_to do |format|
-      if @person.update_attributes(person_params)
+      if @person.update_attributes(@values)
         format.html { redirect_to(@person, :notice => 'Person was successfully updated.') }
         format.xml  { head :ok }
       else
