@@ -1,5 +1,5 @@
 require 'fileutils.rb'
-load 'config/user.rb' # contains set :user, "username"
+load 'config/cap_user.rb' # contains set :cap_user, "username"
 
 set :application, "GMS"
 set :deploy_to, "/u5/www/software/gms/"
@@ -95,12 +95,12 @@ end
  namespace :assets do
    desc "Copies the production shared/system directory to local machine"
    task :prod_to_local do
-     run_locally("rsync --archive --recursive --times --rsh=ssh --compress --human-readable --progress #{user}@#{shared_host}:#{shared_path}/system public/")
+     run_locally("rsync --archive --recursive --times --rsh=ssh --compress --human-readable --progress #{cap_user}@#{shared_host}:#{shared_path}/system public/")
    end
 
    desc "Copies the local public/system directory to production machine"
    task :local_to_prod do
-     run_locally("rsync --archive --recursive --times --rsh=ssh --compress --human-readable --progress public/system #{user}@#{shared_host}:#{shared_path}")
+     run_locally("rsync --archive --recursive --times --rsh=ssh --compress --human-readable --progress public/system #{cap_user}@#{shared_host}:#{shared_path}")
    end
  end
 
@@ -192,7 +192,7 @@ end
       logger.debug "sftping #{prod_dump_file} from #{application}"
       logger.debug "ls #{prod_dump_file}"
       run "ls -lah #{current_path}/tmp/#{prod_dump_file}"
-#      system "rsync -lrp #{user}@#{application}:#{current_path}/tmp/#{prod_dump_file} tmp/data"
+#      system "rsync -lrp #{cap_user}@#{application}:#{current_path}/tmp/#{prod_dump_file} tmp/data"
       get("#{current_path}/tmp/#{prod_dump_file}", "tmp/data/#{prod_dump_file}")
       run "rm #{current_path}/tmp/#{prod_dump_file}"
     end
