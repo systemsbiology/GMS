@@ -749,7 +749,7 @@ class PeopleController < ApplicationController
             person_aliases = Array.new
             person_alias = row[headers["Subject Aliases"]]
             logger.debug("person_alias #{person_alias}")
-            if person_alias.match(';') then
+            if person_alias.to_s.match(';') then
               person_aliases = person_alias.split(/;/)
             else
               person_aliases.push(person_alias)
