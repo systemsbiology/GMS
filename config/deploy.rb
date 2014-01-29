@@ -79,7 +79,7 @@ end
 
    desc "Symlinks the jquery.min"
    task :symlink_jquery, :roles => :app do
-     run "ln -nfs #{release_path}/public/javascripts/jquery.js #{release_path}/public/javascripts/jquery.min.js"
+     run "ln -fs #{release_path}/public/javascripts/jquery.js #{release_path}/public/javascripts/jquery.min.js"
    end
 
    desc "Export files"
@@ -246,6 +246,7 @@ end
 # end
 #
 after 'deploy:update_code', 'deploy:symlink_db'
+after 'deploy:update_code', 'deploy:symlink_jquery'
 after 'deploy:update_code', 'deploy:run_all_exports'
 
 require 'rvm/capistrano'
