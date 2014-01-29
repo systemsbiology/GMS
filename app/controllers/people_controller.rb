@@ -62,6 +62,9 @@ class PeopleController < ApplicationController
   # POST /people.xml
   def create
     @person = Person.new(person_params)
+    puts "params #{params.inspect}"
+    puts "person_params #{person_params.inspect}"
+    puts "person #{@person.inspect}"
     #logger.debug("person_param #{person_params.inspect}")
     #logger.debug("params #{params.inspect}")
 
@@ -93,6 +96,7 @@ class PeopleController < ApplicationController
     @person.pedigree = pedigree
     @person.pedigree_id = params[:pedigree][:id]
     #logger.debug("person is #{@person.inspect}")
+    puts "last person #{@person.inspect}"
     respond_to do |format|
       if @person.save
         # moved into an after_save callback 2012/02/07
@@ -260,37 +264,37 @@ class PeopleController < ApplicationController
     # temp objects are processed in order, so be careful of what order you write them
 
     # person needs to be written first
-    rc = write_temp_object(@trans_id, "person",@people) unless @people.nil? or @people.empty?
+    rc = write_temp_object(@trans_id, "person",@people,1) unless @people.nil? or @people.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 #    logger.debug("rc for people #{@people.inspect} is #{rc.inspect}")
 
     # sample must be written next
-    rc = write_temp_object(@trans_id, "sample",@samples) unless @samples.nil? or @samples.empty?
+    rc = write_temp_object(@trans_id, "sample",@samples,2) unless @samples.nil? or @samples.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 #    logger.debug("rc for samples #{@samples.inspect} is #{rc.inspect}")
 
     # rest are arbitrary
-    rc = write_temp_object(@trans_id, "membership",@memberships) unless @memberships.nil? or @memberships.empty?
+    rc = write_temp_object(@trans_id, "membership",@memberships,3) unless @memberships.nil? or @memberships.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 #    logger.debug("rc for memberships #{@memberships.inspect} is #{rc.inspect}")
 
-    rc = write_temp_object(@trans_id, "acquisition",@acquisitions) unless @acquisitions.nil? or @acquisitions.empty?
+    rc = write_temp_object(@trans_id, "acquisition",@acquisitions,4) unless @acquisitions.nil? or @acquisitions.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 #    logger.debug("rc for acquisitions #{@acquisitions.inspect} is #{rc.inspect}")
 
-    rc = write_temp_object(@trans_id, "diagnosis",@diagnoses) unless @diagnoses.nil? or @diagnoses.empty?
+    rc = write_temp_object(@trans_id, "diagnosis",@diagnoses,5) unless @diagnoses.nil? or @diagnoses.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 #    logger.debug("rc for diagnosis #{@diagnoses.inspect} is #{rc.inspect}")
 
-    rc = write_temp_object(@trans_id, "relationship",@relationships) unless @relationships.nil? or @relationships.empty?
+    rc = write_temp_object(@trans_id, "relationship",@relationships,6) unless @relationships.nil? or @relationships.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 #    logger.debug("rc for relationship #{@relationships.inspect} is #{rc.inspect}")
 
-    rc = write_temp_object(@trans_id, "aliases",@aliases) unless @aliases.nil? or @aliases.empty?
+    rc = write_temp_object(@trans_id, "aliases",@aliases,7) unless @aliases.nil? or @aliases.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
     logger.debug("rc for alias #{@aliases.inspect} is #{rc.inspect}")
 
-    rc = write_temp_object(@trans_id, "phenotypes",@phenotypes) unless @phenotypes.nil? or @phenotypes.empty?
+    rc = write_temp_object(@trans_id, "phenotypes",@phenotypes,8) unless @phenotypes.nil? or @phenotypes.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
     logger.debug("rc for phenotype #{@phenotypes.inspect} is #{rc.inspect}")
 
@@ -306,12 +310,13 @@ class PeopleController < ApplicationController
 ############################################################################################################
 ############################################################################################################
 
-  def write_temp_object(trans_id, obj_type, object)
+  def write_temp_object(trans_id, obj_type, object, order)
     to = TempObject.new
     to.object_type = obj_type.capitalize!
     to.trans_id = trans_id 
     to.added = Time.now
     to.object = Marshal.dump(object)
+    to.object_order = order
     if (to.save) then
       return 1
     else
@@ -378,7 +383,7 @@ class PeopleController < ApplicationController
     end
 
     # process the rest of the objects
-    temp_objects = TempObject.find_all_by_trans_id(trans_id)
+    temp_objects = TempObject.find(:all, :conditions => {:trans_id => trans_id}, :order => "object_order")
     #logger.debug("temp objects are #{temp_objects.inspect}")
     temp_objects.each do |temp_obj|
       # need the begin rescue block because Person includes pedigree information and it needs to lazy load the pedigree class otherwise there is an error
@@ -541,28 +546,34 @@ class PeopleController < ApplicationController
         end
       elsif temp_obj.object_type == "Aliases" then
         person = Person.has_pedigree(obj[0]).find_by_collaborator_id(obj[1])
-        @pedigree_id = person.pedigree_id
-        if obj[2].kind_of?(Array) then
-            obj[2].each do |ali|
+        if person.nil? then
+            person = Person.new
+            person.errors.add(:person_id,"not found for pedigree #{obj[0]} collaborator #{obj[1]}")
+            @errors.push(["person",person,person.errors])
+        else
+            @pedigree_id = person.pedigree_id
+            if obj[2].kind_of?(Array) then
+                obj[2].each do |ali|
+                    pa = PersonAlias.new
+                    pa.person_id = person.id
+                    pa.value = ali
+                    pa.alias_type = "collaborator_id"
+                    if pa.valid? then
+                        pa.save
+                    else
+                        @errors.push(["person_alias",pa, pa.errors])
+                    end
+                end
+            else
                 pa = PersonAlias.new
                 pa.person_id = person.id
-                pa.value = ali
+                pa.value = obj[2]
                 pa.alias_type = "collaborator_id"
                 if pa.valid? then
                     pa.save
                 else
                     @errors.push(["person_alias",pa, pa.errors])
                 end
-            end
-        else
-            pa = PersonAlias.new
-            pa.person_id = person.id
-            pa.value = obj[2]
-            pa.alias_type = "collaborator_id"
-            if pa.valid? then
-                pa.save
-            else
-                @errors.push(["person_alias",pa, pa.errors])
             end
         end
       elsif temp_obj.object_type == "Phenotypes" then
