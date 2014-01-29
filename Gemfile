@@ -62,6 +62,8 @@ group :test do
   gem 'shoulda'
   gem 'shoulda-matchers'
   gem 'fakefs', :require => "fakefs/safe"
+  gem "database_cleaner"
+  gem "email_spec"
 end
 
 # Bundle the extra gems:

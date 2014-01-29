@@ -54,3 +54,9 @@ div.field, div.actions {
   font-size: 12px;
   list-style: square;
 }
+
+header {
+    width: 800px;
+    max-width: 900 px;
+    overflow: auto;
+}

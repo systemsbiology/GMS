@@ -36,14 +36,14 @@ describe PeopleController do
       :id => 1,
       :name => "test",
       :tag => "test",
-      :study => mock_model(Study)
+      :study_id => build_stubbed(:study).id #mock_model(Study)
     }
   end
 
   before(:each) do 
     # need to create the pedigree that we are going to add the person to
     @pedigree = Pedigree.create! valid_pedigree_attributes
-    Pedigree.stub!(:find).and_return(@pedigree)
+    Pedigree.stub(:find).and_return(@pedigree)
   end
 
   describe "GET index" do
@@ -105,17 +105,10 @@ describe PeopleController do
 	  }.to change(Person, :count).by(0)
       end
 
-     it "assigns a newly created but unsaved person as @person" do
-        # Trigger the behavior that occurs when invalid params are submitted
-        Person.any_instance.stub(:save).and_return(false)
-        post :create, :person => {}
-        assigns(:person).should be_a_new(Person)
-      end
-
       it "re-renders the 'new' template" do
         # Trigger the behavior that occurs when invalid params are submitted
         Person.any_instance.stub(:save).and_return(false)
-        post :create, :person => {}
+        post :create, :person => {:collaborator_id => '', :gender => ''}
         response.should render_template("new")
       end
     end

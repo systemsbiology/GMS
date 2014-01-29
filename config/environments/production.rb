@@ -46,4 +46,7 @@ Gms::Application.configure do
 
   # Send deprecation notices to registered listeners
   config.active_support.deprecation = :notify
+
+  # default url options
+  config.action_mailer.default_url_options = { :host => 'bobama.systemsbiology.net:3000'} 
 end

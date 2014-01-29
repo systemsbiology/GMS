@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20110926182022) do
+ActiveRecord::Schema.define(:version => 20140114170410) do
 
   create_table "acquisitions", :force => true do |t|
     t.integer "sample_id"
@@ -335,5 +335,22 @@ ActiveRecord::Schema.define(:version => 20110926182022) do
   end
 
   add_index "traits", ["person_id", "phenotype_id"], :name => "person_id", :unique => true
+
+  create_table "users", :force => true do |t|
+    t.string   "login",               :default => "", :null => false
+    t.string   "email"                
+    t.string   "first_name"
+    t.string   "last_name"
+    t.datetime "remember_created_at"
+    t.integer  "sign_in_count",       :default => 0
+    t.datetime "current_sign_in_at"
+    t.datetime "last_sign_in_at"
+    t.string   "current_sign_in_ip"
+    t.string   "last_sign_in_ip"
+    t.datetime "created_at",                          :null => false
+    t.datetime "updated_at",                          :null => false
+  end
+
+  add_index "users", ["login"], :name => "index_users_on_login", :unique => true
 
 end

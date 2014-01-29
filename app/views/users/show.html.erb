@@ -1,0 +1,14 @@
+<h3>Users</h3>
+<p>Login: <%= @user.login %></p>
+<p>Name: <%= @user.first_name %> <%= @user.last_name %></p>
+<p>Email: <%= @user.email %></p>
+
+<% if true #@user.roles.nil? %>
+    <p>User has no roles in the system</p>
+<% else %>
+    <table>
+    </table>
+<% end %>
+
+
+<%= link_to 'Users', users_path %>

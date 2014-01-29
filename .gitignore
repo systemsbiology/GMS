@@ -13,5 +13,6 @@ public/pedigrees/*
 ._*
 #*
 .#*
-config/user.rb
+config/cap_user.rb
 config/database.yml
+config/ldap.yml
