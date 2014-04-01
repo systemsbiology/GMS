@@ -55,7 +55,9 @@ FILE_TYPES = {
 		'ReMastered_MasterVar_'   => { 'type' => 'ReMastered-MasterVar', 'vendor' => 'ISB'},
 		'ReMastered_Var_' 	  => { 'type' => 'ReMastered-Var', 'vendor' => 'ISB'},
             }
-
+FILE_SKIPS = {
+         '.tbi' => { 'type' => 'tabix', 'category' => 'suffix' },
+}  
 
 Dir[File.dirname(__FILE__) + "/../vendor/*"].each do |path|
   gem_name = File.basename(path.gsub(/-\d+.\d+.\d+$/, ''))
