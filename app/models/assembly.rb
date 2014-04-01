@@ -78,14 +78,28 @@ class Assembly < ActiveRecord::Base
       errors.add(:location, "Directory #{start_dir} does not exist on the system.")
       abort("Directory #{start_dir} does not exist on the system for #{self.inspect}")
     end
-    #logger.debug("start dir is #{start_dir}")
+    #logger.error("start dir is #{start_dir}")
     Find.find(start_dir) do |path|
       filename = File.basename(path).split("/").last
+      skip_flag = 0
+      FILE_SKIPS.each { |filepart, filehash| 
+        type = filehash["type"]
+        category = filehash["category"]
+        if category == 'suffix' then
+            if (filename.match("#{filepart}$")) then
+                skip_flag = 1
+            end
+        end
+      }
+      if (skip_flag == 1) then
+        logger.error("Skipping file #{filename} because it matches a file skip")
+        next
+      end
       FILE_TYPES.each { |filepart, filehash| 
 	    type = filehash["type"]
 	    vendor = filehash["vendor"]
         if filename.match(filepart) then 
-          #logger.debug( "filename is #{filename}")
+          #logger.error("filename is #{filename}")
           files[type] = Hash.new
 	      files[type]["path"] = path
 	      files[type]["vendor"] = vendor
@@ -186,7 +200,7 @@ class Assembly < ActiveRecord::Base
 
       if check == 0 then
         logger.error("skipping file #{file_path} because it contains incorrect values for this filetype")
-	asm_file_errors.push("#{file_path} cannot be added to assembly because it contains incorrect values for this filetype")
+	    asm_file_errors.push("#{file_path} cannot be added to assembly because it contains incorrect values for this filetype")
         next
       end
  
