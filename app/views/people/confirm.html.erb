@@ -1,5 +1,8 @@
 <h1>Success</h1>
 <p>Saved objects to DB</p>
+<% if @pedigree_id then %>
+<p>Go to <%= link_to 'pedigree', pedigree_path(@pedigree_id) %></p>
+<% end %>
 <br />
 <% if @errors.size > 0 %>
   <h1>Failures</h1>
