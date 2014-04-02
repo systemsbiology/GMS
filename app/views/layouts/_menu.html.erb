@@ -18,6 +18,11 @@
 	    <br />
 	    <li><%= link_to("Terminology", terminology_path) %></li>
 	    <br />
+        <li><%= link_to "Acquisitions", acquisitions_path  %></li>
+        <li><%= link_to "Problem Samples", samples_path(:problems => 1) %></li>
+        <br />
+        <li><%= link_to "Ingenuity Check", ingenuity_upload_samples_path %></li>
+        <br />
 	    <li><%= link_to("New Study", new_study_path) %></li>
 	    <li><%= link_to("New Pedigree", new_pedigree_path) %></li>
 	    <li><%= link_to("New Person", new_person_path) %></li>
