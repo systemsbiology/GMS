@@ -2,6 +2,7 @@ require 'will_paginate'
 require 'will_paginate/array'
 
 class AssemblyFilesController < ApplicationController
+  caches_action :ped_info
   # GET /assembly_files
   # GET /assembly_files.xml
   def index
@@ -57,8 +58,7 @@ class AssemblyFilesController < ApplicationController
   # POST /assembly_files
   # POST /assembly_files.xml
   def create
-   puts "params in create are #{params.inspect}"
-    @assembly_file = AssemblyFile.new(params[:assembly_file])
+    @assembly_file = AssemblyFile.new(assembly_file_params)
 
     respond_to do |format|
       puts "format is #{format.inspect}\n"
@@ -84,7 +84,7 @@ class AssemblyFilesController < ApplicationController
     @assembly_file = AssemblyFile.find(params[:id])
 
     respond_to do |format|
-      if @assembly_file.update_attributes(params[:assembly_file])
+      if @assembly_file.update_attributes(assembly_file_params)
         format.html { redirect_to(@assembly_file, :notice => 'Assay file was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -127,6 +127,11 @@ class AssemblyFilesController < ApplicationController
     def find_all_by_pedigree_id(pedigree_id)
     @assembly_files = AssemblyFile.find(:all, :include => { :assembly => {:assay => { :sample => { :person => :pedigree } } } },
                                         :conditions => [ 'pedigrees.id = ?', pedigree_id ])
+  end
+
+  private
+  def assembly_file_params
+    params.require(:assembly_file).permit(:genome_reference_id, :name, :assembly_id, :description, :location, :file_type_id, :metadata, :software, :software_version, :file_date, :current, :comments)
   end
 
 end
