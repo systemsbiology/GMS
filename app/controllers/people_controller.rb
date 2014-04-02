@@ -62,6 +62,12 @@ class PeopleController < ApplicationController
   # POST /people.xml
   def create
     @person = Person.new(person_params)
+    puts "params #{params.inspect}"
+    puts "person_params #{person_params.inspect}"
+    puts "person #{@person.inspect}"
+    #logger.debug("person_param #{person_params.inspect}")
+    #logger.debug("params #{params.inspect}")
+
 
     if params[:gender] then
       if params[:gender] != 'unknown' then
@@ -88,7 +94,9 @@ class PeopleController < ApplicationController
       render :action => "new" and return
     end
     @person.pedigree = pedigree
-
+    @person.pedigree_id = params[:pedigree][:id]
+    #logger.debug("person is #{@person.inspect}")
+    puts "last person #{@person.inspect}"
     respond_to do |format|
       if @person.save
         # moved into an after_save callback 2012/02/07
@@ -102,7 +110,7 @@ class PeopleController < ApplicationController
 #        membership.pedigree_id = params[:pedigree][:id]
 #            membership.person_id = @person.id
 #        membership.save
-
+        expire_action :action => :ped_info
         format.html { redirect_to(@person, :notice => 'Person was successfully created.') }
         format.xml  { render :xml => @person, :status => :created, :location => @person }
       else
@@ -116,9 +124,10 @@ class PeopleController < ApplicationController
   # PUT /people/1.xml
   def update
     @person = Person.find(params[:id])
-
     @values = person_params
+
     if params[:check_dates] then
+        logger.debug("check dates is present in params #{params.inspect}")
       if params[:check_dates][:add_dob].to_i != 1 then
         @values.delete_if{|k,v| k.match(/^dob/)}
       end
@@ -133,12 +142,13 @@ class PeopleController < ApplicationController
     # update the pedigree of the person
     if (params[:pedigree] and params[:pedigree][:id])
       pedigree = Pedigree.find(params[:pedigree][:id])
+      @values["pedigree_id"] = pedigree.id
       @person.pedigree = pedigree
       @person.save
     end
 
     respond_to do |format|
-      if @person.update_attributes(person_params)
+      if @person.update_attributes(@values)
         format.html { redirect_to(@person, :notice => 'Person was successfully updated.') }
         format.xml  { head :ok }
       else
@@ -237,7 +247,7 @@ class PeopleController < ApplicationController
     sheet1 = book.worksheet 0
 
     if spreadsheet_type == 'fgg manifest' then
-      ret_code, @people, @samples, @relationships, @memberships, @diagnoses, @acquisitions, @errors = process_fgg_manifest(sheet1, pedigree, disease)
+      ret_code, @people, @samples, @relationships, @memberships, @diagnoses, @acquisitions, @errors, @aliases, @phenotypes = process_fgg_manifest(sheet1, pedigree, disease)
     else
       flash[:error] = "Spreadsheet type not understood. Try this action again."
       render :action => "upload" and return
@@ -254,31 +264,39 @@ class PeopleController < ApplicationController
     # temp objects are processed in order, so be careful of what order you write them
 
     # person needs to be written first
-    rc = write_temp_object(@trans_id, "person",@people) unless @people.nil? or @people.empty?
+    rc = write_temp_object(@trans_id, "person",@people,1) unless @people.nil? or @people.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 #    logger.debug("rc for people #{@people.inspect} is #{rc.inspect}")
 
     # sample must be written next
-    rc = write_temp_object(@trans_id, "sample",@samples) unless @samples.nil? or @samples.empty?
+    rc = write_temp_object(@trans_id, "sample",@samples,2) unless @samples.nil? or @samples.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 #    logger.debug("rc for samples #{@samples.inspect} is #{rc.inspect}")
 
     # rest are arbitrary
-    rc = write_temp_object(@trans_id, "membership",@memberships) unless @memberships.nil? or @memberships.empty?
+    rc = write_temp_object(@trans_id, "membership",@memberships,3) unless @memberships.nil? or @memberships.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 #    logger.debug("rc for memberships #{@memberships.inspect} is #{rc.inspect}")
 
-    rc = write_temp_object(@trans_id, "acquisition",@acquisitions) unless @acquisitions.nil? or @acquisitions.empty?
+    rc = write_temp_object(@trans_id, "acquisition",@acquisitions,4) unless @acquisitions.nil? or @acquisitions.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 #    logger.debug("rc for acquisitions #{@acquisitions.inspect} is #{rc.inspect}")
 
-    rc = write_temp_object(@trans_id, "diagnosis",@diagnoses) unless @diagnoses.nil? or @diagnoses.empty?
+    rc = write_temp_object(@trans_id, "diagnosis",@diagnoses,5) unless @diagnoses.nil? or @diagnoses.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 #    logger.debug("rc for diagnosis #{@diagnoses.inspect} is #{rc.inspect}")
 
-    rc = write_temp_object(@trans_id, "relationship",@relationships) unless @relationships.nil? or @relationships.empty?
+    rc = write_temp_object(@trans_id, "relationship",@relationships,6) unless @relationships.nil? or @relationships.empty?
     flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
 #    logger.debug("rc for relationship #{@relationships.inspect} is #{rc.inspect}")
+
+    rc = write_temp_object(@trans_id, "aliases",@aliases,7) unless @aliases.nil? or @aliases.empty?
+    flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
+    logger.debug("rc for alias #{@aliases.inspect} is #{rc.inspect}")
+
+    rc = write_temp_object(@trans_id, "phenotypes",@phenotypes,8) unless @phenotypes.nil? or @phenotypes.empty?
+    flash[:error] = "Write temporary objects failed.  Please contact system administrator." if (rc == 0)
+    logger.debug("rc for phenotype #{@phenotypes.inspect} is #{rc.inspect}")
 
     respond_to do |format|
       format.html #upload_and_validate.html.erb
@@ -292,12 +310,13 @@ class PeopleController < ApplicationController
 ############################################################################################################
 ############################################################################################################
 
-  def write_temp_object(trans_id, obj_type, object)
+  def write_temp_object(trans_id, obj_type, object, order)
     to = TempObject.new
     to.object_type = obj_type.capitalize!
     to.trans_id = trans_id 
     to.added = Time.now
     to.object = Marshal.dump(object)
+    to.object_order = order
     if (to.save) then
       return 1
     else
@@ -313,7 +332,7 @@ class PeopleController < ApplicationController
   # gets all objects of that trans_is and saves them to the db
   def confirm
     trans_id = params[:trans_id]
-
+    @pedigree_id = ''
 
     #process Person objects first
     @errors = Array.new
@@ -342,7 +361,7 @@ class PeopleController < ApplicationController
         #logger.debug("person obj is #{person_obj.inspect}")
         #logger.debug("person_obj is a #{person_obj.class.inspect}")
         #logger.debug("person_obj is a #{person_obj.pedigree_id.class.inspect}")
-
+        @pedigree_id = person_obj.pedigree_id
         begin
           if person_obj.valid? then
             person_obj.save!
@@ -364,7 +383,7 @@ class PeopleController < ApplicationController
     end
 
     # process the rest of the objects
-    temp_objects = TempObject.find_all_by_trans_id(trans_id)
+    temp_objects = TempObject.find(:all, :conditions => {:trans_id => trans_id}, :order => "object_order")
     #logger.debug("temp objects are #{temp_objects.inspect}")
     temp_objects.each do |temp_obj|
       # need the begin rescue block because Person includes pedigree information and it needs to lazy load the pedigree class otherwise there is an error
@@ -386,6 +405,7 @@ class PeopleController < ApplicationController
           # been created already...
         #logger.debug("temp_obj is #{temp_obj.inspect}")
         pedigree_id = obj[0]
+        @pedigree_id = pedigree_id
         person_collaborator_id = obj[1]
         relation_collaborator_id = obj[2]
         rel_name = obj[3]
@@ -468,6 +488,7 @@ class PeopleController < ApplicationController
         end 
       elsif temp_obj.object_type == "Membership" then
         ped = Pedigree.find(obj[0])
+        @pedigree_id = ped.id
         #logger.debug("processing membership information for pedigree #{ped.inspect}")
         person = Person.find_by_collaborator_id_and_pedigree_id(obj[1], obj[0])
           m = Membership.new
@@ -485,9 +506,11 @@ class PeopleController < ApplicationController
         end
       elsif temp_obj.object_type == "Acquisition" then
         pedigree_id = obj[0]
+        @pedigree_id = pedigree_id
         person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(obj[1])
         sample = Sample.find_by_sample_vendor_id_and_pedigree_id(obj[2], obj[0])
-          acq = Acquisition.new
+        logger.debug("acquisition debug says pedigree #{pedigree_id.inspect} person #{person.inspect} sample #{sample.inspect}")
+        acq = Acquisition.new
         if person.nil? then
           acq.errors.add(:person_id,"not found for #{obj[0]}")
           @errors.push(["acquisition",acq, acq.errors])
@@ -506,6 +529,7 @@ class PeopleController < ApplicationController
       elsif temp_obj.object_type == "Diagnosis" then 
         disease = Disease.find(obj[0])
         pedigree_id = obj[1]
+        @pedigree_id = pedigree_id
         person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(obj[2])
             diagnosis = Diagnosis.new
         if person.nil? then
@@ -519,6 +543,55 @@ class PeopleController < ApplicationController
           else
             @errors.push(["diagnosis",diagnosis, diagnosis.errors])
           end
+        end
+      elsif temp_obj.object_type == "Aliases" then
+        person = Person.has_pedigree(obj[0]).find_by_collaborator_id(obj[1])
+        if person.nil? then
+            person = Person.new
+            person.errors.add(:person_id,"not found for pedigree #{obj[0]} collaborator #{obj[1]}")
+            @errors.push(["person",person,person.errors])
+        else
+            @pedigree_id = person.pedigree_id
+            if obj[2].kind_of?(Array) then
+                obj[2].each do |ali|
+                    pa = PersonAlias.new
+                    pa.person_id = person.id
+                    pa.value = ali
+                    pa.alias_type = "collaborator_id"
+                    if pa.valid? then
+                        pa.save
+                    else
+                        @errors.push(["person_alias",pa, pa.errors])
+                    end
+                end
+            else
+                pa = PersonAlias.new
+                pa.person_id = person.id
+                pa.value = obj[2]
+                pa.alias_type = "collaborator_id"
+                if pa.valid? then
+                    pa.save
+                else
+                    @errors.push(["person_alias",pa, pa.errors])
+                end
+            end
+        end
+      elsif temp_obj.object_type == "Phenotypes" then
+        phenotype = Phenotype.find(obj[0])
+        person = Person.has_pedigree(obj[1]).find_by_collaborator_id(obj[2])
+        @pedigree_id = person.pedigree_id
+        trait = Trait.find_by_person_id_and_phenotype_id_and_trait_information(person.id, phenotype.id,obj[3])
+        #logger.debug("phenotypes debug person #{person.inspect} trait #{trait.inspect}")
+        if trait.nil? then
+          trait = Trait.new
+        end
+        trait.person_id = person.id
+        trait.phenotype_id = phenotype.id
+        trait.trait_information = obj[3]
+        if trait.valid? then
+          trait.save
+        else
+            @errors.push(["trait",trait,trait.errors])
         end
       end
     else
@@ -537,7 +610,7 @@ class PeopleController < ApplicationController
       rescue Exception => exc
         temp_obj.errors.add(:object_type, "could not be destroyed")
         @errors.push(["temp_object", temp_obj.errors])
-    logger.error("temp_object #{temp_obj.inspect} could not be destroyed!!  #{exc.message}")
+        logger.error("temp_object #{temp_obj.inspect} could not be destroyed!!  #{exc.message}")
       end
 
     end # end temp_objects.each do
@@ -561,6 +634,8 @@ class PeopleController < ApplicationController
     diagnoses = Array.new
     acquisitions = Array.new
     errors = Hash.new
+    aliases = Array.new
+    phenotypes = Array.new
     counter = 0
     flag = 0
     headers = nil
@@ -583,6 +658,8 @@ class PeopleController < ApplicationController
       headers =  YAML.load(header_file)[1.0]
       #elsif sheet.name == "Sample Information v3.5" then
       #  headers =  YAML.load(header_file)[3.5]
+    elsif sheet.name == "FGG Information v1.1" then
+      headers = YAML.load(header_file)[1.1]
     else
       logger.error("Unhandled Sample Information version #{sheet.name} for FGG Manifest.  Check to make sure that the spreadsheet you submitted is a FGG Manifest spreadsheet.  If it is, then please add new version to the YAML and re-run.")
       flash[:error] = "Unhandled Sample Information version #{sheet.name} for FGG Manifest.  Check to make sure that the spreadsheet you submitted is a FGG Manifest spreadsheet.  If it is, then please add new version to the YAML and re-run."
@@ -593,10 +670,10 @@ class PeopleController < ApplicationController
       if row[0] == "Sequencing Sample ID" then
         # check all of the headers exist
         headers.each do |col, index|
-      if row[index] != col then
-            flash[:error] = "Spreadsheet provided has an incorrect column.  <b>\"#{row[index]}\"</b> in column number #{index} should be <b>\"#{col}\"</b>.  Please check the format of your spreadsheet."
-        render :action => "upload" and return(0)
-      end
+            if row[index] != col then
+                flash[:error] = "Spreadsheet provided has an incorrect column.  <b>\"#{row[index]}\"</b> in column number #{index} should be <b>\"#{col}\"</b>.  Please check the format of your spreadsheet."
+                render :action => "upload" and return(0)
+            end
         end
 
         flag = 1
@@ -641,13 +718,54 @@ class PeopleController < ApplicationController
         end
 
         customer_sample_id = row[headers["Customer Sample ID"]]
-
+        # use customer subject_id to find the person with the correct pedigree
         p = Person.has_pedigree(pedigree.id).find_by_collaborator_id(customer_subject_id) 
+        # use the customer_sample_id to find the person with the correct pedigree
         if (p.nil?) then
             p = Person.has_pedigree(pedigree.id).find_by_collaborator_id(customer_sample_id)
         end
+        # use the customer_subject_id but don't trust that there's an entry in the 
+        # memberships table since this sometimes errs out, but then test that
+        # the pedigree id is the same
+        if (p.nil?) then
+            ps = Person.find_by_collaborator_id(customer_subject_id)
+            logger.debug("pedigree #{pedigree.inspect}")
+            if (!ps.nil? and ps.pedigree_id == pedigree.id) then
+               p = ps
+            end
+        end
+        # as above except use the customer_sample_id
+        if (p.nil?) then
+            ps = Person.find_by_collaborator_id(customer_sample_id)
+            if (!ps.nil? and ps.pedigree_id == pedigree.id) then
+               p = ps
+            end
+        end
+        logger.debug("creating new p") if p.nil?
         p = Person.new if p.nil?
         p.collaborator_id = customer_subject_id
+
+        if headers["Subject Aliases"] and !row[headers["Subject Aliases"]].nil? then
+            person_aliases = Array.new
+            person_alias = row[headers["Subject Aliases"]]
+            logger.debug("person_alias #{person_alias}")
+            if person_alias.to_s.match(';') then
+              person_aliases = person_alias.split(/;/)
+            else
+              person_aliases.push(person_alias)
+            end
+            logger.debug("person_aliases #{person_aliases.inspect}")
+            new_aliases = Array.new
+            person_aliases.each do |pa|
+              peral = PersonAlias.find_by_person_id_and_value_and_alias_type(p.id, pa, "collaborator_id")
+              if peral.nil? then 
+                new_aliases.push(pa)
+              end
+            end
+            logger.debug("new aliasses #{new_aliases.inspect}")
+            aliases.push([pedigree.id, p.collaborator_id, new_aliases]) unless new_aliases.nil?
+        end
+
         if row[headers["Gender"]].nil? then
             p.errors.add(:gender, "Must provide a gender for person #{customer_sample_id}")
         else
@@ -680,8 +798,30 @@ class PeopleController < ApplicationController
                     tp = Person.new
                     tp.errors.add(:affected_status, "value provided not recognized - '#{affected_status}'. Should be 'affected' in order to set status correctly.")
                     errors["#{counter}"]["affected_status"] = tp.errors
+                    errors["#{counter}"]["line"] = row
                 end
             end
+        end
+
+        if headers["Subject Phenotypes"] and !row[headers["Subject Phenotypes"]].nil? then
+           all_phenotypes = row[headers["Subject Phenotypes"]].split(/;/)
+           all_phenotypes.each do |pheno|
+                if pheno.match(/=/) then
+                  (pheno, pheno_info) = pheno.split(/=/)
+                end
+                phenotype = Phenotype.find_by_name(pheno)
+                if phenotype.nil? then
+                    phenotype = Phenotype.find_by_tag(pheno)
+                end
+                if phenotype.nil? or phenotype.to_s.match('NA') then
+                    phen = Phenotype.new
+                    phen.errors.add(:name, "could not be found.  Upload value of #{pheno} not in database. Please create in database before uploading spreadsheet.")
+                    errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
+                    errors["#{counter}"]["phenotype"] = phen.errors
+                    next
+                end
+                phenotypes.push([phenotype.id, pedigree.id, p.collaborator_id, pheno_info])
+           end
         end
 
         # queue up the relationship information so that we can add it later after confirmation
@@ -706,10 +846,28 @@ class PeopleController < ApplicationController
             end
         end
 
-        mz_twin_id = row[headers["Monozygotic Twin Subject ID"]]
-        mz_twin_id = mz_twin_id.to_i if (mz_twin_id.is_a? Float)
-        if (!mz_twin_id.nil? and !mz_twin_id.empty? and !mz_twin_id.to_s.match('NA')) then
-            relationships.push([pedigree.id, customer_subject_id, mz_twin_id, 'monozygotic twin','1'])
+        if headers["Monozygotic Twin Subject ID"] then
+            mz_twin_id = row[headers["Monozygotic Twin Subject ID"]]
+            mz_twin_id = mz_twin_id.to_i if (mz_twin_id.is_a? Float)
+            if (!mz_twin_id.nil? and !mz_twin_id.empty? and !mz_twin_id.to_s.match('NA')) then
+                relationships.push([pedigree.id, customer_subject_id, mz_twin_id, 'monozygotic twin','1'])
+            end
+        elsif headers["Twin Subject ID"] and !row[headers["Twin Subject ID"]].nil? then
+            if !row[headers["Twin Subject ID"]].nil? and !row[headers["Twin Type"]].nil? then 
+                if (row[headers["Twin Type"]] != 'mz' and row[headers["Twin Type"]] != 'dz' and row[headers["Twin Type"]] != 'monozygotic' and row[headers["Twin Type"]] != 'dizygotic' ) then
+                    r.errors.add(:parent_id, "Twin Type must be 'mz', 'dz', 'monozygotic', or 'dizygotic'")
+                else
+                    twin_id = row[headers["Twin Subject ID"]]
+                    twin_type = row[headers["Twin Type"]]
+                    if (twin_type == "mz" or twin_type == "monozygotic") then twin_type = "monozygotic twin" end
+                    if (twin_type == "dz" or twin_type == "dizygotic") then twin_type = "dizygotic twin" end
+                    if (!twin_id.nil? and !twin_id.empty? and !twin_id.to_s.match('NA')) then
+                        relationships.push([pedigree.id, customer_subject_id, twin_id, twin_type, '1'])
+                    end
+                end
+            else 
+                r.errors.add(:parent_id, "Twin Subject ID requires a Twin Type")
+            end
         end
 
         spouse_id =  row[headers["Spouse Subject ID"]]
@@ -785,6 +943,8 @@ class PeopleController < ApplicationController
         if p.valid?
           people << p
         else
+            logger.debug("p is not valid #{p.inspect}")
+            logger.debug("p.errors #{p.errors.inspect}")
             errors["#{counter}"] = Hash.new
             errors["#{counter}"]["person"] = p.errors
             printable_row = Array.new
@@ -795,6 +955,7 @@ class PeopleController < ApplicationController
                     printable_row << cell
                 end
             end
+            logger.debug("set error #{counter} to #{printable_row.inspect}")
             errors["#{counter}"]["row"] = "<table><tr><td>"+printable_row.join("</td><td>")+"</tr></table>"
         end
 
@@ -818,11 +979,11 @@ class PeopleController < ApplicationController
     #logger.debug("acquisitions are #{acquisitions.inspect}")
     #logger.debug("errors are #{errors.inspect}")
 
-    return 1, people, samples, relationships, memberships, diagnoses, acquisitions, errors
+    return 1, people, samples, relationships, memberships, diagnoses, acquisitions, errors, aliases, phenotypes
   end # end process fgi manifest definition
 
   def get_drop_down_people_by_pedigree
-    options = Person.find_all_by_pedigree_id(params[:pedigree_id]).collect { |per| "\"#{per.id}\" : \"#{per.full_identifier}\"" }
+    options = Person.has_pedigree(params[:pedigree_id]).collect { |per| "\"#{per.id}\" : \"#{per.full_identifier}\"" }
     render :text => "{#{options.join(",")}}"
   end
 
@@ -846,6 +1007,6 @@ class PeopleController < ApplicationController
 
   private
   def person_params
-    params.require(:people).permit(:collaborator_id, :gender, :dob, :dod, :deceased, :planning_on_sequencing, :complete, :root, :comments, :pedigree_id)
+    params.require(:person).permit(:collaborator_id, :gender, :dob, :dod, :deceased, :planning_on_sequencing, :complete, :root, :comments, :pedigree_id)
   end
 end
