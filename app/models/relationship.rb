@@ -120,6 +120,11 @@ class Relationship < ActiveRecord::Base
   def correct_gender?
     relationship_gender = Settings.relationship_gender
 
+    # bypass the check if either gender is unknown
+    if self.person.gender == 'unknown' or self.relation.gender == 'unknown'
+        return true
+    end
+
     if self.name == 'monozygotic twin' then
       # monozygotic twins are always the same sex (unless they have a disease, which may mean this check should be removed if we get any cases of this)
       #logger.debug("monozygotic twins test #{self.person.gender} to #{self.relation.gender}")
@@ -134,7 +139,7 @@ class Relationship < ActiveRecord::Base
       # dizygotic twins can be any sex combination
       return true
     end
-
+    
     if relationship_gender[self.name].nil? then
       logger.error("Error: relationship_gender does not contain #{self.name}.  Please add to config/application.yml before adding this relationship.")
       return false
