@@ -27,6 +27,8 @@ Gms::Application.routes.draw do
   resources :samples do
     get 'get_drop_down_samples_by_pedigree', :on => :collection
     get 'ped_info', :on => :collection
+    get 'ingenuity_upload', :on => :collection
+    post 'ingenuity_missing_samples',:on => :collection
   end
   resources :sample_types
   resources :acquisitions
@@ -66,6 +68,7 @@ Gms::Application.routes.draw do
     get 'pedigree_datastore', :on => :collection
     get 'export_madeline_table'
     get 'export_madeline_pdf', :on => :collection
+    get 'export_all_madeline_tables', :on => :collection
     get 'founders'
     get 'founders', :on => :collection
     get 'kwanzaa', :on => :collection
