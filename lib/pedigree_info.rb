@@ -55,7 +55,7 @@ end
 # this method outputs a JSON hash
 def pedfile(pedigree_id)
 
-  puts "Creating JSON File for pedigree #{pedigree_id}"
+  #logger.debug "Creating JSON File for pedigree #{pedigree_id}"
   ped = Pedigree.find(pedigree_id)
 
   output_pedigree = Hash.new
@@ -74,7 +74,7 @@ def pedfile(pedigree_id)
 
   check = ped.people.count
   if check <= 0 then
-    puts "No people for this pedigree, skipping"
+    #logger.debug "No people for this pedigree, skipping"
     return output_pedigree
   end
 
@@ -86,7 +86,6 @@ def pedfile(pedigree_id)
   output_pedigree["ordered_pedigree"] =  output_ordered
 
   individuals = Array.new
-  #ped.people.each do |ind|
   ordered_ped.each do |ind|
     person = Hash.new
     person["person_id"] = ind.isb_person_id
@@ -113,7 +112,7 @@ def pedfile(pedigree_id)
     samples_list = Array.new
     ind.samples.each do |sample|
       ind_sample = Hash.new
-      #puts "sample is #{sample.inspect}"
+      #logger.debug "sample is #{sample.inspect}"
       # has isb_sample_ in front already
       ind_sample["sample_id"] = sample.isb_sample_id
       if sample.sample_type.nil?
@@ -134,9 +133,9 @@ def pedfile(pedigree_id)
         assay_holder = Array.new
         assays.group_by { |t| t.assay_type }.each do |assay_type_group, assay_array|
           #assay_hash[assay_type_group] = Array.new
-          #puts "assay_array is #{assay_array}"
+          #logger.debug "assay_array is #{assay_array}"
           assay_array.each do |assay|
-	    #puts "assay is #{assay.inspect}"
+	    #logger.debug "assay is #{assay.inspect}"
             assay_info = Hash.new
 	    assay_info["assay_id"] = "isb_asy_"+assay.id.to_s
             assay_info["assay_name"] = assay.name
@@ -150,7 +149,7 @@ def pedfile(pedigree_id)
 	    assay_info["assemblies"] = Array.new
 
 	    assay.assemblies.each do |assembly|
-    	        #puts "assembly #{assembly.inspect}"
+    	        #logger.debug "assembly #{assembly.inspect}"
                 asm_list = Hash.new
 		asm_list["assembly_id"] = "isb_asm_"+assembly.id.to_s
                 asm_list["assembly_name"] = assembly.name
@@ -166,7 +165,7 @@ def pedfile(pedigree_id)
                 af_list = assembly.assembly_files
                 file_list = Array.new
                 af_list.group_by {|t| t.file_type_id }.each do |file_type_id, assembly_file_array|
-#                  puts "file_type_id is #{file_type_id.inspect} assay_file_array is #{assembly_file_array.inspect}"
+#                  #logger.debug "file_type_id is #{file_type_id.inspect} assay_file_array is #{assembly_file_array.inspect}"
 		  assay_key = FileType.find(file_type_id).type_name
                   next if assay_key == "ASSEMBLY" 
                   assembly_file_array.each do |assembly_file|
@@ -190,7 +189,7 @@ def pedfile(pedigree_id)
 
   	    assay_info.delete("assemblies") if assay_info["assemblies"].size == 0
             #assay_hash[assay_type_group].push(assay_info)
-	    #puts "adding assay_info to assay_array #{assay_info.inspect}"
+	    #logger.debug "adding assay_info to assay_array #{assay_info.inspect}"
 	    assay_holder.push(assay_info)
           end # end assay_array.each
         end # end assays.group_by.each
@@ -295,7 +294,7 @@ def ordered_pedigree(pedigree_id)
   else
     root_person = find_root(pedigree_id)
     #logger.debug("root person in ordered_pedigree is #{root_person.inspect}")
-    puts "ERROR: no root person!" if root_person.nil?
+    logger.error("ERROR: no root person!") if root_person.nil?
 
     madeline_people = breadth_unrooted_traverse(root_person)
   end
@@ -477,45 +476,46 @@ def find_root(pedigree_id)
 
    if Pedigree.find(pedigree_id).tag.downcase.match("unrelateds") then
      first = Pedigree.find(pedigree_id).people.first
-    # puts "Returned one root for unrelated pedigree #{pedigree_id}"
+     #logger.debug "Returned one root for unrelated pedigree #{pedigree_id}"
      return first
    end
 
    if Pedigree.find(pedigree_id).tag.downcase.match("diversity") then
      # diversity shoudl be split into multiple pedigrees, but for now just return the first
      first = Pedigree.find(pedigree_id).people.first
-     #puts "Returned one root for diversity pedigree #{pedigree_id}"
+     #logger.debug "Returned one root for diversity pedigree #{pedigree_id}"
      return first
    end
 
    root_candidates = Person.has_pedigree(pedigree_id).joins(:offspring).where("relationships.person_id not in (?)", Relationship.has_pedigree(pedigree_id).where(:relationship_type => "child").map(&:person_id))
 
-   #puts "root candidates #{root_candidates.inspect}"
+   #logger.debug "root candidates #{root_candidates.inspect}"
    if root_candidates.empty?
      # this means that this pedigree has a single person (probably)
      root_candidates = Person.has_pedigree(pedigree_id)
-     #puts "new root cands is #{root_candidates.inspect}"
+     #logger.debug "new root cands is #{root_candidates.inspect}"
    end
 
    roots = winnow_candidates(root_candidates)
    roots = prefer_male(roots)
    roots = prefer_male_children(roots)
 
-   # to make logger.debug work with the rake task
+   # to make #logger.debug work with the rake task
    if (!defined?(logger)) then
      logger = Logger.new(STDOUT)
    end
-   # to make logger.debug work in the console - can't combine and not sure why
+   # to make #logger.debug work in the console - can't combine and not sure why
    if (logger.nil?) then
      logger = Logger.new(STDOUT)
    end
 
    if roots.size > 1
-     logger.debug("Error: Found multiple roots for pedigree #{pedigree_id}.")
+     #logger.debug("Error: Found multiple roots for pedigree #{pedigree_id}.")
+     #logger.debug "#{roots.inspect}"
    elsif roots.size == 1
-#     logger.debug("Found one root for pedigree #{pedigree_id}")
+     #logger.debug("Found one root for pedigree #{pedigree_id}")
    else
-     logger.debug("Found no root for pedigree #{pedigree_id}")
+     #logger.debug("Found no root for pedigree #{pedigree_id}")
    end
 
    root_array = roots.values
@@ -526,29 +526,29 @@ def winnow_candidates(root_candidates)
 
    roots = Hash.new
    root_candidates.each do |person|
-     #puts "person #{person.inspect}"
+     #logger.debug "person #{person.inspect}"
      # check to see that this person isn't a child of someone else
      parent_relationships = person.parents
-     #puts "parent_rels #{parent_relationships.inspect}"
+     #logger.debug "parent_rels #{parent_relationships.inspect}"
      next if parent_relationships.size > 0
 
      # check marriages to see if spouse has parents
      spouse_relationships = person.spouses
-     #puts "spouse_rels #{spouse_relationships.inspect}"
+     #logger.debug "spouse_rels #{spouse_relationships.inspect}"
      flag = false
      spouse_relationships.each do |spouse_rels|
        spouse = spouse_rels.relation
        spouse_parents = spouse.parents
-       #puts "spouse parents #{spouse_parents.inspect} #{spouse_parents.size}"
+       #logger.debug "spouse parents #{spouse_parents.inspect} #{spouse_parents.size}"
        if spouse_parents.size > 0 then
          flag = true
        end
      end
      next if flag
-     #puts "adding person to root list"
+     #logger.debug "adding person to root list"
      roots[person.id] = person
 
-     #puts "________________"
+     #logger.debug "________________"
    end
 
   return roots
@@ -615,13 +615,13 @@ def pedigree_founders(pedigree_id)
   else
     root_person = find_root(pedigree_id)
     #logger.debug("root person in ordered_pedigree is #{root_person.inspect}")
-    puts "ERROR: no root person!" if root_person.nil?
+    #logger.debug "ERROR: no root person!" if root_person.nil?
 
     madeline_people = breadth_unrooted_traverse(root_person)
   end
 
   madeline_people.each do |person|
-    puts "#{person.id} - #{person.collaborator_id}"
+    #logger.debug "#{person.id} - #{person.collaborator_id}"
   end
 
   return madeline_people
@@ -635,68 +635,76 @@ def breadth_unrooted_traverse(person)
   madeline_people = Array.new
   madeline_people = people.dup
   current_gen = side_unrooted_branch(person, [])
-  #puts("current_gen after side_unrooted_branch #{current_gen}")
+  #logger.debug("breadth_unrooted_traverse current_gen after side_unrooted_branch #{current_gen}")
   people = people | current_gen
-  #puts("people after side_unrooted_branch #{people}")
+  #logger.debug("breadth_unrooted_traverse people after side_unrooted_branch #{people}")
   madeline_people = madeline_people | people
-  #puts("ENTERING LOOP")
+  #logger.debug("ENTERING LOOP")
   loop {
-    #puts("LOOP START")
-    #puts("breadth traverse people #{people}")
-    #puts("breadth traverse up_breadth_unrooted_branch")
+    #logger.debug("LOOP START")
+    #logger.debug("breadth traverse people #{people}")
+    #logger.debug("breadth traverse up_breadth_unrooted_branch")
     people, current_gen = up_breadth_unrooted_branch(people, current_gen)
 
-    #puts("breadth traverse down_breadth_unrooted_branch")
+    #logger.debug("breadth traverse down_breadth_unrooted_branch")
     people, current_gen = down_breadth_unrooted_branch(people, current_gen)
-    #puts("back from down_breadth_unrooted_branch")
-    puts("current gen is #{current_gen.inspect}")
+    #logger.debug("back from down_breadth_unrooted_branch")
+    #logger.debug("current gen is #{current_gen.inspect}")
     break if current_gen.empty?
-    #puts("after break in breadth_traverse")
+    #logger.debug("after break in breadth_traverse")
     madeline_people = madeline_people | current_gen
-    #puts("madeline_people is #{madeline_people}")
+    #logger.debug("madeline_people is #{madeline_people}")
     people = current_gen.dup
-    #puts("LOOP END\n\n\n")
+    #logger.debug("LOOP END\n\n\n")
   }
 
   return madeline_people
 end
 
 def down_breadth_unrooted_branch(people, current_gen)
-  #puts("down_breadth_unrooted_branch called with people #{people.inspect}")
+  #logger.debug("down_breadth_unrooted_branch called with people #{people.inspect}")
   new_gen = Array.new
   people.each do |person|
-    #puts("down_breadth_unrooted_branch loop for person #{person.inspect}")
+    #logger.debug("down_breadth_unrooted_branch loop for person #{person.inspect}")
     # offspring orders by relation_order
     next if person.nil?
     offspr = person.offspring
-    #puts("offspring is #{offspr}")
+    #logger.debug("offspring is #{offspr}")
     person.offspring.each do |offspring_rel|
       child = offspring_rel.relation
-      #puts("down_breadth_unrooted_branch child is #{child.inspect}")
+      #logger.debug("down_breadth_unrooted_branch child is #{child.inspect}")
       if !current_gen.include?(child) and !people.include?(child) then
+        if (child.gender == "female") then
+          #logger.debug("FINDING IF FEMALE HAS A SPOUSE BEFORE ADDING")
+	      new_gen = side_unrooted_branch(child, current_gen)
+        end
+        #logger.debug("adding child #{child.inspect} to people")
         new_gen.push(child)
-	current_gen.push(child) unless current_gen.include?(child)
-	new_gen = side_unrooted_branch(child, current_gen)
-	#puts("down_breadth_unrooted_branch back from side_unrooted_branch")
+	    current_gen.push(child) unless current_gen.include?(child)
+	    new_gen = side_unrooted_branch(child, current_gen)
+	    #logger.debug("down_breadth_unrooted_branch back from side_unrooted_branch")
       end
     end
   end
-  #puts("exiting down_breadth_unrooted_branch") 
+  #logger.debug("exiting down_breadth_unrooted_branch with people #{people.inspect} and new_gen #{new_gen.inspect}") 
   return people, new_gen
 end
 
 def up_breadth_unrooted_branch(people, current_gen)
-  #puts("up_breadth_unrooted_branch called")
+  #logger.debug("up_breadth_unrooted_branch called")
   new_gen = Array.new
   people.each do |person|
     next if person.nil?
     person.ordered_parents.each do |parent_rel|
       parent = parent_rel.relation
-      #puts("up_breadth_unrooted_branch parent is #{parent.inspect}")
+      #logger.debug("up_breadth_unrooted_branch parent is #{parent.inspect}")
       if !current_gen.include?(parent) and !people.include?(parent) and !new_gen.include?(parent) then
         new_gen.push(parent)
-	current_gen.push(parent) unless current_gen.include?(parent)
-	new_gen = side_unrooted_branch(parent, current_gen)
+	    current_gen.push(parent) unless current_gen.include?(parent)
+	    new_gen = side_unrooted_branch(parent, current_gen)
+        children, blah = down_breadth_unrooted_branch([parent], current_gen)
+        #logger.debug("children in up_breadth_unrooted_branch for new parent #{parent.inspect} are #{children.inspect}")
+        #logger.debug("blah in up_breadth_unrooted_branch for new parent #{parent.inspect} are #{blah.inspect}")
       end
     end
   end
@@ -705,11 +713,11 @@ def up_breadth_unrooted_branch(people, current_gen)
 end
 
 def side_unrooted_branch(person, previous)
-  #puts("side_unrooted_branch called")
+  #logger.debug("side_unrooted_branch called")
   return previous if person.nil? or person.spouses.size == 0
   person.spouses.each do |spouse_rel|
     spouse = spouse_rel.relation
-    #puts("side_unrooted_branch found spouse #{spouse.inspect}")
+    #logger.debug("side_unrooted_branch found spouse #{spouse.inspect}")
     if !previous.include?(spouse) then
       previous.push(spouse)
     end
