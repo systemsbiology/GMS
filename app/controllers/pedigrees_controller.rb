@@ -262,7 +262,7 @@ class PedigreesController < ApplicationController
       infile.print(madeline_info.join("\n"))
       infile.flush
       infile.close
-      #FileUtils.copy(infile.path, "/tmp/blah.txt")
+      FileUtils.copy(infile.path, "/tmp/blah.txt")
 
       madeline_table = array_to_html_table(header.split(/\t/), madeline_array)
       madeline_table.gsub!(/table/, "table border=\"1\" cellspacing=\"0\"") #dunno how to get XMLBuilder to return a border
@@ -298,7 +298,42 @@ class PedigreesController < ApplicationController
     end
     
     respond_to do |format|
-      format.html { download_zip("#{@pedigree.tag}_madline_table.zip",{ "#{@pedigree.tag}_madeline_table.csv" => csv_file_name}) }
+      format.html { download_zip("#{@pedigree.tag}_madeline_table.zip",{ "#{@pedigree.tag}_madeline_table.csv" => csv_file_name}) }
+    end
+  end
+
+  def export_all_madeline_tables
+    study = Study.find(params[:study])
+    if (study.nil?) then
+        @pedigrees = Pedigree.all
+    else 
+        @pedigrees = study.pedigrees
+    end
+    filenames = Hash.new
+    @pedigrees.each do |pedigree|
+      ordered_ped = ordered_pedigree(pedigree.id)
+      madeline_array = to_madeline(pedigree,ordered_ped)
+      header = madeline_header(pedigree).split(/\t/)
+
+      csvdir_exists
+      csv_file_name = "#{CSVDIR}/#{pedigree.tag}_madeline_table_#{Date.today.to_s}.csv"
+      filenames["#{pedigree.tag}_madeline_table.csv"] = csv_file_name
+      CSV.open(csv_file_name, "wb") do |csv|
+        csv << header
+        madeline_array.each do |row|
+          csv << row
+        end
+      end
+    end
+
+    if (!study.nil?) then
+      zip_name = "#{study.tag}_"
+    else
+      zip_name = "all"
+    end
+    zip_name = zip_name+"_madeline_table.zip"
+    respond_to do |format|
+      format.html { download_zip(zip_name,filenames) }
     end
   end
 
