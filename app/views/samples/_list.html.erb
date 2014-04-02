@@ -22,7 +22,7 @@
     <td><%= link_to sample.isb_sample_id, sample, :id => sample.id %></td>
     <td><%= sample.customer_sample_id %></td>
     <% if sample.person.nil? then %>
-    <td colspan="3">No person information for this sample</td>
+    <td colspan="3">No person information.  Add <%= link_to('a link', :controller => "acquisitions", :action => "new", :sample_id => sample.id) %> </td>
     <% else %>
     <% if sample.person.collaborator_id.nil? then %>
     <td colspan="1"><%= link_to sample.person.isb_perons_id, sample.person  %>
