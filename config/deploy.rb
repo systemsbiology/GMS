@@ -1,5 +1,5 @@
 require 'fileutils.rb'
-load 'config/user.rb' # contains set :user, "username"
+load 'config/cap_user.rb' # contains set :cap_user, "username"
 
 set :application, "GMS"
 set :deploy_to, "/u5/www/software/gms/"
@@ -16,7 +16,7 @@ set :rvm_scripts_path, "/u5/tools/rvm/bin"
 set :rvm_path, "/u5/tools/rvm"
 set :rake, "bundle exec rake"
 #set :rvm_ruby_string, ENV['GEM_HOME'].gsub(/.*\//,"")  # set up which gemset you're using
-#set :rvm_ruby_string, "ruby-1.9.3-p392@global"
+#set :rvm_ruby_string, "ruby-1.9.3-p448@global"
 #set :rvm_install_ruby_params, '--1.9'
 #set :rvm_install_pkgs, %w[libyaml openssl]
 #set :rvm_install_ruby_params, '--with-opt-dir=/u5/tools/rvm/usr'
@@ -30,13 +30,13 @@ set :bundle_gemfile, "Gemfile"
 set :bundle_dir, fetch(:shared_path)+"/bundle"
 set :bundle_flags, "--deployment"
 
-#before 'bundle:install', "bundle:list"
+before 'bundle:install', "bundle:list"
 set :default_environment, {
-  'PATH' => "/u5/tools/rvm/gems/ruby-1.9.3-p392@global/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts:/bin/:/tools/bin:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",
-  'RUBY_VERSION' => 'ruby-1.9.3-p392@global',
-  'GEM_HOME' => '/u5/tools/rvm/gems/ruby-1.9.3-p392@global',
-  'GEM_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p392@global',
-  'BUNDLE_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p392@global'
+  'PATH' => "/u5/tools/rvm/gems/ruby-1.9.3-p448@global/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts:/bin/:/tools/bin:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",
+  'RUBY_VERSION' => 'ruby-1.9.3-p448@global',
+  'GEM_HOME' => '/u5/tools/rvm/gems/ruby-1.9.3-p448@global',
+  'GEM_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p448@global',
+  'BUNDLE_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p448@global'
 }
 
 #set :scm, :subversion
@@ -45,7 +45,7 @@ set :scm, :git
 set :local_repository, "/proj/famgen/git/gms/"
 set :repository, "/proj/famgen/git/gms/"
 set :branch, "master"
-set :use_sudo, "false"
+set :use_sudo, false
 
 server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
 
@@ -55,7 +55,7 @@ server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
 namespace :bundle do
   desc "list gems"
   task :list do 
-    run "cd #{deploy_to}/current && cat Gemfile"
+    run "cd #{release_path} && cat Gemfile"
   end
 end
 
@@ -77,12 +77,17 @@ end
      run "ln -nfs #{deploy_to}/shared/config/database.yml #{release_path}/config/database.yml"
    end
 
+   desc "Symlinks the jquery.min"
+   task :symlink_jquery, :roles => :app do
+     run "ln -fs #{release_path}/public/javascripts/jquery.js #{release_path}/public/javascripts/jquery.min.js"
+   end
+
    desc "Export files"
    task :run_all_exports, :roles => :app do
-     run("cd #{deploy_to}/current; bundle exec rake export:export_all_assemblies")
-     run("cd #{deploy_to}/current; bundle exec rake export:export_all_assembly_files")
-     run("cd #{deploy_to}/current; bundle exec rake export:export_all_individuals")
-     run("cd #{deploy_to}/current; bundle exec rake export:export_all_samples")
+     run("cd #{release_path}; bundle exec rake export:export_all_assemblies")
+     run("cd #{release_path}; bundle exec rake export:export_all_assembly_files")
+     run("cd #{release_path}; bundle exec rake export:export_all_individuals")
+     run("cd #{release_path}; bundle exec rake export:export_all_samples")
    end
 
  end
@@ -90,12 +95,12 @@ end
  namespace :assets do
    desc "Copies the production shared/system directory to local machine"
    task :prod_to_local do
-     run_locally("rsync --archive --recursive --times --rsh=ssh --compress --human-readable --progress #{user}@#{shared_host}:#{shared_path}/system public/")
+     run_locally("rsync --archive --recursive --times --rsh=ssh --compress --human-readable --progress #{cap_user}@#{shared_host}:#{shared_path}/system public/")
    end
 
    desc "Copies the local public/system directory to production machine"
    task :local_to_prod do
-     run_locally("rsync --archive --recursive --times --rsh=ssh --compress --human-readable --progress public/system #{user}@#{shared_host}:#{shared_path}")
+     run_locally("rsync --archive --recursive --times --rsh=ssh --compress --human-readable --progress public/system #{cap_user}@#{shared_host}:#{shared_path}")
    end
  end
 
@@ -187,7 +192,7 @@ end
       logger.debug "sftping #{prod_dump_file} from #{application}"
       logger.debug "ls #{prod_dump_file}"
       run "ls -lah #{current_path}/tmp/#{prod_dump_file}"
-#      system "rsync -lrp #{user}@#{application}:#{current_path}/tmp/#{prod_dump_file} tmp/data"
+#      system "rsync -lrp #{cap_user}@#{application}:#{current_path}/tmp/#{prod_dump_file} tmp/data"
       get("#{current_path}/tmp/#{prod_dump_file}", "tmp/data/#{prod_dump_file}")
       run "rm #{current_path}/tmp/#{prod_dump_file}"
     end
@@ -241,6 +246,7 @@ end
 # end
 #
 after 'deploy:update_code', 'deploy:symlink_db'
+after 'deploy:update_code', 'deploy:symlink_jquery'
 after 'deploy:update_code', 'deploy:run_all_exports'
 
 require 'rvm/capistrano'
