@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gms</title>
   <%= csrf_meta_tag %>
   <!--[if lt IE 9]>
@@ -12,17 +13,20 @@
   <%= javascript_include_tag 'jquery.tablesorter.min.js' %>
   <%= javascript_include_tag 'jquery.poshytip.min.js' %>
   <%= javascript_include_tag 'jquery.metadata.js' %>
+  <%= yield(:head) %>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
+  <div id="container" class="container">
+    <header>
       <%= render 'layouts/header' %>
-    </div>
+    </header>
     <div class="contents">
       <div class="menu">
         <%= render 'layouts/menu' %>
       </div>
       <div class="page">
+        <p class="notice"><%= notice %></p>
+        <p class="alert"><%= alert %></p>
         <section>
           <%= yield %>
         </section>
