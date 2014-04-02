@@ -1,0 +1,13 @@
+<h1>Choose upload file</h1>
+<p>Uploads and parses a list of samples uploaded to ingenuity then outputs a list of samples that have yet to be uploaded to Ingenuity</p>
+<% if flash[:error] then %>
+<div id="error_explanation"><%= flash[:error].html_safe %></div>
+<% end %>
+<%=form_tag('/samples/ingenuity_missing_samples', :multipart => true) %>
+<div class="field">
+  <%= label "sample", :file %><br />
+  <%= file_field_tag "file" %>
+</div>
+<%= submit_tag "Process this file" %>
+</form>
+
