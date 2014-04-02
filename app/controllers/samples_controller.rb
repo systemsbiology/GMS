@@ -1,8 +1,11 @@
 require 'will_paginate/array'
+require 'ingenuity'
+require 'download_zip'
 
 class SamplesController < ApplicationController
   unloadable
   respond_to :json
+  cache_sweeper :sample_sweeper
 
   # GET /samples
   # GET /samples.xml
@@ -34,7 +37,8 @@ class SamplesController < ApplicationController
     elsif params[:person] then
       @samples = Sample.has_person(params[:person])
         .order_by_pedigree.paginate :page => params[:page], :per_page => 100
-      
+    elsif params[:problems] then
+      @samples = Sample.where( Acquisition.where( Acquisition.arel_table[:sample_id].eq(Sample.arel_table[:id]) ).exists.not ).paginate(:page => params[:page], :per_page => 10)
     else
       
       respond_to do |format|
@@ -92,7 +96,7 @@ class SamplesController < ApplicationController
   # POST /samples.xml
   def create
     @sample = Sample.new(sample_params)
-
+    logger.debug("creating a new sample #{@sample.inspect}")
     if params[:check_dates] then
       if params[:check_dates][:add_date_submitted].to_i != 1 then
         @sample.date_submitted = nil
@@ -140,6 +144,7 @@ class SamplesController < ApplicationController
   # PUT /samples/1.xml
   def update
     @sample = Sample.find(params[:id])
+    @pedigrees = Pedigree.order("pedigrees.tag")
 
     ac_notice = ''
     if (params[:person] and params[:person][:id]) then
@@ -194,7 +199,7 @@ class SamplesController < ApplicationController
         format.html { redirect_to(@sample, :notice => "Sample was successfully updated. #{ac_notice}") }
         format.xml  { head :ok }
       else
-        format.html { render :action => "edit", :notice => "Sample failed updateing .#{ac_notice}" }
+        format.html { render :action => "edit", :notice => "Sample failed updating .#{ac_notice}" }
         format.xml  { render :xml => @sample.errors, :status => :unprocessable_entity }
       end
     end
@@ -232,8 +237,32 @@ class SamplesController < ApplicationController
     end
   end
 
+  # provides a blank upload form
+  def ingenuity_upload
+  end
+
+  def ingenuity_missing_samples
+    uploaded_file = params[:file]
+    logger.debug("#{uploaded_file.inspect}")
+    if uploaded_file and uploaded_file.original_filename then
+    file = Tempfile.new(uploaded_file.original_filename)
+    file.write(uploaded_file.read.force_encoding("UTF-8"))
+    outfilename = check_ingenuity(file)
+    zipname = Pathname.new(outfilename.gsub(/.txt/,'.zip')).basename
+    logger.debug("filename #{outfilename} zipname #{zipname}")
+    respond_to do |format|
+      format.html { download_zip("#{zipname}",{"ingenuity_add.txt" => outfilename})}
+    end
+    else
+      respond_to do |format|
+        flash[:error] = "You must supply a file to process."
+        format.html { render :action => "ingenuity_upload" }
+      end
+    end
+  end
+
   private
   def sample_params
-    params.require(:sample).permit(:customer_sample_id, :sample_type_id, :status, :date_submitted, :protocol, :volume, :concentration, :quantity, :date_received, :description, :comments, :pedigree_id)
+    params.require(:sample).permit(:customer_sample_id, :sample_type_id, :status, :date_submitted, :protocol, :volume, :concentration, :quantity, :date_received, :description, :comments, :pedigree_id, :sample_vendor_id)
   end
 end
