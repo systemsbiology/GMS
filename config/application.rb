@@ -1,6 +1,7 @@
 require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
+require 'rspec-rails'
 
 # If you have a Gemfile, require the gems listed there, including any gems
 # you've limited to :test, :development, or :production.
@@ -50,4 +51,5 @@ module Gms
       g.fixture_replacement :factory_girl
     end
   end
+
 end
