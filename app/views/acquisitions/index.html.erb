@@ -1,29 +1,41 @@
+<script>
+  $(document).ready(function() { setupTablesorter() });
+</script>
 <h1>Listing acquisitions</h1>
 
-<table>
-  <tr>
-    <th>Id</th>
-    <th>Person</th>
-    <th>Sample</th>
-    <th>Method</th>
-    <th></th>
-    <th></th>
-    <th></th>
-  </tr>
-
+<%= render 'partials/filter' %>
+<%= link_to 'New acquisition', new_acquisition_path %>
+<% if @acquisitions.size > 0 %>
+<table class="tablesorter">
+  <thead>
+    <tr>
+      <th>Pedigree</th>
+      <th>Person</th>
+      <th>Sample</th>
+      <th colspan="2" class="nosort">Controls</th>
+    </tr>
+  </thead>
+  <tbody>
 <% @acquisitions.each do |acquisition| %>
+  <% person = acquisition.person %>
+  <% sample = acquisition.sample %>
   <tr>
-    <td><%= acquisition.id %></td>
-    <td><%= acquisition.person_id %></td>
-    <td><%= acquisition.sample_id %></td>
-    <td><%= acquisition.method %></td>
-    <td><%= link_to 'Show', acquisition %></td>
+    <td><%= link_to person.pedigree.name, person.pedigree %></td>
+    <td><%= link_to person.full_identifier, person %></td>
+    <td><%= sample.nil? ? "SAMPLE ID DOESN'T EXIST IN DB: #{acquisition.sample_id}" : link_to(sample.sample_vendor_id, sample) %></td>
+    <td><%= link_to 'show', acquisition_path(acquisition) %></td>
     <td><%= link_to 'Edit', edit_acquisition_path(acquisition) %></td>
-    <td><%= link_to 'Destroy', acquisition, :confirm => 'Are you sure?', :method => :delete %></td>
+    <% if false %><td><%= link_to 'Delete link between person and sample', acquisition, :confirm => 'Are you sure?', :method => :delete %></td><% end %>
   </tr>
 <% end %>
+  </tbody>
 </table>
 
+<%= will_paginate @acquisitions %>
 <br />
-
 <%= link_to 'New Acquisition', new_acquisition_path %>
+<% else %>
+<table class="tablesorter">
+  <tr><td>No acqusiitions found for this query</td></tr>
+</table>
+<% end %>
