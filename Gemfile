@@ -56,12 +56,12 @@ gem 'json_builder'
 
 # create cron jobs to clean the temporary objects from the database
 gem 'whenever'
+gem 'rspec-rails'
 
 # testing
 group :test do
   gem 'factory_girl'
   gem 'factory_girl_rails'
-  gem 'rspec-rails'
   gem 'shoulda'
   gem 'shoulda-matchers'
   gem 'fakefs', :require => "fakefs/safe"
