@@ -3,7 +3,7 @@ source 'http://rubygems.org'
 gem 'rails'
 gem 'rake'
 gem 'builder'
-
+gem 'debugger'
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 gem 'mysql2'
@@ -12,13 +12,16 @@ gem 'mysql2'
 # gem 'unicorn'
 
 # Deploy with Capistrano
-gem 'rvm-capistrano'
+#gem 'rvm-capistrano'
+#gem 'capistrano-bundler'
+#gem 'capistrano-rails'
+gem 'capistrano', '~> 2.15.5'
 
 # To use debugger (ruby-debug for Ruby 1.8.7+, ruby-debug19 for Ruby 1.9.2+)
 # gem 'ruby-debug'
-gem 'linecache19', :git => "git://github.com/mark-moseley/linecache"
-gem 'ruby-debug-base19x', "~>0.11.30.pre10"
-gem 'ruby-debug19', :require => 'ruby-debug'
+#gem 'linecache19', :git => "git://github.com/mark-moseley/linecache"
+#gem 'ruby-debug-base19x', "~>0.11.30.pre10"
+#gem 'ruby-debug19', :require => 'ruby-debug'
 
 gem 'settingslogic'
 
