@@ -57,7 +57,6 @@ gem 'json_builder'
 # create cron jobs to clean the temporary objects from the database
 gem 'whenever'
 gem 'rspec-rails'
-gem 'iconv'
 
 # testing
 group :test do
