@@ -37,11 +37,28 @@ def file_header(file, file_type)
     header = Hash.new
     Open3.popen3(*cmd) do |stdin, stdout, stderr|
         stdout.each do |line|
-            if file_type == "CGI" then
+            if file_type == "CGI" then 
                 if line.match('^#') then
                     line.gsub!(/#/, '')
                     line.strip! # remove newline at the end
-                    (key,value) = line.split(/\t/)
+                    if line.match(/\t/) then # parsing TSV file
+                        (key,value) = line.split(/\t/)
+                        if line.match(/^CHROM/) then
+                            values = line.split(/\t/)
+                            key = 'ASSEMBLY_ID'
+                            value = values.last
+                        end
+                    elsif line.match(/=/) then  # parsing VCF file
+                        (key,value) = line.split(/=/)
+                         if (key == VCF_SOURCE) then
+                            (software, version) = value.split(/_/)
+                            header[CGI_SOFTWARE_VERSION] = version
+                            header[CGI_SOFTWARE_PROGRAM] = software
+                         end
+                         if (key == CGI_VCF_GENOME_REFERENCE) then
+                            header[CGI_GENOME_REFERENCE] = value
+                         end
+                    end
                     header[key] = value
                 else
                     break
