@@ -78,14 +78,33 @@ class Assembly < ActiveRecord::Base
       errors.add(:location, "Directory #{start_dir} does not exist on the system.")
       abort("Directory #{start_dir} does not exist on the system for #{self.inspect}")
     end
-    #logger.debug("start dir is #{start_dir}")
+    #logger.error("start dir is #{start_dir}")
     Find.find(start_dir) do |path|
       filename = File.basename(path).split("/").last
+      skip_flag = 0
+      FILE_SKIPS.each { |filepart, filehash| 
+        type = filehash["type"]
+        category = filehash["category"]
+        if category == 'suffix' then
+            if (filename.match("#{filepart}$")) then
+                skip_flag = 1
+            end
+        else 
+            if (filename.match("#{filepart}")) then
+                skip_flag = 1
+            end
+        end
+
+      }
+      if (skip_flag == 1) then
+        logger.error("Skipping file #{filename} because it matches a file skip")
+        next
+      end
       FILE_TYPES.each { |filepart, filehash| 
 	    type = filehash["type"]
 	    vendor = filehash["vendor"]
         if filename.match(filepart) then 
-          #logger.debug( "filename is #{filename}")
+          #logger.error("filename is #{filename}")
           files[type] = Hash.new
 	      files[type]["path"] = path
 	      files[type]["vendor"] = vendor
@@ -168,7 +187,12 @@ class Assembly < ActiveRecord::Base
       # figure out what the names of the fields are that we're looking for
       # so that the fields are easily updatable 
       header = file_header(file_path, file_vendor)
-      if file_vendor == "CGI" then
+      logger.debug("header is #{header.inspect}")
+      if file_vendor == "CGI" and file_type.match("VCF") then
+        check = check_cgi_vcf_header(header, file_type, file_path)
+        software = header[CGI_SOFTWARE_PROGRAM]
+        software_version = header[CGI_SOFTWARE_VERSION]
+      elsif file_vendor == "CGI" then
         check = check_cgi_header(header, file_type, file_path)
 	    software = header[CGI_SOFTWARE_PROGRAM]
 	    software_version = header[CGI_SOFTWARE_VERSION]
@@ -186,7 +210,7 @@ class Assembly < ActiveRecord::Base
 
       if check == 0 then
         logger.error("skipping file #{file_path} because it contains incorrect values for this filetype")
-	asm_file_errors.push("#{file_path} cannot be added to assembly because it contains incorrect values for this filetype")
+	    asm_file_errors.push("#{file_path} cannot be added to assembly because it contains incorrect values for this filetype")
         next
       end
  
@@ -241,7 +265,11 @@ class Assembly < ActiveRecord::Base
       # so that the fields are easily updatable 
       header = file_header(file_path, file_vendor)
 
-      if file_vendor == "CGI" then
+      if file_vendor == "CGI" and file_type.match("VCF") then
+        check = check_cgi_vcf_header(header, file_type, file_path)
+	    software = header[CGI_SOFTWARE_PROGRAM]
+	    software_version = header[CGI_SOFTWARE_VERSION]
+      elsif file_vendor == "CGI" then
         check = check_cgi_header(header, file_type, file_path)
 	    software = header[CGI_SOFTWARE_PROGRAM]
 	    software_version = header[CGI_SOFTWARE_VERSION]
@@ -296,6 +324,8 @@ class Assembly < ActiveRecord::Base
     "#{name} - #{GenomeReference.find(genome_reference_id).name} - #{software_version}"
   end
 
+
+
   def check_cgi_header(header, file_type, file_path)
      return 1 if file_type == 'SVEVENTS' #SVEVENTS don't have any of this info in the header :(
 
@@ -330,6 +360,28 @@ class Assembly < ActiveRecord::Base
 #        logger.error("ERROR: file type #{header[CGI_FILE_TYPE]} doesn't match #{file_type}.  Make sure that the value for CGI_FILE_TYPE in config/environment.rb is correct.")
 #	next
 #      end
+
+      return 1
+  end
+
+
+  def check_cgi_vcf_header(header, file_type, file_path)
+     return 1 if file_type == 'SVEVENTS' #SVEVENTS don't have any of this info in the header :(
+
+      if header[CGI_ASSEMBLY_ID].nil? or header[CGI_ASSEMBLY_ID] != self.name then
+        logger.error("ERROR: file assembly name #{header[CGI_ASSEMBLY_ID]} doesn't match self assembly id #{self.name}.  Make sure that the value for CGI_ASSEMBLY_ID in config/environment.rb is correct.")
+	    return 0 
+      end
+
+      if header[CGI_GENOME_REFERENCE].nil? or header[CGI_GENOME_REFERENCE] != self.genome_reference.build_name then
+        logger.error("ERROR: file genome_reference #{header[CGI_GENOME_REFERENCE]} doesn't match  #{self.genome_reference.build_name}.  Make sure that the value for CGI_GENOME_REFERENCE in config/environment.rb is correct.")
+	    return 0 
+      end
+
+      if header[CGI_SOFTWARE_PROGRAM].nil? then
+        logger.error("ERROR: file_sample #{header[CGI_SAMPLE]} doesn't have a CGI_SOFTWARE_PROGRAM value.")
+	    return 0
+      end
 
       return 1
   end
