@@ -1,6 +1,7 @@
 require 'utils'
 
 class AssembliesController < ApplicationController
+#  load_and_authorize_resource
   respond_to :json
   # GET /assembly
   # GET /assembly.xml
@@ -136,6 +137,8 @@ class AssembliesController < ApplicationController
     @assemblies.each do |assembly|
       @errors = assembly.ensure_files_up_to_date
     end
+
+    expire_action(:controller => '/assembly_files', :action => :ped_info, :format => 'json')
 
     respond_to do |format|
       format.html 
