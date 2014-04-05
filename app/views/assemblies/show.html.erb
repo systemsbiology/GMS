@@ -53,4 +53,4 @@
 
 <%= link_to "Ensure Files are up to date", assembly_ensure_files_up_to_date_path(@assembly) %>
 <br /><br />
-<%= render 'assembly_files/list', :assembly_files => @assembly.assembly_files.paginate(:page => 1,:per_page => 100) %>
+<%= render 'assembly_files/list', :assembly_files => @assembly.assembly_files.sort! {|a,b| a.name.downcase <=> b.name.downcase}.paginate() %>
