@@ -27,6 +27,7 @@
       <div class="page">
         <p class="notice"><%= notice %></p>
         <p class="alert"><%= alert %></p>
+        <% if flash[:error] %><p id="error_explanation"><%= flash[:error] %></p><% end %>
         <section>
           <%= yield %>
         </section>
