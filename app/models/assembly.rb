@@ -89,7 +89,12 @@ class Assembly < ActiveRecord::Base
             if (filename.match("#{filepart}$")) then
                 skip_flag = 1
             end
+        else 
+            if (filename.match("#{filepart}")) then
+                skip_flag = 1
+            end
         end
+
       }
       if (skip_flag == 1) then
         logger.error("Skipping file #{filename} because it matches a file skip")
