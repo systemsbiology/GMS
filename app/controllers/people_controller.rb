@@ -5,6 +5,7 @@ require 'relationship'
 require 'sample'
 
 class PeopleController < ApplicationController
+#  load_and_authorize_resource
   respond_to :json
   caches_action :ped_info
   # GET /people
@@ -752,7 +753,7 @@ class PeopleController < ApplicationController
             if person_alias.to_s.match(';') then
               person_aliases = person_alias.split(/;/)
             else
-              person_aliases.push(person_alias)
+              person_aliases.push(person_alias.to_s)
             end
             logger.debug("person_aliases #{person_aliases.inspect}")
             new_aliases = Array.new
