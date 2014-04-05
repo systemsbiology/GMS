@@ -24,6 +24,7 @@ CGI_GENERATED_DATE = "GENERATED_AT"
 CGI_SOFTWARE_VERSION = "SOFTWARE_VERSION"
 CGI_FORMAT_VERSION = "FORMAT_VERSION"
 CGI_FILE_TYPE = "TYPE"
+CGI_VCF_GENOME_REFERENCE = "source_GENOME_REFERENCE"
 
 # VCF header keys
 VCF_SOURCE = "source" # only in snp files
@@ -51,12 +52,17 @@ FILE_TYPES = {
 		# VCF FILES
 		'.snp.filtered.vcf' 	  => { 'type' => 'VCF-SNP-ANNOTATION', 'vendor' => 'VCF' },
 		'.indel.vcf' 		  => { 'type' => 'VCF-INDEL-ANNOTATION', 'vendor' => 'VCF' },
+        'vcfBeta-'          => { 'type' => 'VCF-ANNOTATION', 'vendor' => 'CGI' },
 		# Analysis directories
 		'ReMastered_MasterVar_'   => { 'type' => 'ReMastered-MasterVar', 'vendor' => 'ISB'},
 		'ReMastered_Var_' 	  => { 'type' => 'ReMastered-Var', 'vendor' => 'ISB'},
             }
 FILE_SKIPS = {
          '.tbi' => { 'type' => 'tabix', 'category' => 'suffix' },
+         'converted' => { 'type' => 'tabix', 'category' => 'middle'},
+         'original' => { 'type' => 'patch', 'category' => 'middle'},
+         'debug' => { 'type' => 'patch', 'category' => 'middle'},
+         'masterVarBeta[-\d+\w+]+.tsv.gz' => {'type' => 'tabix', 'category' => 'frontback' },
 }  
 
 Dir[File.dirname(__FILE__) + "/../vendor/*"].each do |path|
