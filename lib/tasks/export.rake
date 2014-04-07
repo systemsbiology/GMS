@@ -71,7 +71,7 @@ namespace :export do
     pedigree_id = args[:pedigree_id]
     raise "No pedigree id provided" unless pedigree_id
     output = Array.new
-    output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Father ID", "Mother ID","ISB Sample IDs","ISB Sample Vendor IDs","Sample Types","ISB Assay IDs", "Assay Names", "ISB Assembly IDs","Assembly Names","Assembly Locations", "Assembly Software Versions","Assembly Genome References"].join("\t"))
+    output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Father ID", "Mother ID","ISB Sample IDs","ISB Sample Vendor IDs","Sample Types","ISB Assay IDs", "Assay Names", "Assay Vendor", "Assay Technology", "ISB Assembly IDs","Assembly Names","Assembly Locations", "Assembly Software Versions","Assembly Genome References"].join("\t"))
     output = output+ individual_by_pedigree(pedigree_id)
     filename = "gms_export_individual_pedigree_#{pedigree_id}.txt"
     create_file(output, filename)
@@ -80,7 +80,7 @@ namespace :export do
   desc "Export a combined file with individual information for each pedigree"
   task :export_all_individuals => :environment do
     output = Array.new
-    output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Father ID", "Mother ID","ISB Sample IDs","ISB Sample Vendor IDs","Sample Types","ISB Assay IDs", "Assay Names", "ISB Assembly IDs","Assembly Names","Assembly Locations", "Assembly Software Versions","Assembly Genome References"].join("\t"))
+    output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Father ID", "Mother ID","ISB Sample IDs","ISB Sample Vendor IDs","Sample Types","ISB Assay IDs", "Assay Names", "Assay Vendor", "Assay Technology", "ISB Assembly IDs","Assembly Names","Assembly Locations", "Assembly Software Versions","Assembly Genome References"].join("\t"))
     Pedigree.all.each do |ped|
       output = output+ individual_by_pedigree(ped.id)
     end
@@ -92,7 +92,7 @@ namespace :export do
   task :export_individual_individual => :environment do
     Pedigree.all.each do |ped|
       output = Array.new
-      output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Father ID", "Mother ID","ISB Sample IDs","ISB Sample Vendor IDs","Sample Types","ISB Assay IDs", "Assay Names", "ISB Assembly IDs","Assembly Names","Assembly Locations", "Assembly Software Versions","Assembly Genome References"].join("\t"))
+      output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Father ID", "Mother ID","ISB Sample IDs","ISB Sample Vendor IDs","Sample Types","ISB Assay IDs", "Assay Names", "Assay Vendor", "Assay Technology", "ISB Assembly IDs","Assembly Names","Assembly Locations", "Assembly Software Versions","Assembly Genome References"].join("\t"))
       output = output+ individual_by_pedigree(ped.id)
       filename = "gms_export_individual_pedigree_#{ped.id}.txt"
       create_file(output, filename)
@@ -110,6 +110,8 @@ namespace :export do
       person_sample_types = Array.new
       person_assays_id = Array.new
       person_assays_name = Array.new
+      person_assays_vendor = Array.new
+      person_assays_technology = Array.new
       person_assemblies_id = Array.new
       person_assemblies_name = Array.new
       person_assemblies_location = Array.new
@@ -117,25 +119,27 @@ namespace :export do
       person_assemblies_genome_reference = Array.new
       person.samples.each do |sample|
         next if sample.assays.nil?
-	person_samples_id.push(sample.isb_sample_id)
-	person_samples_vendor_id.push(sample.sample_vendor_id)
-	sample_type = sample.sample_type.nil? ? 'unknown' : sample.sample_type.name 
-	person_sample_types.push(sample_type)
+        person_samples_id.push(sample.isb_sample_id)
+        person_samples_vendor_id.push(sample.sample_vendor_id)
+        sample_type = sample.sample_type.nil? ? 'unknown' : sample.sample_type.name 
+        person_sample_types.push(sample_type)
         sample.assays.each do |assay|
-	  person_assays_id.push("isb_asy_#{assay.id}")
-	  person_assays_name.push(assay.name)
-	  assay.assemblies.each do |asm|
-	    person_assemblies_id.push("isb_asm_#{asm.id}")
-	    person_assemblies_name.push(asm.name)
-	    person_assemblies_location.push(asm.location)
-	    person_assemblies_software_version.push(asm.software_version)
-	    person_assemblies_genome_reference.push(asm.genome_reference.name)
-	  end
-	end
+          person_assays_id.push("isb_asy_#{assay.id}")
+          person_assays_name.push(assay.name)
+          person_assays_vendor.push(assay.vendor)
+          person_assays_technology.push(assay.technology)
+          assay.assemblies.each do |asm|
+            person_assemblies_id.push("isb_asm_#{asm.id}")
+            person_assemblies_name.push(asm.name)
+            person_assemblies_location.push(asm.location)
+            person_assemblies_software_version.push(asm.software_version)
+            person_assemblies_genome_reference.push(asm.genome_reference.name)
+          end
+        end
       end
       mother = person.mother.empty? ? 'NULL' : person.mother.first.isb_person_id
       father = person.father.empty? ? 'NULL' : person.father.first.isb_person_id
-      output = [ped.study.tag, ped.isb_pedigree_id, ped.tag, person.isb_person_id, person.collaborator_id, person.gender, father, mother, person_samples_id.join(","), person_samples_vendor_id.join(","), person_sample_types.join(","), person_assays_id.join(","), person_assays_name.join(","), person_assemblies_id.join(","), person_assemblies_name.join(","), person_assemblies_location.join(","), person_assemblies_software_version.join(","), person_assemblies_genome_reference.join(",")]
+      output = [ped.study.tag, ped.isb_pedigree_id, ped.tag, person.isb_person_id, person.collaborator_id, person.gender, father, mother, person_samples_id.join(","), person_samples_vendor_id.join(","), person_sample_types.join(","), person_assays_id.join(","), person_assays_name.join(","), person_assays_vendor.join(","), person_assays_technology.join(","), person_assemblies_id.join(","), person_assemblies_name.join(","), person_assemblies_location.join(","), person_assemblies_software_version.join(","), person_assemblies_genome_reference.join(",")]
       ind_output.push(output.join("\t"))
     end
     return ind_output
