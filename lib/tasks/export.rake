@@ -71,7 +71,7 @@ namespace :export do
     pedigree_id = args[:pedigree_id]
     raise "No pedigree id provided" unless pedigree_id
     output = Array.new
-    output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Father ID", "Mother ID","ISB Sample IDs","ISB Sample Vendor IDs","Sample Types","ISB Assay IDs", "Assay Names", "Assay Vendor", "Assay Technology", "ISB Assembly IDs","Assembly Names","Assembly Locations", "Assembly Software Versions","Assembly Genome References"].join("\t"))
+    output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Father ID", "Mother ID","ISB Sample IDs","ISB Sample Vendor IDs","Sample Types","ISB Assay IDs", "Assay Names", "Assay Vendors", "Assay Technologies", "ISB Assembly IDs","Assembly Names","Assembly Locations", "Assembly Software Versions","Assembly Genome References"].join("\t"))
     output = output+ individual_by_pedigree(pedigree_id)
     filename = "gms_export_individual_pedigree_#{pedigree_id}.txt"
     create_file(output, filename)
@@ -80,7 +80,7 @@ namespace :export do
   desc "Export a combined file with individual information for each pedigree"
   task :export_all_individuals => :environment do
     output = Array.new
-    output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Father ID", "Mother ID","ISB Sample IDs","ISB Sample Vendor IDs","Sample Types","ISB Assay IDs", "Assay Names", "Assay Vendor", "Assay Technology", "ISB Assembly IDs","Assembly Names","Assembly Locations", "Assembly Software Versions","Assembly Genome References"].join("\t"))
+    output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Father ID", "Mother ID","ISB Sample IDs","ISB Sample Vendor IDs","Sample Types","ISB Assay IDs", "Assay Names", "Assay Vendors", "Assay Technologies", "ISB Assembly IDs","Assembly Names","Assembly Locations", "Assembly Software Versions","Assembly Genome References"].join("\t"))
     Pedigree.all.each do |ped|
       output = output+ individual_by_pedigree(ped.id)
     end
@@ -92,7 +92,7 @@ namespace :export do
   task :export_individual_individual => :environment do
     Pedigree.all.each do |ped|
       output = Array.new
-      output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Father ID", "Mother ID","ISB Sample IDs","ISB Sample Vendor IDs","Sample Types","ISB Assay IDs", "Assay Names", "Assay Vendor", "Assay Technology", "ISB Assembly IDs","Assembly Names","Assembly Locations", "Assembly Software Versions","Assembly Genome References"].join("\t"))
+      output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Father ID", "Mother ID","ISB Sample IDs","ISB Sample Vendor IDs","Sample Types","ISB Assay IDs", "Assay Names", "Assay Vendors", "Assay Technologies", "ISB Assembly IDs","Assembly Names","Assembly Locations", "Assembly Software Versions","Assembly Genome References"].join("\t"))
       output = output+ individual_by_pedigree(ped.id)
       filename = "gms_export_individual_pedigree_#{ped.id}.txt"
       create_file(output, filename)
