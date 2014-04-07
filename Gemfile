@@ -34,9 +34,9 @@ gem 'event-calendar', :require => 'event_calendar'
 gem 'simple_navigation'
 gem 'gollum' # wiki
 
-gem 'devise'
-gem 'devise_ldap_authenticatable'
-gem 'cancan'
+#gem 'devise'
+#gem 'devise_ldap_authenticatable'
+#gem 'cancan'
 
 gem 'paperclip'
 gem 'spreadsheet'
