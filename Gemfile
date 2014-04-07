@@ -4,6 +4,7 @@ gem 'rails'
 gem 'rake'
 gem 'builder'
 
+gem 'net-ssh', '~> 2.8.1', :git => "https://github.com/net-ssh/net-ssh"
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
 gem 'mysql2'
