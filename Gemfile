@@ -48,7 +48,7 @@ gem 'ancestry'
 
 gem 'madeline', '~> 0.1.11'
 
-gem 'rubyzip'
+gem 'rubyzip', '~> 0.9.7'
 gem 'auto_strip_attributes'#, "~> 1.0"
 gem 'json_builder'
 
