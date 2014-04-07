@@ -5,12 +5,6 @@ GIT
     linecache19 (0.5.12)
       ruby_core_source (>= 0.1.4)
 
-GIT
-  remote: https://github.com/net-ssh/net-ssh
-  revision: 329485ab81f3b69697ac1723043369c37a99ea2f
-  specs:
-    net-ssh (2.8.1)
-
 GEM
   remote: http://rubygems.org/
   specs:
@@ -136,6 +130,7 @@ GEM
       net-ssh (>= 2.6.5)
     net-sftp (2.1.2)
       net-ssh (>= 2.6.5)
+    net-ssh (2.7.0)
     net-ssh-gateway (1.2.0)
       net-ssh (>= 2.6.5)
     nokogiri (1.6.1)
@@ -271,7 +266,7 @@ DEPENDENCIES
   linecache19!
   madeline (~> 0.1.11)
   mysql2
-  net-ssh (~> 2.8.1)!
+  net-ssh (~> 2.7.0)
   paperclip
   rails
   rake
