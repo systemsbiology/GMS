@@ -156,7 +156,7 @@ namespace :export do
     pedigree_id = args[:pedigree_id]
     raise "No pedigree id provided" unless pedigree_id
     output = Array.new
-    output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","ISB Sample ID","ISB Sample Vendor ID","Sample Type","ISB Assay ID", "Assay Name", "ISB Assembly ID","Assembly Name","Assembly Location", "Assembly Software Version","Assembly Genome Reference"].join("\t"))
+    output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Father ID", "Mother ID","ISB Sample ID","ISB Sample Vendor ID","Sample Type","ISB Assay ID", "Assay Name", "Assay Vendor", "Assay Technology", "ISB Assembly ID","Assembly Name","Assembly Location", "Assembly Software Version","Assembly Genome Reference"].join("\t"))
     output = output+ assembly_by_pedigree(pedigree_id)
     filename = "gms_export_assembly_pedigree_#{pedigree_id}.txt"
     create_file(output, filename)
@@ -165,7 +165,7 @@ namespace :export do
   desc "Export a combined file with assembly information for each pedigree"
   task :export_all_assemblies => :environment do
     output = Array.new
-    output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","ISB Sample ID","ISB Sample Vendor ID","Sample Type","ISB Assay ID", "Assay Name", "ISB Assembly ID","Assembly Name","Assembly Location", "Assembly Software Version","Assembly Genome Reference"].join("\t"))
+    output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Father ID", "Mother ID","ISB Sample ID","ISB Sample Vendor ID","Sample Type","ISB Assay ID", "Assay Name", "Assay Vendor", "Assay Technology", "ISB Assembly ID","Assembly Name","Assembly Location", "Assembly Software Version","Assembly Genome Reference"].join("\t"))
     Pedigree.all.each do |ped|
       output = output+ assembly_by_pedigree(ped.id)
     end
@@ -177,7 +177,7 @@ namespace :export do
   task :export_individual_assembly => :environment do
     Pedigree.all.each do |ped|
       output = Array.new
-      output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","ISB Sample ID","ISB Sample Vendor ID","Sample Type","ISB Assay ID", "Assay Name", "ISB Assembly ID","Assembly Name","Assembly Location", "Assembly Software Version","Assembly Genome Reference"].join("\t"))
+      output.push(["Study","Pedigree ID", "Pedigree Tag","ISB Person ID","ISB Collaborator ID","Gender","Father ID", "Mother ID","ISB Sample ID","ISB Sample Vendor ID","Sample Type","ISB Assay ID", "Assay Name", "Assay Vendor", "Assay Technology", "ISB Assembly ID","Assembly Name","Assembly Location", "Assembly Software Version","Assembly Genome Reference"].join("\t"))
       output = output+ assembly_by_pedigree(ped.id)
       filename = "gms_export_assembly_pedigree_#{ped.id}.txt"
       create_file(output, filename)
@@ -194,8 +194,10 @@ namespace :export do
         next if sample.assays.nil?
         sample.assays.each do |assay|
 	  assay.assemblies.each do |assembly|
+        mother = person.mother.empty? ? 'NULL' : person.mother.first.isb_person_id
+        father = person.father.empty? ? 'NULL' : person.father.first.isb_person_id
 	    sample_type = sample.sample_type.nil? ? 'unknown' : sample.sample_type.name 
-	    output = [ped.study.tag, ped.isb_pedigree_id, ped.tag, person.isb_person_id, person.collaborator_id, person.gender, sample.isb_sample_id, sample.sample_vendor_id, sample_type, "isb_asy_#{assay.id}", assay.name, "isb_asm_#{assembly.id}", assembly.name, assembly.location, assembly.software_version, assembly.genome_reference.name]
+	    output = [ped.study.tag, ped.isb_pedigree_id, ped.tag, person.isb_person_id, person.collaborator_id, person.gender, father, mother, sample.isb_sample_id, sample.sample_vendor_id, sample_type, "isb_asy_#{assay.id}", assay.name, assay.vendor, assay.technology, "isb_asm_#{assembly.id}", assembly.name, assembly.location, assembly.software_version, assembly.genome_reference.name]
 	    asm_output.push(output.join("\t"))
 	  end
 	end
