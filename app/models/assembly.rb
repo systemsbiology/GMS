@@ -76,7 +76,8 @@ class Assembly < ActiveRecord::Base
     files = Hash.new
     if ! File.directory? start_dir then
       errors.add(:location, "Directory #{start_dir} does not exist on the system.")
-      abort("Directory #{start_dir} does not exist on the system for #{self.inspect}")
+      #abort("Directory #{start_dir} does not exist on the system for #{self.inspect}")
+      return []
     end
     #logger.error("start dir is #{start_dir}")
     Find.find(start_dir) do |path|
@@ -221,7 +222,10 @@ class Assembly < ActiveRecord::Base
       else
         xml = ''
       end
-
+      if file_path.match(/Old/) or file_path.match(/OLD/) then
+        logger.error("Skipping file because it's in an old directory #{file_path}"
+        next
+      end
       filename = File.basename(file_path)
       if filename.match(/~\z/) then
         logger.error("Skipping a file with a tilda when adding assembly files.  filename #{filename}")
@@ -331,7 +335,7 @@ class Assembly < ActiveRecord::Base
 
      if header[CGI_SAMPLE].nil? then
         logger.error("ERROR: file #{file_path} with type #{file_type} doesn't appear to be a valid CGI file.")
-	return 0
+    	return 0
       end
 
       if header[CGI_ASSEMBLY_ID].nil? or header[CGI_ASSEMBLY_ID] != self.name then
