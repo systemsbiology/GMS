@@ -223,7 +223,7 @@ class Assembly < ActiveRecord::Base
         xml = ''
       end
       if file_path.match(/Old/) or file_path.match(/OLD/) then
-        logger.error("Skipping file because it's in an old directory #{file_path}"
+        logger.error("Skipping file because it's in an old directory #{file_path}")
         next
       end
       filename = File.basename(file_path)
