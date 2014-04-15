@@ -17,10 +17,18 @@ def csvdir_exists
 end
 
 def creation_time(file)
+   if (file.match(/^s3/)) then
+       output = `s3cmd ls #{file}`
+       #logger.debug(" output is #{output}")
+       (date, time, size, path) = output.split(/ +/)
+       #logger.debug("date #{date} time #{time} size #{size} path #{path}")
+       return "#{date} #{time}"
+   else
    Time.parse(Open3.popen3("stat", 
                            "-c",
                            "%z", 
                            file)[1].read)
+   end
 end
 
 # open up a file and parse the # comments into a hash.  Use bzcat if bzip'd or gunzip -c for gzip'd

@@ -1,19 +1,17 @@
 require 'fileutils.rb'
+require 'whenever/capistrano'
 load 'config/cap_user.rb' # contains set :cap_user, "username"
 
 set :application, "GMS"
-set :deploy_to, "/u5/www/software/gms/"
+set :deploy_to, "/local/www/software/gms/"
 set :keep_releases, 3
 set :shared_host, "bobama.systemsbiology.net"
 set :whenever_command, "bundle exec whenever"
 set :environment, "production"
-set :whenever_environment, defer { environment }
+#set :whenever_environment, defer { environment }
 set :whenever_identifier, defer { "#{application}_#{environment}" }
 set :rail_env, "production"
 
-set :rvm_bin_path, "/u5/tools/rvm/bin"
-set :rvm_scripts_path, "/u5/tools/rvm/bin"
-set :rvm_path, "/u5/tools/rvm"
 set :rake, "bundle exec rake"
 #set :rvm_ruby_string, ENV['GEM_HOME'].gsub(/.*\//,"")  # set up which gemset you're using
 #set :rvm_ruby_string, "ruby-1.9.3-p448@global"
@@ -38,16 +36,27 @@ set :default_environment, {
   'GEM_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p448@global',
   'BUNDLE_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p448@global'
 }
+#capistrano pem ec2 info
+#default_run_options[:pty] = true
+#ssh_options[:forward_agent] = true
+#ssh_options[:auth_methods] = ["publickey"]
+#ssh_options[:keys] = ["/home/ec2-user/isb_engineers.pem"]
+#before 'bundle:install', "bundle:list"
+#set :default_environment, {
+#  'PATH' => "/usr/local/share/ruby/gems/2.0/bin:/bin/:/tools/bin:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",
+  #'GEM_HOME' => '/usr/local/share/ruby/gems/2.0',
+  #'GEM_PATH' => '/usr/local/share/ruby/gems/2.0',
+#  'BUNDLE_PATH' => '/usr/local/share/ruby/gems/2.0'
+#}
 
 #set :scm, :subversion
 # Or: `accurev`, `bzr`, `cvs`, `darcs`, `git`, `mercurial`, `perforce`, `subversion` or `none`
 set :scm, :git
-set :local_repository, "/proj/famgen/git/gms/"
-set :repository, "/proj/famgen/git/gms/"
+set :repository, "git@github.com:systemsbiology/GMS.git"
 set :branch, "master"
 set :use_sudo, false
 
-server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
+server "54.197.155.102", :app, :web, :db, :primary => true
 
 # if you're still using the script/reaper helper you will need
 # these http://github.com/rails/irs_process_scripts
@@ -236,21 +245,10 @@ end
 
  end # end data
 
-# namespace :rvm do
-#   desc 'Trust rvmrc file'
-#   task :trust_rvmrc do
-#     puts "current release is #{current_release} release_path is #{release_path}"
-#     run "rvm rvmrc trust #{current_release}"
-#     run "rvm rvmrc trust #{release_path}"
-#   end
-# end
-#
 after 'deploy:update_code', 'deploy:symlink_db'
 after 'deploy:update_code', 'deploy:symlink_jquery'
 after 'deploy:update_code', 'deploy:run_all_exports'
-
-require 'rvm/capistrano'
+after 'deploy:publishing','deploy:restart'
 require 'bundler/capistrano'
 require 'whenever/capistrano'
 
-#after "deploy:update_code", "rvm:trust_rvmrc"

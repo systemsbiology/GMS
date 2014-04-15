@@ -2,15 +2,14 @@
 #   gem install mysql
 development:
   adapter: mysql2
-  database: gms_development
+  database: inova_gms_development
   reconnect: true
   wait_timeout: 2147483
   pool: 5
   timeout: 5000
-  username: pedigree
-  password: p3d4b0
+  username: gms_inova
+  password: in0vagms
   host: localhost
-  socket: /u5/mysql/mysql.sock
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -19,22 +18,20 @@ test:
   adapter: mysql2
   reconnect: true
   wait_timeout: 2147483
-  database: gms_test
+  database: inova_gms_test
   pool: 5
   timeout: 5000
-  username: pedigree
-  password: p3d4b0
+  username: gms_inova
+  password: in0vagms
   host: localhost
-  socket: /u5/mysql/mysql.sock
 
 production:
   adapter: mysql2
   reconnect: true
   wait_timeout: 2147483
-  database: gms_production
+  database: inova_gms_production
   pool: 5
   timeout: 5000
-  username: pedigree
-  password: p3d4b0
+  username: gms_inova
+  password: in0vagms
   host: localhost
-  socket: /u5/mysql/mysql.sock
