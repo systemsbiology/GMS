@@ -1,5 +1,6 @@
 require 'find'
 require 'utils'
+require 's3_utils'
 
 class Assembly < ActiveRecord::Base
   belongs_to :assay
@@ -8,9 +9,9 @@ class Assembly < ActiveRecord::Base
   after_save :ensure_files_up_to_date
 
   auto_strip_attributes :name, :location, :description, :metadata, :software, :software_version, :comments
-  validate :validates_assembly_directory
   validates_presence_of :name, :genome_reference_id, :assay, :location, :software, :software_version
   validates_uniqueness_of :name, :location
+  validate :validates_assembly_directory
 
   after_create :check_isb_assembly_id
   after_update :check_isb_assembly_id
@@ -39,7 +40,8 @@ class Assembly < ActiveRecord::Base
   }
 
   def validates_assembly_directory
-      if !File.exists?(self.location) then
+      if self.location && ! self.location.match(/^s3/) && !File.exists?(self.location) then
+        puts "validation is happening"
         errors.add(:location, "Directory does not exist on filesystem.")
       end
   end
@@ -48,7 +50,11 @@ class Assembly < ActiveRecord::Base
   # is an assembly file entry for each file in that directory that is
   # in the config files.
   def ensure_files_up_to_date
-    files = find_assembly_files
+    if self.location.match(/^s3/)
+        files = find_s3_files
+    else 
+        files = find_assembly_files
+    end
     #logger.debug("files #{files}")
     update_files = check_update_assembly_files(files)
     #logger.debug("update files #{update_files}")
@@ -67,6 +73,38 @@ class Assembly < ActiveRecord::Base
     end
  
   end
+
+  # find files on s3
+  def find_s3_files
+    output = `s3cmd ls #{self.location}/`
+    output.gsub!(/DIR/,"")
+    output.gsub!(/ +/," ")
+    dir_listing = output.split(/\n/)
+    logger.debug("dir_listing #{dir_listing.inspect}")
+    files = Hash.new
+    dir_listing.each do |list|
+        if (list.match(/^ /)) then
+          # found a directory - not going to worry about going down the directory for now
+        else
+          # found a file
+          (date, time, size, path) = list.split(/ /)
+          filename = File.basename(path).split("/").last
+          FILE_TYPES.each { |filepart, filehash| 
+            type = filehash["type"]
+            vendor = filehash["vendor"]
+            if filename.match(filepart) then 
+              #logger.debug( "filename is #{filename}")
+              files[type] = Hash.new
+              files[type]["path"] = path
+              files[type]["vendor"] = vendor
+            end
+          }
+        end
+    end
+    logger.debug(" files is #{files.inspect}")
+    return files
+  end
+
 
   # look on disk for the assembly files specified in the config under PEDIGREE_ROOT
   def find_assembly_files
@@ -167,19 +205,24 @@ class Assembly < ActiveRecord::Base
       # header returns the top of the file, use variables in environment.rb to 
       # figure out what the names of the fields are that we're looking for
       # so that the fields are easily updatable 
-      header = file_header(file_path, file_vendor)
-      if file_vendor == "CGI" then
-        check = check_cgi_header(header, file_type, file_path)
-	    software = header[CGI_SOFTWARE_PROGRAM]
-	    software_version = header[CGI_SOFTWARE_VERSION]
-      elsif file_vendor == "VCF" then
-        check = check_vcf_header(header, file_type, file_path)
-	    if file_type == "VCF-INDEL-ANNOTATION" then
-	        software = header[VCF_SOURCE]
-	    else
-	        software = "UnifiedGenotyper"
-	    end
-	    software_version = "UNKNOWN"
+      if (file_path.match(/^s3/)) then
+        software_version = get_software_version(self.location)
+        software = 'cgatools' # this is impossible to get without loading each file and too expensive for now
+      else 
+          header = file_header(file_path, file_vendor)
+          if file_vendor == "CGI" then
+            check = check_cgi_header(header, file_type, file_path)
+            software = header[CGI_SOFTWARE_PROGRAM]
+            software_version = header[CGI_SOFTWARE_VERSION]
+          elsif file_vendor == "VCF" then
+            check = check_vcf_header(header, file_type, file_path)
+            if file_type == "VCF-INDEL-ANNOTATION" then
+                software = header[VCF_SOURCE]
+            else
+                software = "UnifiedGenotyper"
+            end
+            software_version = "UNKNOWN"
+          end
       end
 
        #logger.debug "file #{file_path} file_vendor #{file_vendor} file_type_id #{file_type_id} check #{check} software #{software} software_version #{software_version}\n"
@@ -189,8 +232,9 @@ class Assembly < ActiveRecord::Base
 	asm_file_errors.push("#{file_path} cannot be added to assembly because it contains incorrect values for this filetype")
         next
       end
- 
-      if file_vendor == "CGI" then
+      if file_path.match(/^s3/) then
+        xml = ''
+      elsif file_vendor == "CGI" then
         xml = header.to_xml(:root => "assembly-file")
       elsif file_vendor == "VCF" then
         xml = header.to_xml
@@ -205,11 +249,11 @@ class Assembly < ActiveRecord::Base
       end
       #logger.error("file_type_id #{file_type_id} for assembly #{self.inspect} #{self.location} trying to add #{file_path}")
       assembly_file = AssemblyFile.new( 
-      					:genome_reference_id => self.genome_reference_id,
+      				:genome_reference_id => self.genome_reference_id,
 					:assembly_id => self.id,
-      					:file_type_id => file_type_id, 
+      				:file_type_id => file_type_id, 
 					:name => filename,
-      					:location => file_path, 
+      				:location => file_path, 
 					:file_date => creation_time(file_path),
 					:software => software,
 					:software_version => software_version,
@@ -298,6 +342,7 @@ class Assembly < ActiveRecord::Base
 
   def check_cgi_header(header, file_type, file_path)
      return 1 if file_type == 'SVEVENTS' #SVEVENTS don't have any of this info in the header :(
+     return 1 if file_path.match(/^s3/) # s3 files aren't on disk and can't be read
 
      if header[CGI_SAMPLE].nil? then
         logger.error("ERROR: file #{file_path} with type #{file_type} doesn't appear to be a valid CGI file.")
