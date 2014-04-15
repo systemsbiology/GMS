@@ -8,7 +8,7 @@
   <% end %>
   </ul>
 <% end %>
-<% if @errors.size > 0 %>
+<% if @errors && @errors.size > 0 %>
 <p>Errors processing files:</p>
 <ul>
 <% @errors.each do |error| %>
