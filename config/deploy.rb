@@ -5,7 +5,7 @@ load 'config/cap_user.rb' # contains set :cap_user, "username"
 set :application, "GMS"
 set :deploy_to, "/local/www/software/gms/"
 set :keep_releases, 3
-set :shared_host, "bobama.systemsbiology.net"
+#set :shared_host, "bobama.systemsbiology.net"
 set :whenever_command, "bundle exec whenever"
 set :environment, "production"
 #set :whenever_environment, defer { environment }
@@ -20,7 +20,7 @@ set :bundle_flags, "--deployment"
 
 #capistrano pem ec2 info
 default_run_options[:pty] = true
-#ssh_options[:forward_agent] = true
+ssh_options[:forward_agent] = true
 ssh_options[:auth_methods] = ["publickey"]
 ssh_options[:keys] = ["/home/ec2-user/isb_engineers.pem"]
 
