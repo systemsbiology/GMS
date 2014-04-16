@@ -20,7 +20,7 @@ set :bundle_flags, "--deployment"
 
 #capistrano pem ec2 info
 default_run_options[:pty] = true
-#ssh_options[:forward_agent] = true
+ssh_options[:forward_agent] = true
 ssh_options[:auth_methods] = ["publickey"]
 ssh_options[:keys] = ["/home/ec2-user/isb_engineers.pem"]
 ssh_options[:verbose] = :debug
