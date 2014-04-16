@@ -3,7 +3,6 @@ require 'madeline_utils'
 require 'pedigree_info'
 require 'utils'
 require 'csv'
-#require 'iconv'
 
 class PedigreesController < ApplicationController
   unloadable
