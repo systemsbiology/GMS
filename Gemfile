@@ -16,7 +16,7 @@ gem 'mysql2'
 #gem 'capistrano-bundler'
 #gem 'capistrano-rails'
 gem 'capistrano', '~> 2.15.5'
-gem 'net-ssh', '~> 2.7'
+gem 'net-ssh', '= 2.7.0'
 # To use debugger (ruby-debug for Ruby 1.8.7+, ruby-debug19 for Ruby 1.9.2+)
 # gem 'ruby-debug'
 #gem 'linecache19', :git => "git://github.com/mark-moseley/linecache"
