@@ -147,7 +147,7 @@ end
     task :deploy_dev_data, :roles => [:db] do
       run "mkdir -p #{current_path}/tmp"
       upload('config/database.yml', "#{current_path}/tmp/prod.yml")
-      config = YAML::load_file("tmp/prod.yml")['production']
+      config = YAML::load_file("#{current_path}/tmp/prod.yml")['production']
       run "mkdir -p #{current_path}/tmp/data"
       upload("data/development/#{dev_dump_file}","#{current_path}/tmp/data/#{dev_dump_file}")
       logger.debug "checking that #{current_path}/tmp/data/#{dev_dump_file} got transferred"
