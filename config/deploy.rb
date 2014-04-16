@@ -17,7 +17,7 @@ set :rake, "bundle exec rake"
 set :bundle_gemfile, "Gemfile"
 set :bundle_dir, fetch(:shared_path)+"/bundle"
 set :bundle_flags, "--deployment"
-
+set :user, :cap_user
 #capistrano pem ec2 info
 default_run_options[:pty] = true
 ssh_options[:forward_agent] = true
