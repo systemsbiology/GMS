@@ -102,7 +102,6 @@ class Assembly < ActiveRecord::Base
     end
     logger.debug(" files is #{files.inspect}")
     return files
->>>>>>> GMS-DIST/master
   end
 
 
