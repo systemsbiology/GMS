@@ -1,0 +1,20 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <b>Sales order:</b>
+  <%= @delivery.sales_order %>
+</p>
+
+<p>
+  <b>Spreadsheet name:</b>
+  <%= @delivery.spreadsheet_name %>
+</p>
+
+<p>
+  <b>Date uploaded:</b>
+  <%= @delivery.date_uploaded %>
+</p>
+
+
+<%= link_to 'Edit', edit_delivery_path(@delivery) %> |
+<%= link_to 'Back', deliveries_path %>

@@ -1,0 +1,41 @@
+CGI_1.0:
+  Company: 0
+  Sales Order: 1
+  Deliverable ID: 2
+  Part Number: 3
+  Sample ID: 4
+  Cust. Sample ID: 5
+  Cust. Subject ID: 6
+  Tumor Status: 7
+  Baseline: 8
+  Assembly Version: 9
+  Assembly ID: 10
+  Job ID: 11
+  Tracking Number: 12
+  Shipper: 13
+  Shipped Date: 14
+  Shipped To: 15
+  Shipment Status: 16
+  Delivery Comments: 17
+  Encryption Key: 18
+1.1:
+  Company: 0
+  Sales Order: 1
+  Deliverable ID: 2
+  Part Number: 3
+  Sample ID: 4
+  Customer Sample ID: 5
+  Customer Subject ID: 6
+  Tumor Status: 7
+  Baseline: 8
+  Assembly Version: 9
+  Assembly ID: 10
+  Job ID: 11
+  Tracking Number: 12
+  Shipper: 13
+  Shipped Date: 14
+  Shipped To: 15
+  Shipment Status: 16
+  Delivery Comments: 17
+  Encryption Key: 18
+

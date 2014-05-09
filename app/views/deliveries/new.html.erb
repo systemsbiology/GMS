@@ -1,0 +1,32 @@
+<h1>New delivery</h1>
+
+<p><b><%= flash[:notice] unless flash[:notice].nil? or flash[:notice].empty? %></b></p>
+
+<% if @errors.nil? or @errors.empty? %>
+<% else %>
+<h1>Failures</h1>
+<ul>
+<% @errors.each do |error| %>
+<li>
+Problems in line number <%= error[0] %>:<br/>
+<%= raw error[1]["row"] %>
+<%= raw error[1]["line"] %>
+<% error[1].each_pair do |type, entry| %>
+  <% next if type == "row" %>
+  <p><b><%= type %>:</b>
+  <% entry.full_messages.each do |msg| %>
+    <%= msg %><br />
+  <% end %>
+  </p>
+<% end %>
+</li>
+<br />
+
+<% end %>
+</ul>
+<% end %>
+
+
+<%= render 'form' %>
+
+<%= link_to 'Back', deliveries_path %>
