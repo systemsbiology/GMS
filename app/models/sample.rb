@@ -7,9 +7,9 @@ class Sample < ActiveRecord::Base
   has_one :acquisition, :dependent => :destroy
   has_one :person, :through => :acquisition
 
-  auto_strip_attributes :sample_vendor_id, :volume, :concentration, :quantity, :protocol, :comments
+  auto_strip_attributes :sample_vendor_id, :customer_sample_id, :volume, :concentration, :quantity, :protocol, :comments
   validates_presence_of :sample_type_id, :status, :sample_vendor_id #, :volume, :concentration, :quantity
-  validates_uniqueness_of :sample_vendor_id
+  validates_uniqueness_of :sample_vendor_id, :customer_sample_id
 
   after_save :check_isb_sample_id, :trigger_person_sample_check
   after_commit :trigger_person_sample_check
