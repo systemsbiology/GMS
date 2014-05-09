@@ -25,4 +25,23 @@ namespace :sample do
     end
   end
 
+  desc "Retrieve varFile metadata for a sample directory"
+  task :var_metadata, [:filename] => [:environment] do |t, args|
+    raise "No filename of samples provided" unless args[:filename]
+    f = File.open(args[:filename], "r")
+    f.each_line do |line|
+        line.strip!
+        sample = line.split(/\//).last
+        s = Sample.find_by_sample_vendor_id(sample)
+        assem = s.assays.first.assemblies.first
+        if assem.software_version.to_i < 2 then
+            #puts "skipping sample due to age #{assem.software_version}"
+        else
+            varFile = assem.assembly_files.where(file_type_id: 1).first
+            puts [s.sample_vendor_id, assem.isb_assembly_id, varFile.location, varFile.software_version].join("\t")
+        end
+    end
+    f.close
+  end
+
 end
