@@ -1,4 +1,7 @@
 Gms::Application.routes.draw do
+  resources :deliveries
+
+
 #  resources :user_roles
 #  resources :roles
 #  resources :user_groups
