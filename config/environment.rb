@@ -34,6 +34,7 @@ VCF_GENOME_REFERENCE = "reference"
 # where to find the header file for the Excel spreadsheet uploads
 EXCEL_CGI_HEADER_INDEX_FILE = "config/cgi_manifest_indexes.yml"
 EXCEL_FGG_HEADER_INDEX_FILE = "config/fgg_manifest_indexes.yml"
+EXCEL_DELIVERY_INDEX_FILE = "config/delivery_indexes.yml"
 
 
 # file types to add to the assembly_files table
