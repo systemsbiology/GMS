@@ -63,9 +63,9 @@ class PeopleController < ApplicationController
   # POST /people.xml
   def create
     @person = Person.new(person_params)
-    puts "params #{params.inspect}"
-    puts "person_params #{person_params.inspect}"
-    puts "person #{@person.inspect}"
+    #puts "params #{params.inspect}"
+    #puts "person_params #{person_params.inspect}"
+    #puts "person #{@person.inspect}"
     #logger.debug("person_param #{person_params.inspect}")
     #logger.debug("params #{params.inspect}")
 
@@ -908,7 +908,6 @@ class PeopleController < ApplicationController
                 plate_id,plate_well = vendor_id.split(/_/,2)
                 vendor_id = plate_id+"-DNA_"+plate_well
             end
-            vendor_id = vendor_id
             s.sample_vendor_id = vendor_id
             s.pedigree_id = pedigree.id
 
