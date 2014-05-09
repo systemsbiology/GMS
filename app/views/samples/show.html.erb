@@ -11,11 +11,17 @@
    <b>Vendor ID:</b>
    <%= @sample.sample_vendor_id %>
  </td>
+ <td colspan="2">
+   <b>Customer ID:</b>
+   <%= @sample.customer_sample_id %>
+ </td>
+ </tr>
+ <tr>
  <% if @sample.person.nil? then %>
  <td>&nbsp</td>
  <span style="font-weight: bold; color: red;">No person information for this sample</span>
  <% else %>
-  <td colspan="2">
+  <td >
       <b>Person:</b>
       <% if @sample.person.collaborator_id.nil? then %>
       <%= link_to @sample.person.isb_person_id, @sample.person  %>
@@ -23,14 +29,11 @@
       <%= link_to @sample.person.collaborator_id, @sample.person  %>
       (<%= link_to @sample.person.isb_person_id, @sample.person  %>)
 <%end%>
- </td>
-</tr>
-<tr>
 <td>
   <b>Pedigree:</b>
   <%= link_to @sample.person.pedigree.name, pedigree_path(@sample.person.pedigree) %>
 </td>
-<td colspan="2">
+<td >
   <b>Status:</b>
   <% rr = Hash.new; rr[:pedigree_filter] = Hash.new; rr[:pedigree_filter][:id] = @sample.person.pedigree.id %>
   <%= link_to @sample.status, receiving_report_people_path(rr) %>
@@ -91,6 +94,7 @@
     <th>Name</th>
     <th>ID</th>
     <th>Sample</th>
+    <th>Customer Sample ID</th>
     <th>ISB Sample ID</th>
     <th>ISB Person ID&nbsp;&nbsp;&nbsp;</th>
     <th>Collaborator ID&nbsp;&nbsp;&nbsp;</th>
@@ -106,6 +110,7 @@
     <td><%= link_to assay.name, assay %></td>
     <td><%= link_to "isb_asy_"+assay.id.to_s, assay %></td>
     <td><%= assay.sample.sample_vendor_id %></td>
+    <td><%= assay.sample.customer_sample_id %></td>
     <td><%= assay.sample.isb_sample_id %></td>
     <% if assay.sample.person.nil? then %>
     <td colspan="3">No Person information for this sample</td>
@@ -140,6 +145,7 @@
     <th>ID</th>
     <th>Assay</th>
     <th>Sample</th>
+    <th>Customer Sample</th>
     <th>Genome reference&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</th>
     <th>Assembler version</th>
     <th>Date Recieved</th>
@@ -154,6 +160,7 @@
     <td><%= link_to "isb_asm_"+assembly.id.to_s, assembly %></td>
     <td><%= link_to assay.name, assay %></td>
     <td><%= assay.sample.sample_vendor_id %></td>
+    <td><%= assay.sample.customer_sample_id %></td>
     <td><%= assembly.genome_reference.name %></td>
     <td><%= assembly.software_version %> </td>
     <td><%= assembly.file_date %> </td>
