@@ -41,6 +41,7 @@ gem 'gollum' # wiki
 #gem 'devise'
 #gem 'devise_ldap_authenticatable'
 #gem 'cancan'
+gem 'attr_encrypted'
 
 gem 'paperclip'
 gem 'spreadsheet'
