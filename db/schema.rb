@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140114170410) do
+ActiveRecord::Schema.define(:version => 20140502185930) do
 
   create_table "acquisitions", :force => true do |t|
     t.integer "sample_id"
@@ -32,6 +32,7 @@ ActiveRecord::Schema.define(:version => 20140114170410) do
     t.string   "status"
     t.string   "technology"
     t.string   "description"
+    t.string   "encrypted_truecrypt_key"
     t.date     "date_received"
     t.date     "date_transferred"
     t.date     "dated_backup"
@@ -136,6 +137,14 @@ ActiveRecord::Schema.define(:version => 20140114170410) do
   add_index "audits", ["auditable_id", "auditable_type"], :name => "auditable_index"
   add_index "audits", ["created_at"], :name => "index_audits_on_created_at"
   add_index "audits", ["user_id", "user_type"], :name => "user_index"
+
+  create_table "deliveries", :force => true do |t|
+    t.string   "sales_order"
+    t.string   "spreadsheet_name"
+    t.string   "date_uploaded"
+    t.datetime "created_at",       :null => false
+    t.datetime "updated_at",       :null => false
+  end
 
   create_table "diagnoses", :force => true do |t|
     t.integer "person_id"
@@ -266,6 +275,12 @@ ActiveRecord::Schema.define(:version => 20140114170410) do
     t.datetime "updated_at"
   end
 
+  create_table "roles", :force => true do |t|
+    t.string   "name"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
   create_table "sample_assays", :force => true do |t|
     t.integer  "sample_id"
     t.integer  "assay_id"
@@ -318,11 +333,20 @@ ActiveRecord::Schema.define(:version => 20140114170410) do
     t.datetime "updated_at"
   end
 
+  create_table "study_groups", :force => true do |t|
+    t.string   "name"
+    t.integer  "user_id"
+    t.integer  "study_id"
+    t.datetime "created_at"
+    t.datetime "update_at"
+  end
+
   create_table "temp_objects", :force => true do |t|
     t.integer   "trans_id"
     t.string    "object_type"
     t.binary    "object"
-    t.timestamp "added",       :null => false
+    t.integer   "object_order"
+    t.timestamp "added",        :null => false
     t.datetime  "created_at"
     t.datetime  "updated_at"
   end
@@ -336,11 +360,18 @@ ActiveRecord::Schema.define(:version => 20140114170410) do
 
   add_index "traits", ["person_id", "phenotype_id"], :name => "person_id", :unique => true
 
+  create_table "user_roles", :force => true do |t|
+    t.integer  "user_id"
+    t.integer  "role_id"
+    t.datetime "created_at"
+    t.datetime "updated_at"
+  end
+
   create_table "users", :force => true do |t|
     t.string   "login",               :default => "", :null => false
-    t.string   "email"                
-    t.string   "first_name"
-    t.string   "last_name"
+    t.string   "first_name",          :default => ""
+    t.string   "last_name",           :default => ""
+    t.string   "email"
     t.datetime "remember_created_at"
     t.integer  "sign_in_count",       :default => 0
     t.datetime "current_sign_in_at"
