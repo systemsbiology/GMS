@@ -11,6 +11,7 @@ class Assay < ActiveRecord::Base
   after_update :check_isb_assay_id
 
   attr_accessible :name, :assay_type, :technology, :vendor, :status, :description, :date_received, :date_transferred, :dated_backup, :qc_pass_date, :current
+  attr_encrypted :truecrypt_key, :key => "JFDIAFUIOEUR#*(@IJHFDAIFU#*(@" # stores in encrypted_truecrypt_key
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
