@@ -17,3 +17,4 @@ config/cap_user.rb
 config/database.yml
 config/ldap.yml
 config/database.yml.example
+db/migrate/*
