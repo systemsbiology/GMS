@@ -69,6 +69,7 @@
   <thead>
   <tr>
     <th>Sample Vendor ID</th>
+    <th>Customer Sample ID</th>
     <th>ISB sample ID</th>
     <th>ISB Person</th>
     <th>Person</th>
@@ -84,6 +85,7 @@
 <% @person.samples.each do |sample| %>
   <tr>
     <td><%= link_to sample.sample_vendor_id,sample %></td>
+    <td><%= link_to sample.customer_sample_id, sample %></td>
     <td><%= link_to sample.isb_sample_id, sample %></td>
     <td><%= sample.person.isb_person_id %></td>
     <td><%= sample.person.collaborator_id %></td>
