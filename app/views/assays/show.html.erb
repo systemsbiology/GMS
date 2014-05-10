@@ -11,6 +11,11 @@
     <b>ID:</b>
     <%= 'isb_asy_'+@assay.id.to_s %>
 </td>
+<td><b>Job/Media/Disk ID:</b>
+    <%= @assay.media_id %>
+</td>
+</tr>
+<tr>
 <td >
  <% if @assay.sample.person.nil? then %>
  &nbsp;
@@ -26,11 +31,11 @@
 <%end%>
 </td>
  <td><b>Pedigree:</b> <%= link_to @assay.sample.person.pedigree.name, @assay.sample.person.pedigree %></td>
-</tr>
-<tr>
   <td><b>Status:</b>
   <%= @assay.status %>
   </td>
+</tr>
+<tr>
   <td>
       <b>Assay type:</b>
       <%= @assay.assay_type %>
