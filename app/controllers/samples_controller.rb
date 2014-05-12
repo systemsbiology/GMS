@@ -23,6 +23,17 @@ class SamplesController < ApplicationController
           .find(:all, :include => {:person => { :pedigree => :study} }, 
                 :order => ['samples.sample_vendor_id']).paginate :page => params[:page], :per_page => 100
       end
+    elsif params[:customer_sample_id] then
+      nameArg=params[:customer_sample_id] if  params[:customer_sample_id]
+      if nameArg.match(/%/) then
+        @samples = Sample.where("customer_sample_id like ?", nameArg)
+          .find(:all, :include => {:person => {:pedigree => :study }}, 
+                :order => ['samples.customer_sample_id']).paginate :page => params[:page], :per_page => 100
+      else
+        @samples = Sample.where("customer_sample_id = ?", nameArg)
+          .find(:all, :include => {:person => { :pedigree => :study} }, 
+                :order => ['samples.customer_sample_id']).paginate :page => params[:page], :per_page => 100
+      end
     elsif params[:id] then
       if params[:id].match(/%/) then
         @samples = Sample.where("samples.id like ?", params[:id])
