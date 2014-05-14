@@ -19,7 +19,7 @@ gem 'mysql2'
 #gem 'capistrano-bundler'
 #gem 'capistrano-rails'
 gem 'capistrano', '~> 2.15.5'
-
+gem 'net-ssh', '= 2.7.0'
 # To use debugger (ruby-debug for Ruby 1.8.7+, ruby-debug19 for Ruby 1.9.2+)
 # gem 'ruby-debug'
 #gem 'linecache19', :git => "git://github.com/mark-moseley/linecache"
@@ -54,7 +54,7 @@ gem 'ancestry'
 
 gem 'madeline', '~> 0.1.11'
 
-gem 'rubyzip', '~> 0.9.7'
+gem 'rubyzip', '<1.0.0'
 gem 'auto_strip_attributes'#, "~> 1.0"
 gem 'json_builder'
 
