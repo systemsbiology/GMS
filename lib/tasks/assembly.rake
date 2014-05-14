@@ -39,4 +39,23 @@ namespace :assembly do
       assembly.ensure_files_up_to_date
     end
   end
+
+  desc "check software versions"
+  task :check_software_version, [:file] => [:environment] do |t, args|
+    raise "No file provided " unless args[:file]
+    f = File.open(args[:file],"r")
+    f.each_line do |line|
+        next if line.match(/^#/)
+        line.strip!
+        path = line.split(/\//)
+        assembly_name = path[-1]
+        assembly = Assembly.find_by_name(assembly_name)
+        if assembly.nil? then
+            puts "can't find assembly named #{assembly_name}"
+        else
+            puts [line,assembly_name, assembly.software_version.to_s].join("\t")
+        end
+    end
+    f.close
+  end
 end
