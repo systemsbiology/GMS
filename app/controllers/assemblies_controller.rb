@@ -35,6 +35,31 @@ class AssembliesController < ApplicationController
     end
   end
 
+  def retrieve_circos
+    assembly = Assembly.find(params[:assembly_id])
+    # check for a circos-<assembly>.html file
+    circos = assembly.location+'/REPORTS/circos-'+assembly.name+'.png'
+    if File.exists?(circos) then
+        File.open(circos, 'rb') do |f|
+            send_data f.read, :type => "image/png", :disposition => "inline"
+        end
+    else
+        return nil
+    end
+  end
+
+  def retrieve_circos_legend
+    assembly = Assembly.find(params[:assembly_id])
+    # check for a circos-<assembly>.html file
+    circos = assembly.location+'/REPORTS/circosLegend.png'
+    if File.exists?(circos) then
+        File.open(circos, 'rb') do |f|
+            send_data f.read, :type => "image/png", :disposition => "inline"
+        end
+    else
+        return nil
+    end
+  end
 
   # GET /assembly/1
   def show

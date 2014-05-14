@@ -1,7 +1,6 @@
 Gms::Application.routes.draw do
   resources :deliveries
 
-
 #  resources :user_roles
 #  resources :roles
 #  resources :user_groups
@@ -22,6 +21,8 @@ Gms::Application.routes.draw do
   resources :assemblies do
     get 'ensure_files_up_to_date'
     get 'ped_info', :on => :collection
+    get 'retrieve_circos'
+    get 'retrieve_circos_legend'
   end
 
   match "assembly_files/ped_info", :to => "assembly_files#ped_info", :as => "ped_info"
