@@ -3,7 +3,7 @@ require 'whenever/capistrano'
 load 'config/cap_user.rb' # contains set :cap_user, "username"
 
 set :application, "GMS"
-set :deploy_to, "/u5/www/software/gms/"
+set :deploy_to, "/local/www/software/gms/"
 set :keep_releases, 3
 set :shared_host, "bobama.systemsbiology.net"
 set :whenever_command, "bundle exec whenever"
@@ -56,7 +56,7 @@ set :repository, "git@github.com:systemsbiology/GMS.git"
 set :branch, "master"
 set :use_sudo, false
 
-server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
+server "54.197.155.102", :app, :web, :db, :primary => true
 
 # if you're still using the script/reaper helper you will need
 # these http://github.com/rails/irs_process_scripts
