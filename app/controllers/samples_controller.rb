@@ -34,6 +34,18 @@ class SamplesController < ApplicationController
           .find(:all, :include => {:person => { :pedigree => :study} }, 
                 :order => ['samples.customer_sample_id']).paginate :page => params[:page], :per_page => 100
       end
+    elsif params[:customer_subject_id] then
+        # aka person.collaborator_id 
+        nameArg=params[:customer_subject_id] if  params[:customer_subject_id]
+        if nameArg.match(/%/) then
+            @samples = Sample.find(:all, :include => {:person => {:pedigree => :study}}, 
+                        :conditions => {:people => {:collaborator_id => nameArg} },
+                        :order => ['samples.sample_vendor_id']).paginate :page => params[:page], :per_page => 100
+        else
+            @samples = Sample.find(:all, :include => {:person => {:pedigree => :study}}, 
+                        :conditions => {:people => {:collaborator_id => nameArg} },
+                        :order => ['samples.sample_vendor_id']).paginate :page => params[:page], :per_page => 100
+        end
     elsif params[:id] then
       if params[:id].match(/%/) then
         @samples = Sample.where("samples.id like ?", params[:id])

@@ -6,3 +6,7 @@
     Search for a Customer Sample ID: <%= text_field_tag("customer_sample_id") %>
     <%= submit_tag("Search") %>
 <% end %>
+<%= form_tag("#", :method => "get", :remote => true) do %>
+    Search for a Customer Subject ID: <%= text_field_tag("customer_subject_id") %>
+    <%= submit_tag("Search") %>
+<% end %>
