@@ -1,0 +1,29 @@
+<% if conditions.size > 0 %>
+<table class="tablesorter" style="max-width: 80%">
+  <thead>
+  <tr>
+    <th>Name</th>
+    <th>Omim</th>
+    <th>Description</th>
+  </tr>
+  </thead>
+  <tbody>
+<% conditions.each do |condition| %>
+  <tr>
+    <td><%= link_to condition.name, condition %></td>
+    <td><% if condition.omim_id %><%= link_to condition.omim_id, "http://omim.org/entry/#{condition.omim_id}" %><% else %>NA<% end %></td>
+    <td><p style="white-space:pre"><% if !condition.description.nil? then %><% wrapped = word_wrap(condition.description) %><%= raw wrapped.gsub(/\(\d+\)/) { |digits| digits.sub!("(",""); digits.sub!(")",""); link_to("(#{digits})", "http://omim.org/entry/#{digits}") } %> <% end %></td>
+    <% if false %>
+    <td><%= link_to 'Show', condition %></td>
+    <td><%= link_to 'Edit', edit_condition_path(condition) %></td>
+    <td><%= link_to 'Destroy', condition, :confirm => 'Are you sure?', :method => :delete %></td>
+    <% end %>
+  </tr>
+<% end %>
+</tbody>
+</table>
+<%= will_paginate conditions %>
+
+<% else %>
+<p>No conditions found.</p>
+<% end %>
