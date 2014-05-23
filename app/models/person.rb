@@ -74,8 +74,8 @@ class Person < ActiveRecord::Base
       parent = rel.relation
       logger.error("Parent is nil!") if parent.nil?
       next if parent.nil?
-      male.push(rel) if parent.gender == "male"
-      female.push(rel) if parent.gender == "female"
+      male.push(rel) if lc(parent.gender) == "male"
+      female.push(rel) if lc(parent.gender) == "female"
     end
 
     parents = male | female
@@ -87,7 +87,7 @@ class Person < ActiveRecord::Base
     father = Array.new
     parent_relationships.each do |rel|
       next unless rel.relation
-      father.push(rel.relation) if rel.relation.gender == 'male'
+      father.push(rel.relation) if lc(rel.relation.gender) == 'male'
     end
     return father
   end
@@ -97,7 +97,7 @@ class Person < ActiveRecord::Base
     mother = Array.new
     parent_relationships.each do |rel|
       next unless rel.relation
-      mother.push(rel.relation) if rel.relation.gender == 'female'
+      mother.push(rel.relation) if lc(rel.relation.gender) == 'female'
     end
     return mother
   end
