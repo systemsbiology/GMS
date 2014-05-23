@@ -52,7 +52,8 @@ set :default_environment, {
 #set :scm, :subversion
 # Or: `accurev`, `bzr`, `cvs`, `darcs`, `git`, `mercurial`, `perforce`, `subversion` or `none`
 set :scm, :git
-set :repository, "git@github.com:systemsbiology/GMS.git"
+set :repository, "/proj/famgen/git/gms"
+#set :repository, "git@github.com:systemsbiology/GMS.git"
 set :branch, "master"
 set :use_sudo, false
 
