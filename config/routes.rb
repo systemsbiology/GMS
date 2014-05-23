@@ -61,7 +61,7 @@ Gms::Application.routes.draw do
   resources :person_aliases
   resources :traits
   resources :phenotypes
-  resources :diseases
+  resources :conditions
   resources :relationships
   resources :aliases
   resources :memberships

@@ -1,6 +1,6 @@
 class Setup < ActiveRecord::Migration
   def self.up
-    create_table :diseases do |t|
+    create_table :conditions do |t|
       t.integer :id
       t.string :name
       t.string :omim_id
@@ -10,7 +10,7 @@ class Setup < ActiveRecord::Migration
 
     create_table :phenotypes do |t|
       t.integer :id
-      t.references :disease
+      t.references :condition
       t.string :name
       t.text :description
       t.timestamps
@@ -185,7 +185,7 @@ class Setup < ActiveRecord::Migration
   end
 
   def self.down
-    drop_table :diseases
+    drop_table :conditions
     drop_table :pedigrees
     drop_table :memberships
     drop_table :people

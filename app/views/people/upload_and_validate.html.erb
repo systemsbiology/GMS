@@ -95,13 +95,13 @@ Problems in line number <%= error[0] %>:<br/>
 <h3>Diagnoses Found</h3>
 <table class="tablesorter">
   <thead>
-    <th>disease</th>
+    <th>conditions</th>
     <th>pedigree</th>
     <th>person</th>
   </thead>
   <% @diagnoses.each do |diag| %>
   <tr>
-    <td><%= Disease.find(diag[0]).name %></td>
+    <td><%= Condition.find(diag[0]).name %></td>
     <td><%= diag[1] %></td>
     <td><%= diag[2] %></td>
   </tr>

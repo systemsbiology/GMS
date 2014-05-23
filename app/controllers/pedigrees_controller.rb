@@ -245,7 +245,7 @@ class PedigreesController < ApplicationController
 
       labels = Array.new
       labels.push("IndividualID")
-      labels << pedigree.diseases.map{|d| d.name.gsub!(/ /, '_')}
+      labels << pedigree.conditions.map{|d| d.name.gsub!(/ /, '_')}
       labels << pedigree.phenotypes.map{|p| p.name.gsub!(/ /,'_')}
 
       madeline_info = Array.new

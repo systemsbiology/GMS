@@ -312,7 +312,7 @@ namespace :export do
       person.samples.each do |sample|
         next if sample.assays.nil?
         affected = 'N'
-        affected = 'Y' if person.diseases.size > 0
+        affected = 'Y' if person.conditions.size > 0
         sample.assays.each do |assay|
 	  assay.assemblies.each do |assembly|
 	    assembly.varfiles.each do |file|

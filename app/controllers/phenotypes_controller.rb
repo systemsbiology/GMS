@@ -83,6 +83,6 @@ class PhenotypesController < ApplicationController
 
   private
   def phenotype_params
-    params.require(:phenotype).permit(:disease_id, :name, :tag, :phenotype_type, :description)
+    params.require(:phenotype).permit(:condition_id, :name, :tag, :phenotype_type, :description)
   end
 end

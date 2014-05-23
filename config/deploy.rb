@@ -27,6 +27,12 @@ set :rake, "bundle exec rake"
 set :bundle_gemfile, "Gemfile"
 set :bundle_dir, fetch(:shared_path)+"/bundle"
 set :bundle_flags, "--deployment"
+
+
+# IN ORDER TO MAKE THE DEPLOY WORK ON EC2 with a PEM, YOU HAVE TO 
+# type 'ssh-agent', then copy and paste that into your shell to
+# set the ssh agent information
+
 set :user, 'ec2-user'
 #capistrano pem ec2 info
 default_run_options[:pty] = true

@@ -20,8 +20,8 @@ class Pedigree < ActiveRecord::Base
     self.people.map(&:phenotypes).flatten.uniq
   end
 
-  def diseases
-    self.people.map(&:diseases).flatten.uniq
+  def conditions
+    self.people.map(&:conditions).flatten.uniq
   end
 
   def write_pedigrees

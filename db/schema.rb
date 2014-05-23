@@ -148,17 +148,17 @@ ActiveRecord::Schema.define(:version => 20140502185930) do
 
   create_table "diagnoses", :force => true do |t|
     t.integer "person_id"
-    t.integer "disease_id"
+    t.integer "condition_id"
     t.string  "age_of_onset",        :limit => 50
-    t.text    "disease_information"
+    t.text    "condition_information"
     t.integer "output_order"
     t.date    "created_at"
     t.date    "updated_at"
   end
 
-  add_index "diagnoses", ["person_id", "disease_id"], :name => "person_id", :unique => true
+  add_index "diagnoses", ["person_id", "condition_id"], :name => "person_id", :unique => true
 
-  create_table "diseases", :force => true do |t|
+  create_table "conditions", :force => true do |t|
     t.string   "name"
     t.string   "omim_id"
     t.text     "description"
@@ -241,7 +241,7 @@ ActiveRecord::Schema.define(:version => 20140502185930) do
   add_index "person_aliases", ["person_id"], :name => "alias_person_id"
 
   create_table "phenotypes", :force => true do |t|
-    t.integer  "disease_id"
+    t.integer  "condition_id"
     t.string   "name"
     t.string   "tag"
     t.string   "phenotype_type"

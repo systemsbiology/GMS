@@ -3,7 +3,7 @@
   <thead>
   <tr>
     <th>Phenotype Name</th>
-    <th>Associated with Disease</th>
+    <th>Associated with Condition</th>
     <th>Description</th>
   </tr>
   </thead>
@@ -12,7 +12,7 @@
 <% phenotypes.each do |phenotype| %>
   <tr>
     <td><%= link_to phenotype.name, phenotype %></td>
-    <td><%= link_to(phenotype.disease.name,phenotype.disease) if phenotype.disease %></td>
+    <td><%= link_to(phenotype.condition.name,phenotype.condition) if phenotype.condition %></td>
     <td><span style="white-space:pre"><%= word_wrap(phenotype.description, :line_width => 100) if phenotype.description %></span></td>
     <% if false %>
     <td><%= link_to 'Show', phenotype %></td>

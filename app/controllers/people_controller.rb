@@ -213,12 +213,12 @@ class PeopleController < ApplicationController
       render :action => "upload" and return
     end
 
-    disease = ''
-    if (params[:disease] && params[:disease][:id] && !params[:disease][:id].empty?) then
+    condition = ''
+    if (params[:condition] && params[:condition][:id] && !params[:condition][:id].empty?) then
       begin
-        disease = Disease.find(params[:disease][:id])
+        condition = Condition.find(params[:condition][:id])
       #rescue
-      #  flash[:error] = "Disease must be selected params: #{params[:disease].inspect}"
+      #  flash[:error] = "Condition must be selected params: #{params[:condition].inspect}"
       #  render :action => "upload" and return
       end
     end
@@ -248,7 +248,7 @@ class PeopleController < ApplicationController
     sheet1 = book.worksheet 0
 
     if spreadsheet_type == 'fgg manifest' then
-      ret_code, @people, @samples, @relationships, @memberships, @diagnoses, @acquisitions, @errors, @aliases, @phenotypes = process_fgg_manifest(sheet1, pedigree, disease)
+      ret_code, @people, @samples, @relationships, @memberships, @diagnoses, @acquisitions, @errors, @aliases, @phenotypes = process_fgg_manifest(sheet1, pedigree, condition)
     else
       flash[:error] = "Spreadsheet type not understood. Try this action again."
       render :action => "upload" and return
@@ -528,17 +528,17 @@ class PeopleController < ApplicationController
           end
         end
       elsif temp_obj.object_type == "Diagnosis" then 
-        disease = Disease.find(obj[0])
+        condition = Condition.find(obj[0])
         pedigree_id = obj[1]
         @pedigree_id = pedigree_id
         person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(obj[2])
             diagnosis = Diagnosis.new
         if person.nil? then
-          diagnosis.errors.add(:person_id,"not found for disease #{obj[0]} pedigree #{pedigree_id} collaborator_id #{obj[2]}")
+          diagnosis.errors.add(:person_id,"not found for condition #{obj[0]} pedigree #{pedigree_id} collaborator_id #{obj[2]}")
           @errors.push(["diagnosis",diagnosis, diagnosis.errors])
         else
             diagnosis.person_id = person.id
-          diagnosis.disease_id = disease.id
+          diagnosis.condition_id = condition.id
           if diagnosis.valid? then
             diagnosis.save
           else
@@ -627,7 +627,7 @@ class PeopleController < ApplicationController
 #
 ############################################################################################################
 
-  def process_fgg_manifest(sheet, pedigree, disease)
+  def process_fgg_manifest(sheet, pedigree, condition)
     people = []
     samples = []
     relationships = Array.new
@@ -778,12 +778,12 @@ class PeopleController < ApplicationController
         p.comments = row[headers["Comments"]]
         p.pedigree_id = pedigree.id
 
-        if !disease.nil? and !disease.blank? then
+        if !condition.nil? and !condition.blank? then
             # add diagnosis for this person if affected 
             affected_status = row[headers["Affected Status"]]
             if affected_status.nil? then
                 diag = Diagnosis.new
-                diag.errors.add(:disease_id, "could not be set.  No value for Affected Status found in upload spreadsheet.")
+                diag.errors.add(:condition_id, "could not be set.  No value for Affected Status found in upload spreadsheet.")
                 errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
                 errors["#{counter}"]["affected_status"] = diag.errors
             else
@@ -791,7 +791,7 @@ class PeopleController < ApplicationController
                 # other statuses are unaffected and unknown but those aren't handled right now...
                 # don't really have a way to indicate in the database that the person is known unaffected versus unknown
                 if affected_status == "affected" then
-                    diagnoses.push([disease.id, pedigree.id, p.collaborator_id])
+                    diagnoses.push([condition.id, pedigree.id, p.collaborator_id])
                 elsif affected_status == "unknown" or affected_status == "unaffected" then
                     # do nothing - these are valid statuses but not stored in db
                 else

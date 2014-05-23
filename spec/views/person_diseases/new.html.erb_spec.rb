@@ -5,8 +5,8 @@ describe "diagnoses/new.html.erb" do
     assign(:diagnosis, stub_model(Diagnosis,
       :id => 1,
       :person_id => 1,
-      :disease_id => 1,
-      :disease_information => "MyString",
+      :condition_id => 1,
+      :condition_information => "MyString",
       :output_order => 1
     ).as_new_record)
   end
@@ -18,8 +18,8 @@ describe "diagnoses/new.html.erb" do
     assert_select "form", :action => diagnoses_path, :method => "post" do
       assert_select "input#diagnosis_id", :name => "diagnosis[id]"
       assert_select "input#diagnosis_person_id", :name => "diagnosis[person_id]"
-      assert_select "input#diagnosis_disease_id", :name => "diagnosis[disease_id]"
-      assert_select "input#diagnosis_disease_information", :name => "diagnosis[disease_information]"
+      assert_select "input#diagnosis_condition_id", :name => "diagnosis[condition_id]"
+      assert_select "input#diagnosis_condition_information", :name => "diagnosis[condition_information]"
       assert_select "input#diagnosis_output_order", :name => "diagnosis[output_order]"
     end
   end

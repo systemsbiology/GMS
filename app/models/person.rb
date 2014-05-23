@@ -19,7 +19,7 @@ class Person < ActiveRecord::Base
   has_many :acquisitions, :dependent => :destroy
   has_many :samples, :through => :acquisitions, :dependent => :destroy
   has_many :diagnoses, :dependent => :destroy
-  has_many :diseases, :through => :diagnoses
+  has_many :conditions, :through => :diagnoses
   has_many :reciprocal_relationships, :class_name => "Relationship", :foreign_key => "relation_id", :dependent => :destroy
 
   auto_strip_attributes :collaborator_id
@@ -74,8 +74,8 @@ class Person < ActiveRecord::Base
       parent = rel.relation
       logger.error("Parent is nil!") if parent.nil?
       next if parent.nil?
-      male.push(rel) if parent.gender == "male"
-      female.push(rel) if parent.gender == "female"
+      male.push(rel) if parent.gender.downcase == "male"
+      female.push(rel) if parent.gender.downcase == "female"
     end
 
     parents = male | female
@@ -87,7 +87,7 @@ class Person < ActiveRecord::Base
     father = Array.new
     parent_relationships.each do |rel|
       next unless rel.relation
-      father.push(rel.relation) if rel.relation.gender == 'male'
+      father.push(rel.relation) if rel.relation.gender.downcase == 'male'
     end
     return father
   end
@@ -97,7 +97,7 @@ class Person < ActiveRecord::Base
     mother = Array.new
     parent_relationships.each do |rel|
       next unless rel.relation
-      mother.push(rel.relation) if rel.relation.gender == 'female'
+      mother.push(rel.relation) if rel.relation.gender.downcase == 'female'
     end
     return mother
   end

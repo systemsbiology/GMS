@@ -100,7 +100,7 @@ def pedfile(pedigree_id)
     person["DOD"] = ind.dod
     person["deceased"] = ind.deceased
     person["phenotype"] = person_traits(ind)
-    person["diseases"] = person_diseases(ind)
+    person["conditions"] = person_conditions(ind)
     person["comments"] = ind.comments
     person["planning_on_sequencing"] = ind.planning_on_sequencing
     if founders.include? ind.isb_person_id then
@@ -214,20 +214,20 @@ def pedfile(pedigree_id)
 
 end  # end pedigree
 
-def person_diseases(person)
-  diseases = Array.new
+def person_conditions(person)
+  conditions = Array.new
   person.diagnoses.each do |diagnosis|
     if diagnosis.age_of_onset.nil? or diagnosis.age_of_onset == "" then
-      diseases << diagnosis.disease.name
+      conditions << diagnosis.condition.name
     else
-      diseases << diagnosis.disease.name + ": "+diagnosis.age_of_onset
+      conditions << diagnosis.condition.name + ": "+diagnosis.age_of_onset
     end
   end
 
-  if diseases.size == 0 then
+  if conditions.size == 0 then
     return nil
   else 
-    return diseases
+    return conditions
   end
 end
 

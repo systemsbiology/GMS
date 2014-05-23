@@ -20,10 +20,10 @@
   <td><b>Dod:</b> <%= @person.dod %></td>
   <td><b>Deceased:</b> <%= @person.deceased %></td>
 </tr>
-<% if @person.diseases.size > 0 %>
-  <tr><td colspan="3"><b>Diagnosed with following Diseases:</b></td></tr>
+<% if @person.conditions.size > 0 %>
+  <tr><td colspan="3"><b>Diagnosed with following Conditions:</b></td></tr>
   <% @person.diagnoses.each do |pd| %>
-    <tr><td><%= pd.person.full_identifier %></td><td><%= pd.disease.name %><% unless pd.disease_information.nil? %>: <%= pd.disease_information %><% end %></td><td>Age of Onset: <%= pd.age_of_onset %></td></tr>
+    <tr><td><%= pd.person.full_identifier %></td><td><%= pd.condition.name %><% unless pd.condition_information.nil? %>: <%= pd.condition_information %><% end %></td><td>Age of Onset: <%= pd.age_of_onset %></td></tr>
   <% end %>
 <% end %>
 
@@ -51,7 +51,7 @@
 <p>Not a member of a family.</p>
 <% end %>
 <br />
-<h1>Diagnosed with the following Diseases</h1>
+<h1>Diagnosed with the following Conditions</h1>
 <%= render 'diagnoses/list', :diagnoses => @person.diagnoses %>
 <br />
 <%= link_to 'Add a new Diagnosis', new_diagnosis_path(:person_id => @person) %>

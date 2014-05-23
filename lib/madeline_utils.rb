@@ -9,10 +9,10 @@ def madeline_file(pedigree)
 end
 
 def madeline_header(pedigree)
-  diseases = pedigree.diseases
+  conditions = pedigree.conditions
 
   header = "FamilyID\tIndividualID\tGender\tFather\tMother\tMZTwin\tDZTwin\tAffected\tSampled\tDeceased\tDOB\tRelationshipEnded\tSortOrder"
-  header << "\t" + diseases.map(&:name).join("\t")
+  header << "\t" + conditions.map(&:name).join("\t")
 
   phenotypes = pedigree.phenotypes
   header << "\t" + phenotypes.map(&:name).join("\t")
@@ -25,22 +25,22 @@ def to_madeline(pedigree, people)
   results = Array.new
   familyID = pedigree.tag
 
-  diseases = pedigree.diseases
+  conditions = pedigree.conditions
   phenotypes = pedigree.phenotypes
 
   twin_letter = 'A'
   twin_count = 0
   people.each do |person|
-  blah = twin_count % 2 
-    if (((twin_count % 2) == 0) and twin_count > 0) then
-      # in order for the letter to not be the same, we need to create a new object.
-      tl = twin_letter.dup
-      tl.next!
-      twin_letter = tl
-      twin_count = 0
-    end
-    cp, twin_count = create_row(person, familyID, diseases, phenotypes, twin_letter, twin_count)
-    results.push(cp)
+      blah = twin_count % 2 
+      if (((twin_count % 2) == 0) and twin_count > 0) then
+          # in order for the letter to not be the same, we need to create a new object.
+          tl = twin_letter.dup
+          tl.next!
+          twin_letter = tl
+          twin_count = 0
+      end
+      cp, twin_count = create_row(person, familyID, conditions, phenotypes, twin_letter, twin_count)
+      results.push(cp)
   end # end people.each
 
   logger.debug("results before childless marriages #{results.inspect}")
@@ -50,7 +50,7 @@ def to_madeline(pedigree, people)
     mother_ident = Person.find(mother_id).madeline_identifier
     fake_child = Person.new
     fake_child.collaborator_id = "^"+(0...8).map{65.+(rand(25)).chr}.join
-    cp = create_fake(fake_child, familyID, diseases, phenotypes, father_ident, mother_ident) 
+    cp = create_fake(fake_child, familyID, conditions, phenotypes, father_ident, mother_ident) 
 
     results.push(cp)
   end
@@ -59,12 +59,13 @@ def to_madeline(pedigree, people)
 
 end
 
-def create_row(person, familyID, diseases, phenotypes, twin_letter, twin_count)
+def create_row(person, familyID, conditions, phenotypes, twin_letter, twin_count)
     return [],twin_count if person.nil? 
     current_person = Array.new
     current_person.push(familyID)
     current_person.push(person.madeline_identifier) # isb_person_id - collaborator_ids
     current_person.push(person.gender)
+    logger.debug("create_row for person #{person.inspect} father #{person.father.inspect} mother #{person.mother.inspect}")
     if person.father.nil? or person.father.empty? then
       current_person.push('.')
     else
@@ -92,7 +93,7 @@ def create_row(person, familyID, diseases, phenotypes, twin_letter, twin_count)
     end
 
     # Affected
-    if (person.diseases.size > 0)
+    if (person.conditions.size > 0)
       current_person.push('Y')
     else
       current_person.push('.')
@@ -152,8 +153,8 @@ def create_row(person, familyID, diseases, phenotypes, twin_letter, twin_count)
       end
     end
 
-    diseases.each do |disease|
-      diagnoses = disease.diagnoses.where(:person_id => person.id)
+    conditions.each do |condition|
+      diagnoses = condition.diagnoses.where(:person_id => person.id)
       if diagnoses.nil? or diagnoses.empty? then
         current_person.push('.')
       else
@@ -186,7 +187,7 @@ def create_row(person, familyID, diseases, phenotypes, twin_letter, twin_count)
 end
 
 
-def create_fake(person, familyID, diseases, phenotypes, father_id, mother_id)
+def create_fake(person, familyID, conditions, phenotypes, father_id, mother_id)
     current_person = Array.new
     current_person.push(familyID)
     current_person.push(person.madeline_identifier) # isb_person_id - collaborator_ids
@@ -202,7 +203,7 @@ def create_fake(person, familyID, diseases, phenotypes, father_id, mother_id)
     current_person.push('.') # RelationshipEnded
     current_person.push('1') # Sort Order
 
-    diseases.each do |disease|
+    conditions.each do |condition|
       current_person.push('.')
     end
 

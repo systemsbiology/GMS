@@ -3,9 +3,9 @@
   <thead>
   <tr>
     <th>Person</th>
-    <th>Disease</th>
+    <th>Condition</th>
     <th>Age of Onset</th>
-    <th>Disease information</th>
+    <th>Condition information</th>
     <th>Output order</th>
     <th class="nosort">Controls</th>
   </tr>
@@ -14,9 +14,9 @@
 <% diagnoses.each do |diagnosis| %>
   <tr>
     <td><%= link_to diagnosis.person.full_identifier, diagnosis.person %></td>
-    <td><%= link_to diagnosis.disease.name, diagnosis.disease %></td>
+    <td><%= link_to diagnosis.condition.name, diagnosis.condition %></td>
     <td><%= diagnosis.age_of_onset %></td>
-    <td><%= diagnosis.disease_information %></td>
+    <td><%= diagnosis.condition_information %></td>
     <td><%= diagnosis.output_order %></td>
     <td><%= link_to 'Show', diagnosis %></td>
     <% if false %>
@@ -28,5 +28,5 @@
 </tbody>
 </table>
 <% else %>
-<p>No diseases found for this person</p>
+<p>No conditions found for this person</p>
 <% end %>

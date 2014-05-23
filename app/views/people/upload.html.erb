@@ -13,8 +13,8 @@
   <%= collection_select(:pedigree, :id, Pedigree.all(:include=> :study, :order => ['studies.name', 'pedigrees.name']), :id, :name, options = {:include_blank => '-Select the pedigree this person belongs to', :selected => cur_pedigree_id}, :class => "pedigree_select") %>
 </div>
 <div class="field">
-  <%= label "disease", :disease_id %><br />
-  <%= collection_select(:disease, :id, Disease.order(:name), :id, :name, options = {:include_blank => "-Select the disease for this pedigree or leave this selection for no disease"}) %>
+  <p>Condition</p>
+  <%= collection_select(:condition, :id, Condition.order(:name), :id, :name, options = {:include_blank => "-Select the condition for this pedigree or leave this selection for no condition"}) %>
 </div>
 <div class="field">
    Type of spreadsheet:<br />

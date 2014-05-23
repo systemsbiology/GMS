@@ -5,8 +5,8 @@ describe "diagnoses/show.html.erb" do
     @diagnosis = assign(:diagnosis, stub_model(Diagnosis,
       :id => 1,
       :person_id => 1,
-      :disease_id => 1,
-      :disease_information => "Disease Information",
+      :condition_id => 1,
+      :condition_information => "Condition Information",
       :output_order => 1
     ))
   end
@@ -20,7 +20,7 @@ describe "diagnoses/show.html.erb" do
     # Run the generator again with the --webrat flag if you want to use webrat matchers
     rendered.should match(/1/)
     # Run the generator again with the --webrat flag if you want to use webrat matchers
-    rendered.should match(/Disease Information/)
+    rendered.should match(/Condition Information/)
     # Run the generator again with the --webrat flag if you want to use webrat matchers
     rendered.should match(/1/)
   end

@@ -45,7 +45,7 @@ class DiagnosesController < ApplicationController
 
     respond_to do |format|
       if @diagnosis.save
-        format.html { redirect_to @diagnosis, notice: 'Person disease was successfully created.' }
+        format.html { redirect_to @diagnosis, notice: 'Person condition was successfully created.' }
         format.json { render json: @diagnosis, status: :created, location: @diagnosis }
       else
         format.html { render action: "new" }
@@ -61,7 +61,7 @@ class DiagnosesController < ApplicationController
 
     respond_to do |format|
       if @diagnosis.update_attributes(diagnosis_params)
-        format.html { redirect_to @diagnosis, notice: 'Person disease was successfully updated.' }
+        format.html { redirect_to @diagnosis, notice: 'Person condition was successfully updated.' }
         format.json { head :ok }
       else
         format.html { render action: "edit" }
@@ -85,6 +85,6 @@ class DiagnosesController < ApplicationController
 
   private
   def diagnosis_params
-    params.require(:diagnosis).permit(:person_id, :disease_id, :age_of_onset, :disease_information, :output_order)
+    params.require(:diagnosis).permit(:person_id, :condition_id, :age_of_onset, :condition_information, :output_order)
   end
 end

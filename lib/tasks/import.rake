@@ -109,9 +109,9 @@ namespace :import do
             person.collaborator_id = person_name if person.collaborator_id.nil? or person.collaborator_id.empty?
             # for the inova studies gender is defined by the collaborator id
             if person_name.match(/^M-/) then
-                gender = "Female"
+                gender = "female"
             elsif person_name.match(/^F-/) then
-                gender = "Male"
+                gender = "male"
             else
                 gender = "Unknown"  # all newborns will be this until later when we upload the clinical file
             end

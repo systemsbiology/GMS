@@ -6,10 +6,10 @@
     <%= f.text_field :name %>
   </div>
   <div class="field">
-    <%= f.label :disease_id %><br />
-    <%= f.collection_select(:disease_id, Disease.order(:name), :id, :name, { :include_blank => "-Select Disease or leave blank" }) %>
+    <%= f.label :condition_id %><br />
+    <%= f.collection_select(:condition_id, Condition.order(:name), :id, :name, { :include_blank => "-Select Condition or leave blank" }) %>
   </div>
-  <div>If disease is not in this list, then <%= link_to "create a new disease", new_disease_path %></div>
+  <div>If condition is not in this list, then <%= link_to "create a new condition", new_condition_path %></div>
   <div class="field">
     <%= f.label :tag %><br />
     <%= f.text_field :tag %>

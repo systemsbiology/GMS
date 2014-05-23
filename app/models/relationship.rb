@@ -126,9 +126,9 @@ class Relationship < ActiveRecord::Base
     end
 
     if self.name == 'monozygotic twin' then
-      # monozygotic twins are always the same sex (unless they have a disease, which may mean this check should be removed if we get any cases of this)
+      # monozygotic twins are always the same sex (unless they have a condition, which may mean this check should be removed if we get any cases of this)
       #logger.debug("monozygotic twins test #{self.person.gender} to #{self.relation.gender}")
-      if self.person.gender == self.relation.gender then
+      if self.person.gender.downcase == self.relation.gender.downcase then
         return true
       else
         return false
@@ -150,7 +150,7 @@ class Relationship < ActiveRecord::Base
       return false
     end
 
-    if self.person.gender == relationship_gender[self.name] and self.relation.gender == relationship_gender[self.reverse_name] then
+    if self.person.gender.downcase == relationship_gender[self.name.downcase].downcase and self.relation.gender.downcase == relationship_gender[self.reverse_name.downcase].downcase then
       return true
     else
       return false

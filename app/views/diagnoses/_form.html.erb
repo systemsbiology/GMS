@@ -6,17 +6,17 @@
     <%= f.collection_select(:person_id, Person.all, :id, :full_identifier, { :include_blank => "-Select Person", :selected => params[:person_id] || @diagnosis.person.id || '' }) %>
   </div>
   <div class="field">
-    <%= f.label :disease_id %><br />
-    <%= f.collection_select(:disease_id, Disease.find(:all, :order => ['name']), :id, :name, { :include_blank => "-Select Disease or leave blank" }) %>
-    <div>If disease is not in this list, then <%= link_to "create a new disease", new_disease_path %></div>
+    <%= f.label :condition_id %><br />
+    <%= f.collection_select(:condition_id, Condition.find(:all, :order => ['name']), :id, :name, { :include_blank => "-Select Condition or leave blank" }) %>
+    <div>If condition is not in this list, then <%= link_to "create a new condition", new_condition_path %></div>
   </div>
   <div class="field">
     <%= f.label :age_of_onset %>
     <%= f.text_field :age_of_onset %>
   </div>
   <div class="field">
-    <%= f.label :disease_information %> (Ex: something associated with this person and this disease only and not a general property of this disease.  If this applies to multiple people, then add a phenotype that is associated with this disease instead.<br />
-    <%= f.text_field :disease_information %>
+    <%= f.label :condition_information %> (Ex: something associated with this person and this condition only and not a general property of this condition.  If this applies to multiple people, then add a phenotype that is associated with this condition instead.<br />
+    <%= f.text_field :condition_information %>
   </div>
   <div class="field">
     <%= f.label :output_order %><br />
