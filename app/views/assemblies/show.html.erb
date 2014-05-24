@@ -58,10 +58,10 @@
 <% if @assembly.software_version.to_i > 1 %>
 <div style="position: relative;">
 <div style="position: absolute; left: 0px; top: 0px; z-index: -1">
-<%= image_tag(assembly_retrieve_circos_path(@assembly), height:"750", width:"750") %>
+<%= image_tag(assembly_retrieve_circos_path(@assembly), height:"750", width:"750", alt:"") %>
 </div>
 <div style="position:absolute; left: 675px; top: 0px; z-index:1">
-<%= image_tag(assembly_retrieve_circos_legend_path(@assembly),height:"650",width:"600") %>
+<%= image_tag(assembly_retrieve_circos_legend_path(@assembly),height:"650",width:"600",alt:"") %>
 </div>
 </div>
 <% end %>
