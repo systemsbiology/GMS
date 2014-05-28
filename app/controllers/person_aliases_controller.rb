@@ -83,6 +83,6 @@ class PersonAliasesController < ApplicationController
 
   private
   def person_alias_params
-    params.requrie(:person_alias).permit(:person_id, :value, :alias_type)
+    params.require(:person_alias).permit(:person_id, :value, :alias_type)
   end
 end

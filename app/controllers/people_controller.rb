@@ -760,7 +760,7 @@ class PeopleController < ApplicationController
             person_aliases.each do |pa|
               peral = PersonAlias.find_by_person_id_and_value_and_alias_type(p.id, pa, "collaborator_id")
               if peral.nil? then 
-                new_aliases.push(pa)
+                new_aliases.push(pa.to_s)
               end
             end
             logger.debug("new aliasses #{new_aliases.inspect}")
