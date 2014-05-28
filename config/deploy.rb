@@ -3,9 +3,9 @@ require 'whenever/capistrano'
 load 'config/cap_user.rb' # contains set :cap_user, "username"
 
 set :application, "GMS"
-set :deploy_to, "/local/www/software/gms/"
+set :deploy_to, "/u5/www/software/gms/"
 set :keep_releases, 3
-#set :shared_host, "bobama.systemsbiology.net"
+set :shared_host, "bobama.systemsbiology.net"
 set :whenever_command, "bundle exec whenever"
 set :environment, "production"
 #set :whenever_environment, defer { environment }
@@ -28,19 +28,6 @@ set :bundle_gemfile, "Gemfile"
 set :bundle_dir, fetch(:shared_path)+"/bundle"
 set :bundle_flags, "--deployment"
 
-
-# IN ORDER TO MAKE THE DEPLOY WORK ON EC2 with a PEM, YOU HAVE TO 
-# type 'ssh-agent', then copy and paste that into your shell to
-# set the ssh agent information
-
-set :user, 'ec2-user'
-#capistrano pem ec2 info
-default_run_options[:pty] = true
-#ssh_options[:forward_agent] = true
-ssh_options[:auth_methods] = ["publickey"]
-ssh_options[:keys] = ["/home/ec2-user/.ssh/isb_engineers.pem"]
-#ssh_options[:verbose] = :debug
-
 before 'bundle:install', "bundle:list"
 set :default_environment, {
   'PATH' => "/u5/tools/rvm/gems/ruby-1.9.3-p448@global/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts:/bin/:/tools/bin:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",
@@ -49,15 +36,28 @@ set :default_environment, {
   'GEM_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p448@global',
   'BUNDLE_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p448@global'
 }
+#capistrano pem ec2 info
+#default_run_options[:pty] = true
+#ssh_options[:forward_agent] = true
+#ssh_options[:auth_methods] = ["publickey"]
+#ssh_options[:keys] = ["/home/ec2-user/isb_engineers.pem"]
+#before 'bundle:install', "bundle:list"
+#set :default_environment, {
+#  'PATH' => "/usr/local/share/ruby/gems/2.0/bin:/bin/:/tools/bin:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",
+  #'GEM_HOME' => '/usr/local/share/ruby/gems/2.0',
+  #'GEM_PATH' => '/usr/local/share/ruby/gems/2.0',
+#  'BUNDLE_PATH' => '/usr/local/share/ruby/gems/2.0'
+#}
 
 #set :scm, :subversion
 # Or: `accurev`, `bzr`, `cvs`, `darcs`, `git`, `mercurial`, `perforce`, `subversion` or `none`
 set :scm, :git
-set :repository, "git@github.com:systemsbiology/GMS.git"
+set :repository, "/proj/famgen/git/gms"
+#set :repository, "git@github.com:systemsbiology/GMS.git"
 set :branch, "master"
 set :use_sudo, false
 
-server "54.197.155.102", :app, :web, :db, :primary => true
+server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
 
 # if you're still using the script/reaper helper you will need
 # these http://github.com/rails/irs_process_scripts
@@ -164,7 +164,7 @@ end
     task :deploy_dev_data, :roles => [:db] do
       run "mkdir -p #{current_path}/tmp"
       upload('config/database.yml', "#{current_path}/tmp/prod.yml")
-      config = YAML::load_file("#{current_path}/tmp/prod.yml")['production']
+      config = YAML::load_file("tmp/prod.yml")['production']
       run "mkdir -p #{current_path}/tmp/data"
       upload("data/development/#{dev_dump_file}","#{current_path}/tmp/data/#{dev_dump_file}")
       logger.debug "checking that #{current_path}/tmp/data/#{dev_dump_file} got transferred"
