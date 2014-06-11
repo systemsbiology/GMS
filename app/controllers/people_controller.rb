@@ -8,6 +8,7 @@ class PeopleController < ApplicationController
 #  load_and_authorize_resource
   respond_to :json
   caches_action :ped_info
+  cache_sweeper :people_sweeper
   # GET /people
   # GET /people.xml
   def index

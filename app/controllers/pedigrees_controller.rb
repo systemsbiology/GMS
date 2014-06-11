@@ -8,6 +8,7 @@ class PedigreesController < ApplicationController
   unloadable
   respond_to :json
   caches_page :all_pedigrees
+  cache_sweeper :pedigree_sweeper
   
   # GET /pedigrees
   # GET /pedigrees.xml
