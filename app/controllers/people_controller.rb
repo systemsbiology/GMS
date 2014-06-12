@@ -112,7 +112,6 @@ class PeopleController < ApplicationController
 #        membership.pedigree_id = params[:pedigree][:id]
 #            membership.person_id = @person.id
 #        membership.save
-        expire_action :action => :ped_info
         format.html { redirect_to(@person, :notice => 'Person was successfully created.') }
         format.xml  { render :xml => @person, :status => :created, :location => @person }
       else
@@ -994,9 +993,12 @@ class PeopleController < ApplicationController
       ped = p.pedigree
       logger.error("no pedigree for person #{p.inspect}") if ped.nil?
       next if ped.nil?
-      ped_info[p.collaborator_id] = ped.isb_pedigree_id
-      ped_info[p.isb_person_id] = ped.isb_pedigree_id
-      ped_info[p.full_identifier] = ped.isb_pedigree_id
+      ped_info[p.collaborator_id] = Array.new unless ped_info[p.collaborator_id]
+      ped_info[p.collaborator_id].push(ped.isb_pedigree_id)
+      ped_info[p.isb_person_id] = Array.new unless ped_info[p.isb_person_id]
+      ped_info[p.isb_person_id].push(ped.isb_pedigree_id)
+      ped_info[p.full_identifier] = Array.new unless ped_info[p.full_identifier]
+      ped_info[p.full_identifier].push(ped.isb_pedigree_id)
     end
 
     respond_to do |format|

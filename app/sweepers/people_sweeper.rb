@@ -1,4 +1,4 @@
-class PersonSweeper < ActionController::Caching::Sweeper
+class PeopleSweeper < ActionController::Caching::Sweeper
     observe Person
 
     # expire people ped_info
