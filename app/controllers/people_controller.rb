@@ -714,6 +714,9 @@ class PeopleController < ApplicationController
         # need to check both customer_subject_id and customer_sample_id in case they're
         # trying to switch which one is which in the database... /facepalm
         customer_subject_id = row[headers["Customer Subject ID"]]
+        if (customer_subject_id.match(/ /)) then
+            customer_subject_id.tr(" ","_")
+        end
         if (customer_subject_id.is_a? Float) then 
           customer_subject_id = customer_subject_id.to_i
         end
