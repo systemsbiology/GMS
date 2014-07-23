@@ -1,41 +1,57 @@
+<script>
+  $(document).ready(function() {
+    $(".tablesorter").tablesorter({widgets: ['zebra']});
+  });
+</script>
 <p id="notice"><%= notice %></p>
-<p>
+<% if flash[:error] then %>
+<p id="error_explanation"><%= flash[:error].html_safe %></p>
+<% end %>
+<table class="tablesorter">
+<tr>
+<td>
   <b>Name:</b>
   <%= @study.name %>&nbsp;&nbsp;&nbsp;<b>ID:</b><%= 'isb_study_'+@study.id.to_s %>
-</p>
-
-<p>
+</td>
+<td>
   <b>Tag:</b>
   <%= @study.tag %>
-</p>
+</td>
 
-<p>
+<td>
   <b>Lead:</b>
   <%= @study.lead %>
-</p>
-
-<p>
-  <b>Collaborator:</b>
+</td>
+</tr>
+<tr>
+<td>
+  <b>Principle Investigator:</b>
   <%= @study.collaborator %>
-</p>
+</td>
 
-<p>
+<td>
   <b>Collaborating Institution:</b>
   <%= @study.collaborating_institution %>
-</p>
-
-<p>
-  <b>Description:</b>
-  <%= @study.description %>
-</p>
-
-<p>
+</td>
+<td>
   <b>Contact:</b>
   <%= @study.contact %>
-</p>
+</td>
+</tr>
+<tr>
+<td colspan="3">
+  <b>Description:</b>
+  <%= @study.description %>
+</td>
+</tr>
+</table>
 
 <% if false %> <%= link_to "Delete study #{@study.name}, all pedigrees, all people, and all samples associated", @study, :confirm => "Are you sure you want to delete this study, all of its pedigrees, all of its people, and all of their associated information (including samples)?", :method => :delete %> <% end %>
 
+<p>
+  <b>Genome Count:</b>
+  <%= @study.genomic_count %>
+</p>
 
 <p>
   <b>Pedigrees:</b>

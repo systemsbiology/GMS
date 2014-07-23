@@ -105,6 +105,16 @@ class Pedigree < ActiveRecord::Base
     return quartets
   end
 
+  def genomic_count
+    complete_count = 0
+    self.people.each do |person|
+        if person.complete then
+            complete_count = complete_count+1
+        end
+    end
+    return complete_count
+  end
+
   # return 1 if there are no 'planning_on_sequencing' members that don't have assembly files
   def complete
     plan_count = 0
@@ -112,10 +122,10 @@ class Pedigree < ActiveRecord::Base
     self.people.each do |person|
       if person.planning_on_sequencing then
         # check to see if they have a sample. return true if one sample is complete
-	plan_count = plan_count+1
+	    plan_count = plan_count+1
         if person.complete then 
-	  complete_count = complete_count+1
-	end
+	        complete_count = complete_count+1
+	    end
       end
     end
     return true if ((plan_count > 0) and (plan_count == complete_count))

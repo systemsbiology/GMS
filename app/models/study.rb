@@ -17,4 +17,13 @@ class Study < ActiveRecord::Base
       self.save
     end
   end
+
+  def genomic_count
+    total_count = 0
+    self.pedigrees.each do |ped|
+        ped_count = ped.genomic_count
+        total_count = total_count + ped_count
+    end
+    return total_count
+  end
 end
