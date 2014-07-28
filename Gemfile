@@ -26,6 +26,8 @@ gem 'capistrano', '~> 2.15.5'
 #gem 'ruby-debug-base19x', "~>0.11.30.pre10"
 #gem 'ruby-debug19', :require => 'ruby-debug'
 
+gem "chartkick"
+
 gem 'settingslogic'
 
 gem 'strong_parameters'
