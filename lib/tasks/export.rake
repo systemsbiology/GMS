@@ -342,7 +342,8 @@ namespace :export do
 
   def create_file(output, filename)
     exportdir_exists
-    full_path = EXPORT_DIR + filename
+    full_path =  EXPORT_DIR + '/' unless EXPORT_DIR.match('/$')
+    full_path = "#{full_path}#{filename}"
     #puts "full path #{full_path}"
     string = output.join("\n")
     File.open(full_path, 'w') do |f|

@@ -4,7 +4,8 @@ require File.expand_path('../application', __FILE__)
 # Configuration directives for application locations
 PEDIGREES_DIR = Rails.root.join('public/pedigrees')
 MADELINE_DIR = Rails.root.join('public/pedigrees/madeline')
-EXPORT_DIR = Rails.root.join('public/pedigrees/export')
+EXPORT_DIR = Rails.root.join('public/pedigrees/export') if Rails.env.development?
+EXPORT_DIR = "/proj/famgen/gms" if Rails.env.production?
 PEDIGREE_ROOT = "/proj/famgen/studies"
 PEDFILES_DIR = Rails.root.join('public/pedigrees/pedFiles')
 KWANZAA_DIR = Rails.root.join('public/pedigrees/kwanzaa')
