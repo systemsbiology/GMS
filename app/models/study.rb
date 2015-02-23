@@ -17,4 +17,29 @@ class Study < ActiveRecord::Base
       self.save
     end
   end
+
+  def count_trios
+	numTrios = 0
+    self.pedigrees.each do |ped|
+		numTrios += ped.trios[0][2].count unless ped.trios.empty?
+	end
+	numTrios
+  end
+
+  def count_individuals
+	numPeople = 0
+	self.pedigrees.each do |ped|
+		numPeople += ped.people.count
+	end
+	numPeople
+  end
+
+  def count_sequenced
+	numPeople =0
+	self.pedigrees.each do |ped|
+		numPeople += ped.count_sequenced
+	end
+	numPeople
+  end
+
 end
