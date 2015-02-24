@@ -94,11 +94,15 @@ class Pedigree < ActiveRecord::Base
   end
 
   def trios
-	trios = self.nTuple(3)
+	Rails.cache.fetch("trios/#{id}", :expires_in => 7.days) do
+		trios = self.nTuple(3)
+	end
   end
   
   def quartets
-	quartets = self.nTuple(4)
+	Rails.cache.fetch("quartets/#{id}", :expires_in => 7.days) do
+		quartets = self.nTuple(4)
+	end
   end
 
   # returns COMPLETE families - therefore skips anything that doesn't have a mother and a father
@@ -145,11 +149,13 @@ class Pedigree < ActiveRecord::Base
   end
 
   def count_sequenced
-	numSequenced = 0
-	self.people.each do |person|
-		numSequenced+=1 if person.complete
+	Rails.cache.fetch("count_sequenced/#{id}", :expires_in => 7.days) do
+		numSequenced = 0
+		self.people.each do |person|
+			numSequenced+=1 if person.complete
+		end
+		numSequenced
 	end
-	numSequenced
   end
 
   def destroy_people

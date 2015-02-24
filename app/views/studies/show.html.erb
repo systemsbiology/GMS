@@ -22,10 +22,11 @@
 
 
 <p>
-  <b>Pedigrees:</b>
+  <b>Pedigrees</b>
 <% if @pedigrees.nil? or @pedigrees.empty? %>
   <p>No pedigrees for this study</p>
 <% else %>
+<b>(<%= @pedigrees.count %>)</b>:<br>
 <table class="tablesorter">
   <tr>
     <th>Pedigree Name</th>

@@ -2,7 +2,7 @@ class PhenotypesController < ApplicationController
   # GET /phenotypes
   # GET /phenotypes.xml
   def index
-    @phenotypes = Phenotype.all
+    @phenotypes = Phenotype.order('madeline_display DESC, name')
 
     respond_to do |format|
       format.html # index.html.erb
@@ -14,7 +14,7 @@ class PhenotypesController < ApplicationController
   # GET /phenotypes/1.xml
   def show
     @phenotype = Phenotype.find(params[:id])
-
+	logger.debug("hpnoetype madleine {#@phenotype.inspect} #{@phenotype.madeline_display.inspect} #{I18n.t @phenotype.madeline_display}")
     respond_to do |format|
       format.html # show.html.erb
       format.xml  { render :xml => @phenotype }
@@ -83,6 +83,6 @@ class PhenotypesController < ApplicationController
 
   private
   def phenotype_params
-    params.require(:phenotype).permit(:condition_id, :name, :tag, :phenotype_type, :description)
+    params.require(:phenotype).permit(:condition_id, :name, :tag, :phenotype_type, :madeline_display, :description)
   end
 end

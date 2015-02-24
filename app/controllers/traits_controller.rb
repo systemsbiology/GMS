@@ -2,7 +2,7 @@ class TraitsController < ApplicationController
   # GET /traits
   # GET /traits.xml
   def index
-    @traits = Trait.has_pedigree(params[:pedigree_filter]).has_person(params[:person])
+    @traits = Trait.has_pedigree(params[:pedigree_filter]).has_person(params[:person]).paginate :page => params[:page], :per_page => 100
 
     respond_to do |format|
       format.html # index.html.erb

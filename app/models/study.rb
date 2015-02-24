@@ -19,27 +19,33 @@ class Study < ActiveRecord::Base
   end
 
   def count_trios
-	numTrios = 0
-    self.pedigrees.each do |ped|
-		numTrios += ped.trios[0][2].count unless ped.trios.empty?
+	Rails.cache.fetch("numTrios/#{id}", :expires_in => 7.days) do
+		numTrios = 0
+		self.pedigrees.each do |ped|
+			numTrios += ped.trios[0][2].count unless ped.trios.empty?
+		end
+		numTrios
 	end
-	numTrios
   end
 
   def count_individuals
-	numPeople = 0
-	self.pedigrees.each do |ped|
-		numPeople += ped.people.count
+	Rails.cache.fetch("numPeople/#{id}",:expires_in => 7.days) do
+		numPeople = 0
+		self.pedigrees.each do |ped|
+			numPeople += ped.people.count
+		end
+		numPeople
 	end
-	numPeople
   end
 
   def count_sequenced
-	numPeople =0
-	self.pedigrees.each do |ped|
-		numPeople += ped.count_sequenced
+	Rails.cache.fetch("numSequenced/#{id}",:expires_in => 7.days) do
+		numPeople =0
+		self.pedigrees.each do |ped|
+			numPeople += ped.count_sequenced
+		end
+		numPeople
 	end
-	numPeople
   end
 
 end

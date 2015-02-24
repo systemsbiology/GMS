@@ -1,6 +1,6 @@
 <p id="notice"><%= notice %></p>
 
-<table class="tablesorter">
+<table class="tablesorter" style="width:950px;">
 <tr>
   <td><b>ISB ID:</b> <%= @person.isb_person_id %></td>
   <td colspan="2"><b>Identifier:</b> <%= @person.collaborator_id %></td>
@@ -12,7 +12,7 @@
 <% end %>
 <tr>
   <td><b>Gender:</b> <%= @person.gender %></td>
-  <td><b>Pedigree:</b> <%= link_to @person.pedigree.name, @person.pedigree %></td>
+  <td><b>Pedigree:</b> <% if @person.pedigree %><%= link_to @person.pedigree.name, @person.pedigree %><% else %>No Pedigree for person<% end %></td>
   <td colspan="1"><b>Planning on Sequencing this person:</b> <%= @person.planning_on_sequencing %></td>
 </tr>
 <tr>
@@ -30,7 +30,7 @@
 <% if @person.traits.size > 0 %>
   <tr> <td colspan="3"><b>Traits:</b></td></tr>
   <% @person.traits.each do |t| %>
-  <tr><td><%= t.person.full_identifier %></td><td><%= t.phenotype.name %></td><td><% unless t.trait_information.nil? %><%= t.trait_information %><% end %></td></tr>
+  <tr><td colspan="2" class="wrap-long"><%= link_to t.phenotype.name, t.phenotype %></td><td class="wrap-long"><% unless t.trait_information.nil? %><%= t.trait_information %><% end %></td></tr>
   <% end %>
 <% end %>
 </table>
@@ -56,9 +56,11 @@
 <br />
 <%= link_to 'Add a new Diagnosis', new_diagnosis_path(:person_id => @person) %>
 <br />
+<% if false %>
 <h1>Traits</h1>
 <%= render 'traits/list', :traits => @person.traits %>
 <%= link_to 'Add a new Trait', new_trait_path(:person_id => @person) %>
+<% end %>
 <br />
 <h1>Samples</h1>
 <% if @person.samples.size > 0 %>
