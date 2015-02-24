@@ -14,7 +14,7 @@ def madeline_header(pedigree)
   header = "FamilyID\tIndividualID\tGender\tFather\tMother\tMZTwin\tDZTwin\tAffected\tSampled\tDeceased\tDOB\tRelationshipEnded\tSortOrder"
   header << "\t" + conditions.map(&:name).join("\t")
 
-  phenotypes = pedigree.phenotypes
+  phenotypes = pedigree.people.map { |p| p.phenotypes.where(:madeline_display => 1) }.flatten.uniq
   header << "\t" + phenotypes.map(&:name).join("\t")
 
   return header
@@ -26,19 +26,20 @@ def to_madeline(pedigree, people)
   familyID = pedigree.tag
 
   conditions = pedigree.conditions
-  phenotypes = pedigree.phenotypes
+  phenotypes = pedigree.people.map { |p| p.phenotypes.where(:madeline_display => 1) }.flatten.uniq
 
   twin_letter = 'A'
   twin_count = 0
   people.each do |person|
-      blah = twin_count % 2 
-      if (((twin_count % 2) == 0) and twin_count > 0) then
+		# this doesn't work for triplets?!?
+      #blah = twin_count % 2 
+      #if (((twin_count % 2) == 0) and twin_count > 0) then
           # in order for the letter to not be the same, we need to create a new object.
-          tl = twin_letter.dup
-          tl.next!
-          twin_letter = tl
-          twin_count = 0
-      end
+      #    tl = twin_letter.dup
+      #    tl.next!
+      #    twin_letter = tl
+      #    twin_count = 0
+      #end
       cp, twin_count = create_row(person, familyID, conditions, phenotypes, twin_letter, twin_count)
       results.push(cp)
   end # end people.each
@@ -55,6 +56,7 @@ def to_madeline(pedigree, people)
     results.push(cp)
   end
 
+  logger.debug("to_madeline results #{results.inspect}")
   return results
 
 end
