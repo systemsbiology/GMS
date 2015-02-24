@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20140502185930) do
+ActiveRecord::Schema.define(:version => 20150223221750) do
 
   create_table "acquisitions", :force => true do |t|
     t.integer "sample_id"
@@ -32,7 +32,6 @@ ActiveRecord::Schema.define(:version => 20140502185930) do
     t.string   "status"
     t.string   "technology"
     t.string   "description"
-    t.string   "encrypted_truecrypt_key"
     t.date     "date_received"
     t.date     "date_transferred"
     t.date     "dated_backup"
@@ -138,26 +137,6 @@ ActiveRecord::Schema.define(:version => 20140502185930) do
   add_index "audits", ["created_at"], :name => "index_audits_on_created_at"
   add_index "audits", ["user_id", "user_type"], :name => "user_index"
 
-  create_table "deliveries", :force => true do |t|
-    t.string   "sales_order"
-    t.string   "spreadsheet_name"
-    t.string   "date_uploaded"
-    t.datetime "created_at",       :null => false
-    t.datetime "updated_at",       :null => false
-  end
-
-  create_table "diagnoses", :force => true do |t|
-    t.integer "person_id"
-    t.integer "condition_id"
-    t.string  "age_of_onset",        :limit => 50
-    t.text    "condition_information"
-    t.integer "output_order"
-    t.date    "created_at"
-    t.date    "updated_at"
-  end
-
-  add_index "diagnoses", ["person_id", "condition_id"], :name => "person_id", :unique => true
-
   create_table "conditions", :force => true do |t|
     t.string   "name"
     t.string   "omim_id"
@@ -165,6 +144,18 @@ ActiveRecord::Schema.define(:version => 20140502185930) do
     t.datetime "created_at"
     t.datetime "updated_at"
   end
+
+  create_table "diagnoses", :force => true do |t|
+    t.integer "person_id"
+    t.integer "condition_id"
+    t.string  "age_of_onset",          :limit => 50
+    t.text    "condition_information"
+    t.integer "output_order"
+    t.date    "created_at"
+    t.date    "updated_at"
+  end
+
+  add_index "diagnoses", ["person_id", "condition_id"], :name => "person_id", :unique => true
 
   create_table "file_types", :force => true do |t|
     t.string   "type_name",  :limit => 50
@@ -275,12 +266,6 @@ ActiveRecord::Schema.define(:version => 20140502185930) do
     t.datetime "updated_at"
   end
 
-  create_table "roles", :force => true do |t|
-    t.string   "name"
-    t.datetime "created_at", :null => false
-    t.datetime "updated_at", :null => false
-  end
-
   create_table "sample_assays", :force => true do |t|
     t.integer  "sample_id"
     t.integer  "assay_id"
@@ -321,6 +306,16 @@ ActiveRecord::Schema.define(:version => 20140502185930) do
 
   add_index "samples", ["isb_sample_id"], :name => "samples_isb_sample_id"
 
+  create_table "sessions", :force => true do |t|
+    t.string   "session_id", :null => false
+    t.text     "data"
+    t.datetime "created_at", :null => false
+    t.datetime "updated_at", :null => false
+  end
+
+  add_index "sessions", ["session_id"], :name => "index_sessions_on_session_id"
+  add_index "sessions", ["updated_at"], :name => "index_sessions_on_updated_at"
+
   create_table "studies", :force => true do |t|
     t.string   "name"
     t.string   "tag",                       :limit => 50
@@ -333,22 +328,13 @@ ActiveRecord::Schema.define(:version => 20140502185930) do
     t.datetime "updated_at"
   end
 
-  create_table "study_groups", :force => true do |t|
-    t.string   "name"
-    t.integer  "user_id"
-    t.integer  "study_id"
-    t.datetime "created_at"
-    t.datetime "update_at"
-  end
-
   create_table "temp_objects", :force => true do |t|
-    t.integer   "trans_id"
-    t.string    "object_type"
-    t.binary    "object"
-    t.integer   "object_order"
-    t.timestamp "added",        :null => false
-    t.datetime  "created_at"
-    t.datetime  "updated_at"
+    t.integer  "trans_id"
+    t.string   "object_type"
+    t.binary   "object"
+    t.datetime "added",       :null => false
+    t.datetime "created_at"
+    t.datetime "updated_at"
   end
 
   create_table "traits", :force => true do |t|
@@ -358,30 +344,6 @@ ActiveRecord::Schema.define(:version => 20140502185930) do
     t.string  "output_order"
   end
 
-  add_index "traits", ["person_id", "phenotype_id"], :name => "person_id", :unique => true
-
-  create_table "user_roles", :force => true do |t|
-    t.integer  "user_id"
-    t.integer  "role_id"
-    t.datetime "created_at"
-    t.datetime "updated_at"
-  end
-
-  create_table "users", :force => true do |t|
-    t.string   "login",               :default => "", :null => false
-    t.string   "first_name",          :default => ""
-    t.string   "last_name",           :default => ""
-    t.string   "email"
-    t.datetime "remember_created_at"
-    t.integer  "sign_in_count",       :default => 0
-    t.datetime "current_sign_in_at"
-    t.datetime "last_sign_in_at"
-    t.string   "current_sign_in_ip"
-    t.string   "last_sign_in_ip"
-    t.datetime "created_at",                          :null => false
-    t.datetime "updated_at",                          :null => false
-  end
-
-  add_index "users", ["login"], :name => "index_users_on_login", :unique => true
+  add_index "traits", ["person_id", "phenotype_id", "trait_information"], :name => "traits"
 
 end
