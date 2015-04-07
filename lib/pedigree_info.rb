@@ -295,8 +295,11 @@ def ordered_pedigree(pedigree_id)
     root_person = find_root(pedigree_id)
     #logger.debug("root person in ordered_pedigree is #{root_person.inspect}")
     logger.error("ERROR: no root person!") if root_person.nil?
-
-    madeline_people = breadth_unrooted_traverse(root_person)
+    if (root_person.nil?) then
+      madeline_people = Pedigree.find(pedigree_id).people.order("isb_person_id")
+    else
+      madeline_people = breadth_unrooted_traverse(root_person)
+    end
   end
 
   # if this is an unrelateds pedigree then breadth_traverse should return fewer people than
