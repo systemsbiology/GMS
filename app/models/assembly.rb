@@ -40,9 +40,12 @@ class Assembly < ActiveRecord::Base
   }
 
   def validates_assembly_directory
+      if self.location.match(/wellness/) then # this is a hack because the user the db runs as doesn't have access to all of the directories - TODO: Make this better somehow?
+          return
+      end
       if self.location && ! self.location.match(/^s3/) && !File.exists?(self.location) then
-        puts "validation is happening"
         errors.add(:location, "Directory does not exist on filesystem.")
+        logger.error("validates_assembly_directory says that #{self.location} doesn't exist")
       end
   end
 
@@ -488,5 +491,44 @@ class Assembly < ActiveRecord::Base
     return self.assembly_files.where(["file_type_id = ?", "1"])
   end
 
+
+  def self.qualityChart(assembly)
+    summ = assembly.assembly_files.where(["file_type_id = ?", "7"]).first # summary file
+    return nil if summ.nil?
+    # get Gross Mapping Yield (Gb), Fully called genome fraction, Fully called exome fraction, Genome fraction where weightSumSequenceCoverage >= 40x, Exome fraction where weightSumSequenceCoverage >=40x, SNP total count, SNP heterozygous/homozygous ratio, SNP transitions/transversions ratio, SNP novelty fraction
+    fileKeys = ["Gross mapping yield (Gb)","Fully called genome fraction","Fully called exome fraction","Genome fraction where weightSumSequenceCoverage >= 40x","Exome fraction where weightSumSequenceCoverage >=40x","SNP total count","SNP heterozygous/homozygous ratio","SNP transitions/transversions ratio"]
+    fileValues = { 
+           "Genome coverage - Gross mapping yield (Gb)" => { "MIN" => "136.975", "FIRST" => "167.663", "MEDIAN" => "180.157", "THIRD" => "194.508", "MAX" => "379.232"},
+           "Genome coverage - Fully called genome fraction" => { "MIN" => "0.8644", "FIRST" => "0.963", "MEDIAN" => "0.968", "THIRD" => "0.972", "MAX" => "0.978"},
+           "Exome coverage - Fully called exome fraction" => { "MIN" => "0.932", "FIRST" => "0.979", "MEDIAN" => "0.983", "THIRD" =>"0.985", "MAX" => "0.99" },
+           "Genome coverage - Genome fraction where weightSumSequenceCoverage >= 40x" => { "MIN" => "0.466", "FIRST" => "0.63", "MEDIAN" => "0.682", "THIRD" => "0.765", "MAX" => "0.975" },
+           "Exome coverage - Exome fraction where weightSumSequenceCoverage >=40x" => { "MIN" => "0.46", "FIRST" => "0.722", "MEDIAN" => "0.778", "THIRD" => "0.818", "MAX" => "0.988"},
+           "Genome variations - SNP total count" => { "MIN" => "2880744", "FIRST" => "3444634", "MEDIAN" => "3475246", "THIRD" => "3506851", "MAX" => "4252714"},
+           "Exome variations - SNP total count" => { "MIN" => "19751", "FIRST" => "22075", "MEDIAN" => "22315", "THIRD" => "22588", "MAX" => "27139"},
+           "Genome variations - SNP heterozygous/homozygous ratio" => { "MIN" => "1.216", "FIRST" => "1.614", "MEDIAN" => "1.653", "THIRD" => "1.681", "MAX" => "2.357" },
+           "Exome variations - SNP heterozygous/homozygous ratio" => { "MIN" => "1.329", "FIRST" => "1.681", "MEDIAN" => "1.728", "THIRD" => "1.781", "MAX" => "2.476"},
+           "Genome variations - SNP transitions/transversions ratio" => { "MIN" => "2.059", "FIRST" => "2.108", "MEDIAN" => "2.123", "THIRD" => "2.134", "MAX" => "2.196"},
+           "Exome variations - SNP transitions/transversions ratio" => { "MIN" => "2.689", "FIRST" => "2.942", "MEDIAN" => "2.983", "THIRD" => "3.027", "MAX" => "3.192" }
+        }
+    logger.debug("file values #{fileValues.inspect}")
+    logger.debug("file keys #{fileKeys.inspect}")
+    logger.debug("summary file #{summ.inspect}")
+    results = Array.new
+    File.open(summ.location).each_line do |line|
+        logger.debug("line is #{line.inspect}")
+        (category,type,value,scale) = line.split(/\t/)
+        logger.debug("category #{category.inspect} type #{type.inspect} value #{value.inspect} scale #{scale.inspect}")
+        next if scale and scale.match(/HIGH/)
+        if fileKeys.include?(type.to_s) then
+            logger.debug("found type #{type.inspect} in file!")
+            local = Array.new
+            local.push("#{category} - #{type}")
+            local.push(value)
+            results.push(local)
+        end
+    end
+    logger.debug("results #{results.inspect}")
+    return results
+  end
 
 end
