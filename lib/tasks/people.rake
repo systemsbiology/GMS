@@ -15,8 +15,15 @@ namespace :people do
       ped.people.each do |person|
         person.check_sequencing_status
       end
-      print "finished ped #{ped.tag}\n"
+      puts "finished ped #{ped.tag}\n"
     end
+  end
+
+  desc "Find Problem people"
+  task :find_problem_people do
+	People.all.each do |person|
+		puts "#{person.inspect} doesn't have a pedigree" if person.membership.nil?
+	end
   end
 
 end
