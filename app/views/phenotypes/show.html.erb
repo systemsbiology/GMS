@@ -30,7 +30,7 @@
 <% if (@phenotype.people.size > 0) then %>
 <p><b>People with this phenotype:</b></p>
 <% @people = @phenotype.people.paginate :page => params[:page], :per_page => 100 %>
-<%= render 'people/list' %>
+<%= render 'people_phenotypes' %>
 <% else %>
 <p>No people with this phenotype</p>
 <% end %>
