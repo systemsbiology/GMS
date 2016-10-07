@@ -102,6 +102,6 @@ directories just have to be there (though logs may need production.log).  The co
 directory of GMS requires that you specify a user.
 
 config/user.rb
-set :user, "dmauldin"
+set :user, "username"
 
 

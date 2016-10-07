@@ -43,9 +43,8 @@ class AssembliesController < ApplicationController
         File.open(circos, 'rb') do |f|
             send_data f.read, :type => "image/png", :disposition => "inline"
         end
-    else
-        return nil
     end
+    render :nothing => true
   end
 
   def retrieve_circos_legend
@@ -56,9 +55,8 @@ class AssembliesController < ApplicationController
         File.open(circos, 'rb') do |f|
             send_data f.read, :type => "image/png", :disposition => "inline"
         end
-    else
-        return nil
     end
+    render :nothing => true
   end
 
   # GET /assembly/1
