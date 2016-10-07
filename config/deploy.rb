@@ -13,8 +13,8 @@ set :whenever_identifier, defer { "#{application}_#{environment}" }
 set :rail_env, "production"
 
 set :rake, "bundle exec rake"
-#set :rvm_ruby_string, ENV['GEM_HOME'].gsub(/.*\//,"")  # set up which gemset you're using
-#set :rvm_ruby_string, "ruby-1.9.3-p448@global"
+set :rvm_ruby_string, ENV['GEM_HOME'].gsub(/.*\//,"")  # set up which gemset you're using
+set :rvm_ruby_string, "ruby-2.3.1@rails3"
 #set :rvm_install_ruby_params, '--1.9'
 #set :rvm_install_pkgs, %w[libyaml openssl]
 #set :rvm_install_ruby_params, '--with-opt-dir=/u5/tools/rvm/usr'
@@ -30,11 +30,11 @@ set :bundle_flags, "--deployment"
 
 before 'bundle:install', "bundle:list"
 set :default_environment, {
-  'PATH' => "/u5/tools/rvm/gems/ruby-1.9.3-p448@global/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts:/bin/:/tools/bin:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",
-  'RUBY_VERSION' => 'ruby-1.9.3-p448@global',
-  'GEM_HOME' => '/u5/tools/rvm/gems/ruby-1.9.3-p448@global',
-  'GEM_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p448@global',
-  'BUNDLE_PATH' => '/u5/tools/rvm/gems/ruby-1.9.3-p448@global'
+  'PATH' => "/u5/tools/rvm/gems/ruby-2.3.1@rails3/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts:/bin/:/tools/bin:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",
+  'RUBY_VERSION' => 'ruby-2.3.1@rails3',
+  'GEM_HOME' => '/u5/tools/rvm/gems/ruby-2.3.1@rails3',
+  'GEM_PATH' => '/u5/tools/rvm/gems/ruby-2.3.1@rails3',
+  'BUNDLE_PATH' => '/u5/tools/rvm/gems/ruby-2.3.1@rails3'
 }
 #capistrano pem ec2 info
 #default_run_options[:pty] = true
