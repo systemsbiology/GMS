@@ -1,16 +1,17 @@
 source 'http://rubygems.org'
 
-gem 'rails'
+gem 'rails', "3.2.17"
 gem 'rake'
 gem 'builder'
 gem 'net-ssh', '~>2.7.0'
 #gem 'net-ssh', '~> 2.8.1', :git => "https://github.com/net-ssh/net-ssh"
-gem 'debugger'
+gem 'debugger2'
 
 # Bundle edge Rails instead:
 # gem 'rails', :git => 'git://github.com/rails/rails.git'
-gem 'mysql2'
+gem 'mysql2', '0.3.15'
 gem 'minitest'
+gem 'sprockets', '2.2.2'
 
 # Use unicorn as the web server
 # gem 'unicorn'
