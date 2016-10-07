@@ -55,7 +55,7 @@
 <br /><br />
 <%= render 'assembly_files/list', :assembly_files => @assembly.assembly_files.sort! {|a,b| a.name.downcase <=> b.name.downcase}.paginate() %>
 
-<% if @assembly.software_version.to_i > 1 %>
+<% if @assembly.check_circos %>
 <div style="position: relative;">
 <div style="position: absolute; left: 0px; top: 0px; z-index: -1">
 <%= image_tag(assembly_retrieve_circos_path(@assembly), height:"750", width:"750", alt:"") %>

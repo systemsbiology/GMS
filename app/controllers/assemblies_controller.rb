@@ -42,6 +42,7 @@ class AssembliesController < ApplicationController
     if File.exists?(circos) then
         File.open(circos, 'rb') do |f|
             send_data f.read, :type => "image/png", :disposition => "inline"
+			return
         end
     end
     render :nothing => true
@@ -54,6 +55,7 @@ class AssembliesController < ApplicationController
     if File.exists?(circos) then
         File.open(circos, 'rb') do |f|
             send_data f.read, :type => "image/png", :disposition => "inline"
+			return
         end
     end
     render :nothing => true

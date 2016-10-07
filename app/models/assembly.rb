@@ -39,6 +39,15 @@ class Assembly < ActiveRecord::Base
     { :conditions => [ 'current = ?', '1'] }
   }
 
+  def check_circos
+    circos = self.location+'/REPORTS/circos-'+self.name+'.png'
+    if File.exists?(circos) then
+        return true
+    else
+        return false
+    end
+  end
+
   def validates_assembly_directory
       if self.location.match(/wellness/) then # this is a hack because the user the db runs as doesn't have access to all of the directories - TODO: Make this better somehow?
           return
