@@ -9,8 +9,6 @@ class AssemblyFile < ActiveRecord::Base
   validates_uniqueness_of :name, :location
   after_save :update_completeness
 
-  attr_accessible :genome_reference_id, :assembly_id, :file_type_id, :name, :description, :location, :file_date, :metadata, :disk_id, :software, :software_version, :record_date, :current, :comments
-
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
       if pedigree.kind_of?(Array) then
@@ -39,7 +37,7 @@ class AssemblyFile < ActiveRecord::Base
   }
 
   def pedigree_id
-    begin 
+    begin
       self.assembly.assay.sample.person.pedigree.id
     rescue
       logger.error("Error with pedigree_id call for file #{self.inspect}")

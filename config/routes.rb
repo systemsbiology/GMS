@@ -1,4 +1,4 @@
-Gms::Application.routes.draw do
+Rails.application.routes.draw do
   resources :deliveries
 
 #  resources :user_roles
@@ -14,8 +14,8 @@ Gms::Application.routes.draw do
   resources :file_types
   resources :diagnoses
   resources :reports
-  match "terminology" => "terminology#index"
-  match '/calendar(/:year(/:month))' => 'calendar#index', :as => :calendar, :constraints => {:year => /\d{4}/, :month => /\d{1,2}/}
+  get "terminology" => "terminology#index"
+  get '/calendar(/:year(/:month))' => 'calendar#index', :as => :calendar, :constraints => {:year => /\d{4}/, :month => /\d{1,2}/}
   resources :genome_references
 #  match "assemblies/ensure_files_up_to_date/(:id)", :to => "assemblies#ensure_files_up_to_date", :as => "ensure_files_up_to_date"
   resources :assemblies do
@@ -25,7 +25,7 @@ Gms::Application.routes.draw do
     get 'retrieve_circos_legend'
   end
 
-  match "assembly_files/ped_info", :to => "assembly_files#ped_info", :as => "ped_info"
+  get "assembly_files/ped_info", :to => "assembly_files#ped_info", :as => "ped_info"
   resources :assembly_files do
     get 'ped_info', :on => :collection
   end
@@ -77,7 +77,7 @@ Gms::Application.routes.draw do
     get 'pedigree_file'
     post 'pedigree_file'
     get 'all_pedigrees', :on => :collection
-    get 'all_pedigree_files', :on => :collection
+    post 'all_pedigree_files', :on => :collection
     get 'pedigree_datastore', :on => :collection
     get 'export_madeline_table'
     get 'export_madeline_pdf', :on => :collection
@@ -90,7 +90,7 @@ Gms::Application.routes.draw do
 
   resources :studies
 
-  match "/fgg_manifest", :to => "static#fgg_manifest"
+  get "/fgg_manifest", :to => "static#fgg_manifest"
 
   def self.inherited(child)
     child.instance_eval do

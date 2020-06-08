@@ -1,4 +1,4 @@
-<%= form_for(@trait) do |f| %>
+<%= form_with model: @trait do |f| %>
   <%= render "partials/error_messages", :target => @trait %>
 
   <div class="field">

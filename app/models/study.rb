@@ -8,7 +8,6 @@ class Study < ActiveRecord::Base
   after_update :check_study_tag
   after_create :check_study_tag
 
-  attr_accessible :name, :tag, :lead, :collaborator, :collaborating_institution, :description, :contact
 
   def check_study_tag
     if !self.tag.nil? and self.tag.match(/ /) then

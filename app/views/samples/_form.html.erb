@@ -1,9 +1,9 @@
-<%= form_for(@sample) do |f| %>
+<%= form_with model: @sample do |f| %>
   <%= render "partials/error_messages", :target => @sample %>
   <%= render "partials/pedigree_person_select", :pedigrees => @pedigrees, :f => f %>
 
   <div class="field">
-    <%= f.label :customer_sample_id %> - The Sample ID if it is different than Subject ID.<br/> 
+    <%= f.label :customer_sample_id %> - The Sample ID if it is different than Subject ID.<br/>
     <%= f.text_field :customer_sample_id %>
   </div>
   <div class="field">

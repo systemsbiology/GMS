@@ -14,7 +14,6 @@ class Pedigree < ActiveRecord::Base
   validates_presence_of :name, :tag, :study_id
   validates_uniqueness_of :name, :tag
 
-  attr_accessible :name, :tag, :study_id, :directory, :description, :version, :genotype_vector_date, :quartet_date, :autozygosity_date, :relation_pairing_date
 
   def phenotypes
     self.people.map(&:phenotypes).flatten.uniq
@@ -98,7 +97,7 @@ class Pedigree < ActiveRecord::Base
 		trios = self.nTuple(3)
 	end
   end
-  
+
   def quartets
 	Rails.cache.fetch("quartets/#{id}", :expires_in => 7.days) do
 		quartets = self.nTuple(4)
@@ -113,7 +112,7 @@ class Pedigree < ActiveRecord::Base
     peopleByFamily = Hash.new
     self.people.each do |person|
       (father_rel, mother_rel) = person.parents
-       next if father_rel.nil? or mother_rel.nil? 
+       next if father_rel.nil? or mother_rel.nil?
        father = father_rel.relation # person is the child
        mother = mother_rel.relation
        peopleByFamily[father] = Hash.new if peopleByFamily[father].nil?
@@ -127,7 +126,7 @@ class Pedigree < ActiveRecord::Base
 		tuple.push([father, mother, childrenCombos])
       end
     end
-   
+
     return tuple
   end
 
@@ -149,7 +148,7 @@ class Pedigree < ActiveRecord::Base
       if person.planning_on_sequencing then
         # check to see if they have a sample. return true if one sample is complete
 	    plan_count = plan_count+1
-        if person.complete then 
+        if person.complete then
 	        complete_count = complete_count+1
 	    end
       end

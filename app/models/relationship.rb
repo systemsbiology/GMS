@@ -3,8 +3,7 @@ class Relationship < ActiveRecord::Base
   belongs_to :relation, :class_name => "Person"
   validates_presence_of :person_id, :relation_id, :relationship_type, :name, :relation_order
   before_save :validate_relationship_ids_differ
-  attr_accessible :name, :person_id, :relation_id, :relationship_type, :relation_order, :divorced
- 
+
   def validate_relationship_ids_differ
     return false if self.person_id == self.relation_id
     return true
@@ -32,7 +31,7 @@ class Relationship < ActiveRecord::Base
     end
   }
 
-  scope :display_filter, lambda { 
+  scope :display_filter, lambda {
     {:conditions => ["relationship_type = 'parent' or relationship_type = 'undirected'"]}
   }
 
@@ -139,7 +138,7 @@ class Relationship < ActiveRecord::Base
       # dizygotic twins can be any sex combination
       return true
     end
-    
+
     if relationship_gender[self.name].nil? then
       logger.error("Error: relationship_gender does not contain #{self.name}.  Please add to config/application.yml before adding this relationship.")
       return false

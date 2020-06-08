@@ -1,17 +1,25 @@
 source 'http://rubygems.org'
 
-gem 'rails', "3.2.17"
+gem 'rails'
 gem 'rake'
 gem 'builder'
-gem 'net-ssh', '~>2.7.0'
-#gem 'net-ssh', '~> 2.8.1', :git => "https://github.com/net-ssh/net-ssh"
+gem 'net-ssh'
 gem 'debugger2'
-
-# Bundle edge Rails instead:
-# gem 'rails', :git => 'git://github.com/rails/rails.git'
-gem 'mysql2', '0.3.15'
+gem 'sass-rails'
+gem 'listen'
+gem 'activerecord-session_store'
+# caches_page
+gem 'actionpack-page_caching'
+# caches_action
+gem 'actionpack-action_caching'
+# cache_sweeper
+gem 'rails-observers'
+gem 'aws-sdk'
+gem 'mysql2'
 gem 'minitest'
-gem 'sprockets', '2.2.2'
+# handle responds_to
+gem 'responders'
+gem 'sprockets'
 
 # Use unicorn as the web server
 # gem 'unicorn'
@@ -20,21 +28,15 @@ gem 'sprockets', '2.2.2'
 #gem 'rvm-capistrano'
 #gem 'capistrano-bundler'
 #gem 'capistrano-rails'
-gem 'capistrano', '~> 2.15.5'
-# To use debugger (ruby-debug for Ruby 1.8.7+, ruby-debug19 for Ruby 1.9.2+)
-# gem 'ruby-debug'
+gem 'capistrano'
 #gem 'linecache19', :git => "git://github.com/mark-moseley/linecache"
-#gem 'ruby-debug-base19x', "~>0.11.30.pre10"
-#gem 'ruby-debug19', :require => 'ruby-debug'
 
 gem "chartkick"
 
 gem 'settingslogic'
 
-gem 'strong_parameters'
-
 gem 'will_paginate'
-gem 'jquery-rails'#, '~> 2.1'
+gem 'jquery-rails'
 gem 'select2-rails'    # jquery select boxes
 gem 'formtastic'
 gem 'event-calendar', :require => 'event_calendar'
@@ -57,7 +59,7 @@ gem 'ancestry'
 
 gem 'madeline', '~> 0.1.11'
 
-gem 'rubyzip', '<1.0.0'
+gem 'rubyzip'
 gem 'auto_strip_attributes'#, "~> 1.0"
 gem 'json_builder'
 

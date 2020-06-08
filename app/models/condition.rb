@@ -6,5 +6,4 @@ class Condition < ActiveRecord::Base
   auto_strip_attributes :name, :omim_id, :description
   validates_presence_of :name
   validates_uniqueness_of :name
-  attr_accessible :name, :omim_id, :description
 end

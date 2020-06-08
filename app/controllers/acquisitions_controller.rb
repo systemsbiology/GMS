@@ -5,8 +5,9 @@ class AcquisitionsController < ApplicationController
   # GET /acquisitions.xml
   def index
     respond_to do |format|
+      # find(:all, :include => { :person => :pedigree}, :order => ['pedigrees.tag'])
       format.html {
-        @acquisitions = Acquisition.has_pedigree(params[:pedigree_filter]).find(:all, :include => { :person => :pedigree}, :order => ['pedigrees.tag'])
+        @acquisitions = Acquisition.has_pedigree(params[:pedigree_filter]).includes(:person => :pedigree).order('pedigrees.tag')
                                    .paginate(:page => params[:page], :per_page => 100)
       }
       format.any {
@@ -94,7 +95,7 @@ class AcquisitionsController < ApplicationController
     end
   end
 
-  private 
+  private
   def acquisition_params
     params.require(:acquisition).permit(:sample_id, :person_id, :method)
   end

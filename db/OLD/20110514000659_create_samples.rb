@@ -1,4 +1,4 @@
-class CreateSamples < ActiveRecord::Migration
+class CreateSamples < ActiveRecord::Migration[4.2]
   def self.up
     create_table :samples do |t|
       t.integer :id

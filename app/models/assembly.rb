@@ -16,8 +16,6 @@ class Assembly < ActiveRecord::Base
   after_create :check_isb_assembly_id
   after_update :check_isb_assembly_id
 
-  attr_accessible :genome_reference_id, :assay_id, :name, :description, :location, :file_type, :file_date, :status, :metadata, :disk_id, :software, :software_version, :record_date, :current, :comments, :coverage_data_date, :qa_data_date, :bed_file_date, :genotype_file_date, :COVERAGE_Alltypes_Fully_Called_Percent, :COVERAGE_Alltypes_Partially_Called_Percent, :COVERAGE_Alltypes_No_Called_Percent, :COVERAGE_Alltypes_Fully_Called_Count, :COVERAGE_Alltypes_Partially_Called_Count, :COVERAGE_Alltypes_No_Called_Count, :COVERAGE_Exon_Any_Called_Count, :COVERAGE_Unclassified_Any_Called_Count, :COVERAGE_Repeat_Simple_Low_Fully_Called_Count, :COVERAGE_Repeat_Int_Young_Fully_Called_Count, :COVERAGE_Repeat_Other_Fully_Called_Count, :COVERAGE_Cnv_Fully_Called_Count, :COVERAGE_Segdup_Fully_Called_Count, :COVERAGE_Exon_Partially_Called_Count, :COVERAGE_Unclassified_Partially_Called_Count, :COVERAGE_Repeat_Simple_Low_Partially_Called_Count, :COVERAGE_Repeat_Int_Young_Partially_Called_Count, :COVERAGE_Repeat_Other_Partially_Called_Count, :COVERAGE_Cnv_Partially_Called_Count, :COVERAGE_Segdup_Partially_Called_Count, :COVERAGE_Exon_No_Called_Count, :COVERAGE_Unclassified_No_Called_Count, :COVERAGE_Repeat_Simple_Low_No_Called_Count, :COVERAGE_Repeat_Int_Young_No_Called_Count, :COVERAGE_Repeat_Other_No_Called_Count, :COVERAGE_Cnv_No_Called_Count, :COVERAGE_Segdup_No_Called_Count
-
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
       if pedigree.kind_of?(Array) then
@@ -64,7 +62,7 @@ class Assembly < ActiveRecord::Base
   def ensure_files_up_to_date
     if self.location.match(/^s3/)
         files = find_s3_files
-    else 
+    else
         files = find_assembly_files
     end
     #logger.debug("files #{files}")
@@ -100,10 +98,10 @@ class Assembly < ActiveRecord::Base
           # found a file
           (date, time, size, path) = list.split(/ /)
           filename = File.basename(path).split("/").last
-          FILE_TYPES.each { |filepart, filehash| 
+          FILE_TYPES.each { |filepart, filehash|
             type = filehash["type"]
             vendor = filehash["vendor"]
-            if filename.match(filepart) then 
+            if filename.match(filepart) then
               #logger.debug( "filename is #{filename}")
               files[type] = Hash.new
               files[type]["path"] = path
@@ -132,14 +130,14 @@ class Assembly < ActiveRecord::Base
     Find.find(start_dir) do |path|
       filename = File.basename(path).split("/").last
       skip_flag = 0
-      FILE_SKIPS.each { |filepart, filehash| 
+      FILE_SKIPS.each { |filepart, filehash|
         type = filehash["type"]
         category = filehash["category"]
         if category == 'suffix' then
             if (filename.match("#{filepart}$")) then
                 skip_flag = 1
             end
-        else 
+        else
             if (filename.match("#{filepart}")) then
                 skip_flag = 1
             end
@@ -150,10 +148,10 @@ class Assembly < ActiveRecord::Base
         logger.error("Skipping file #{filename} because it matches a file skip")
         next
       end
-      FILE_TYPES.each { |filepart, filehash| 
+      FILE_TYPES.each { |filepart, filehash|
 	    type = filehash["type"]
 	    vendor = filehash["vendor"]
-        if filename.match(filepart) then 
+        if filename.match(filepart) then
           #logger.error("filename is #{filename}")
           files[type] = Hash.new
 	      files[type]["path"] = path
@@ -174,7 +172,7 @@ class Assembly < ActiveRecord::Base
       filename = File.basename(file_path)
       # if you use file_type then if the file_type is wrong it tries to add a new file...
 #      af = AssemblyFile.includes(:file_type).where(:name => filename, :file_types => {:type_name => file_type})
-      af = AssemblyFile.where(:name => filename) 
+      af = AssemblyFile.where(:name => filename)
 
       if af.size == 0 then
         add[file_path] = Hash.new
@@ -233,13 +231,13 @@ class Assembly < ActiveRecord::Base
       #logger.debug "file type is #{file_type} and path is #{file_path} and file_vendor is #{file_vendor}"
       #logger.debug FileType.find_by_type_name(file_type)
       file_type_id = FileType.find_by_type_name(file_type).id
-      # header returns the top of the file, use variables in environment.rb to 
+      # header returns the top of the file, use variables in environment.rb to
       # figure out what the names of the fields are that we're looking for
-      # so that the fields are easily updatable 
+      # so that the fields are easily updatable
       if (file_path.match(/^s3/)) then
         software_version = get_software_version(self.location)
         software = 'cgatools' # this is impossible to get without loading each file and too expensive for now
-      else 
+      else
           header = file_header(file_path, file_vendor)
           if file_vendor == "CGI" and file_type.match("VCF") then
             check = check_cgi_vcf_header(header, file_type, file_path)
@@ -286,12 +284,12 @@ class Assembly < ActiveRecord::Base
         next
       end
       #logger.error("file_type_id #{file_type_id} for assembly #{self.inspect} #{self.location} trying to add #{file_path}")
-      assembly_file = AssemblyFile.new( 
+      assembly_file = AssemblyFile.new(
       				:genome_reference_id => self.genome_reference_id,
 					:assembly_id => self.id,
-      				:file_type_id => file_type_id, 
+      				:file_type_id => file_type_id,
 					:name => filename,
-      				:location => file_path, 
+      				:location => file_path,
 					:file_date => creation_time(file_path),
 					:software => software,
 					:software_version => software_version,
@@ -318,9 +316,9 @@ class Assembly < ActiveRecord::Base
       assembly_file = AssemblyFile.find(assembly_file_id)
 
       file_type_id = FileType.find_by_type_name(file_type).id
-      # header returns the top of the file, use variables in environment.rb to 
+      # header returns the top of the file, use variables in environment.rb to
       # figure out what the names of the fields are that we're looking for
-      # so that the fields are easily updatable 
+      # so that the fields are easily updatable
       header = file_header(file_path, file_vendor)
 
       if file_vendor == "CGI" and file_type.match("VCF") then
@@ -361,12 +359,12 @@ class Assembly < ActiveRecord::Base
       end
 
       filename = File.basename(file_path)
-      assembly_file.update_attributes( 
+      assembly_file.update_attributes(
       				"genome_reference_id" => self.genome_reference_id,
 					"assembly_id" => self.id,
-      				"file_type_id" => file_type_id, 
+      				"file_type_id" => file_type_id,
 					"name" => filename,
-      				"location" => file_path, 
+      				"location" => file_path,
 					"file_date" => creation_time(file_path),
 					"software" => software,
 					"software_version" => software_version,
@@ -395,18 +393,18 @@ class Assembly < ActiveRecord::Base
 
       if header[CGI_ASSEMBLY_ID].nil? or header[CGI_ASSEMBLY_ID] != self.name then
         logger.error("ERROR: file assembly name #{header[CGI_ASSEMBLY_ID]} doesn't match self assembly id #{self.name}.  Make sure that the value for CGI_ASSEMBLY_ID in config/environment.rb is correct.")
-	return 0 
+	return 0
       end
 
       if header[CGI_GENOME_REFERENCE].nil? or header[CGI_GENOME_REFERENCE] != self.genome_reference.build_name then
         logger.error("ERROR: file genome_reference #{header[CGI_GENOME_REFERENCE]} doesn't match  #{self.genome_reference.build_name}.  Make sure that the value for CGI_GENOME_REFERENCE in config/environment.rb is correct.")
-	return 0 
+	return 0
       end
 
       if header[CGI_SAMPLE].nil? or header[CGI_SAMPLE] != self.assay.sample.sample_vendor_id then
         #print "file sample #{header[CGI_SAMPLE]} doesn't match #{self.assay.sample.sample_vendor_id}\n"
         logger.error("ERROR: file HEADER sample #{header[CGI_SAMPLE]} doesn't match SELF VENDOR_ID #{self.assay.sample.sample_vendor_id}.  Make sure that the value for CGI_SAMPLE in config/environment.rb is correct.")
-	return 0 
+	return 0
       end
 
       if header[CGI_SOFTWARE_PROGRAM].nil? then
@@ -429,12 +427,12 @@ class Assembly < ActiveRecord::Base
 
       if header[CGI_ASSEMBLY_ID].nil? or header[CGI_ASSEMBLY_ID] != self.name then
         logger.error("ERROR: file assembly name #{header[CGI_ASSEMBLY_ID]} doesn't match self assembly id #{self.name}.  Make sure that the value for CGI_ASSEMBLY_ID in config/environment.rb is correct.")
-	    return 0 
+	    return 0
       end
 
       if header[CGI_GENOME_REFERENCE].nil? or header[CGI_GENOME_REFERENCE] != self.genome_reference.build_name then
         logger.error("ERROR: file genome_reference #{header[CGI_GENOME_REFERENCE]} doesn't match  #{self.genome_reference.build_name}.  Make sure that the value for CGI_GENOME_REFERENCE in config/environment.rb is correct.")
-	    return 0 
+	    return 0
       end
 
       if header[CGI_SOFTWARE_PROGRAM].nil? then
@@ -471,7 +469,7 @@ class Assembly < ActiveRecord::Base
   def complete
     # TODO: there should be a better way to do this other than to hardcode the file_type_id
     var_file_count = self.assembly_files.where(["file_type_id = ?", 1]).count
-    vcf_file_count = self.assembly_files.where(["file_type_id = ?", 8]).count    
+    vcf_file_count = self.assembly_files.where(["file_type_id = ?", 8]).count
     if var_file_count > 0 || vcf_file_count > 0 then
       return true
     end
@@ -506,7 +504,7 @@ class Assembly < ActiveRecord::Base
     return nil if summ.nil?
     # get Gross Mapping Yield (Gb), Fully called genome fraction, Fully called exome fraction, Genome fraction where weightSumSequenceCoverage >= 40x, Exome fraction where weightSumSequenceCoverage >=40x, SNP total count, SNP heterozygous/homozygous ratio, SNP transitions/transversions ratio, SNP novelty fraction
     fileKeys = ["Gross mapping yield (Gb)","Fully called genome fraction","Fully called exome fraction","Genome fraction where weightSumSequenceCoverage >= 40x","Exome fraction where weightSumSequenceCoverage >=40x","SNP total count","SNP heterozygous/homozygous ratio","SNP transitions/transversions ratio"]
-    fileValues = { 
+    fileValues = {
            "Genome coverage - Gross mapping yield (Gb)" => { "MIN" => "136.975", "FIRST" => "167.663", "MEDIAN" => "180.157", "THIRD" => "194.508", "MAX" => "379.232"},
            "Genome coverage - Fully called genome fraction" => { "MIN" => "0.8644", "FIRST" => "0.963", "MEDIAN" => "0.968", "THIRD" => "0.972", "MAX" => "0.978"},
            "Exome coverage - Fully called exome fraction" => { "MIN" => "0.932", "FIRST" => "0.979", "MEDIAN" => "0.983", "THIRD" =>"0.985", "MAX" => "0.99" },

@@ -14,12 +14,11 @@ class AssaysController < ApplicationController
       respond_to do |format|
         format.html {
           @assays = Assay.has_pedigree(params[:pedigree_filter])
-            .find(:all, :order => [ 'assays.name'])
+            .order('assays.name')
             .paginate :page => params[:page], :per_page => 100
         }
         format.any  {
-          @assays = Assay.has_pedigree(params[:pedigree_filter])
-            .find(:all, :order => [ 'assays.id'])
+          @assays = Assay.has_pedigree(params[:pedigree_filter]).order('assays.id')
         }
       end
     end
@@ -27,7 +26,7 @@ class AssaysController < ApplicationController
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @assays }
-      format.json { respond_with @assays } 
+      format.json { respond_with @assays }
       format.js
     end
   end
@@ -69,7 +68,7 @@ class AssaysController < ApplicationController
       sample = Sample.find(params[:sample][:sample_id])
       @assay.sample = sample
     end
-   
+
     respond_to do |format|
       if @assay.save
         format.html { redirect_to(@assay, :notice => notice) }
@@ -78,7 +77,7 @@ class AssaysController < ApplicationController
       else
         format.html { render :action => "new" }
         format.xml  { render :xml => @assay.errors, :status => :unprocessable_entity }
-        format.json { render :json => @assay.errors } 
+        format.json { render :json => @assay.errors }
       end
     end
   end

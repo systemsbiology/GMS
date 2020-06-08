@@ -1,4 +1,4 @@
-class CreateTraits < ActiveRecord::Migration
+class CreateTraits < ActiveRecord::Migration[4.2]
   def self.up
     create_table :traits do |t|
       t.integer :id

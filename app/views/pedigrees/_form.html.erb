@@ -1,4 +1,4 @@
-<%= form_for(@pedigree) do |f| %>
+<%= form_with model: @pedigree do |f| %>
   <%= render "partials/error_messages", :target => @pedigree %>
 
   <div class="field">

@@ -14,21 +14,19 @@ class Sample < ActiveRecord::Base
   after_save :check_isb_sample_id, :trigger_person_sample_check
   after_commit :trigger_person_sample_check
 
-  attr_accessible :customer_sample_id, :sample_type_id, :status, :date_submitted, :protocol, :volume, :concentration, :quantity, :date_received, :description, :comments, :pedigree_id, :sample_vendor_id
 
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
       if pedigree.kind_of?(Array) then
         pedigree_id = pedigree[0]
       elsif pedigree.kind_of?(Hash) then
-      pedigree_id = pedigree[:id]
+        pedigree_id = pedigree[:id]
       else
-      pedigree_id = pedigree.to_i
+        pedigree_id = pedigree.to_i
       end
+      logger.debug("pedigree_id #{pedigree_id}")
       unless pedigree_id.blank?
-        { :include => { :person => :pedigree  },
-          :conditions => [ 'pedigrees.id = ?', pedigree_id]
-        }
+        -> { includes(person: :pedigree).where('pedigrees.id = ?', pedigree_id) }
       end
     end
   }
@@ -37,17 +35,12 @@ class Sample < ActiveRecord::Base
     unless person.blank? or person[:id].nil?
       person_id = person[:id]
       unless person_id.blank?
-        { :include => :person,
-	:conditions => ['people.id = ?', person_id] }
+        -> { includes(:person).where('people.id = ?', person_id) }
       end
     end
   }
 
-  scope :order_by_pedigree 
-    {
-      :include => { :person => :pedigree},
-      :order => 'pedigrees.name'
-    }
+  scope :order_by_pedigree, -> { includes(person: :pedigree).order('pedigrees.name') }
 
   def check_isb_sample_id
     if self.isb_sample_id.nil? or !self.isb_sample_id.match(/isb_sample/) then
@@ -67,18 +60,17 @@ class Sample < ActiveRecord::Base
     self.assays.each do |assay|
       assay.assemblies.each do |assembly|
         if assembly.assembly_files.where(:file_type_id => 1).count > 0 then
-	  return true
-	end
+	        return true
+	      end
       end
     end
     return false
-
   end
 
-  def identifier 
+  def identifier
     if self.person.nil? then
       return "#{isb_sample_id} - #{sample_vendor_id} - NA"
-    else 
+    else
       return "#{isb_sample_id} - #{sample_vendor_id} - #{self.person.identifier}"
     end
   end
@@ -91,6 +83,5 @@ class Sample < ActiveRecord::Base
       return nil
     end
   end
-
 
 end

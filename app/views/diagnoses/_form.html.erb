@@ -1,4 +1,4 @@
-<%= form_for(@diagnosis) do |f| %>
+<%= form_with model: @diagnosis do |f| %>
   <%= render "partials/error_messages", :target => @diagnosis %>
 
   <div class="field">

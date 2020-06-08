@@ -1,4 +1,4 @@
-class CreateSampleAssays < ActiveRecord::Migration
+class CreateSampleAssays < ActiveRecord::Migration[4.2]
   def self.up
     create_table :sample_assays do |t|
       t.integer :id

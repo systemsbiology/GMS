@@ -1,4 +1,4 @@
-<%= form_for(@assembly_file) do |f| %>
+<%= form_with model: @assembly_file do |f| %>
   <%= render "partials/error_messages", :target => @assembly_file %>
 
   <div class="field">
@@ -24,7 +24,7 @@
   </div>
   <div class="field">
     <%= f.label :file_type %><br />
-    <%= f.collection_select(:file_type_id, FileType.all, :id, :type_name, { :prompt => "-Select a File Type" }, :selected => @assembly_file.file_type_id || '') %>
+    <%= f.collection_select(:file_types_id, FileType.all, :id, :type_name, { :prompt => "-Select a File Type" }, :selected => @assembly_file.file_types_id || '') %>
   </div>
   <div class="field">
     <%= f.label :metadata %><br />

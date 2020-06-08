@@ -1,4 +1,4 @@
-class CreateRecords < ActiveRecord::Migration
+class CreateRecords < ActiveRecord::Migration[4.2]
   def self.up
     create_table :records do |t|
       t.integer :id

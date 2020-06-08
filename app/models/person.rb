@@ -6,13 +6,13 @@ class Person < ActiveRecord::Base
 #  has_many :memberships
   has_one :membership, :dependent => :destroy
   has_one :pedigree, :through => :membership
-  has_many :offspring, :class_name => "Relationship", :foreign_key => "person_id", :conditions => { :relationship_type => 'parent' }, :include => :person, :order => "relation_order", :dependent => :destroy
+  has_many :offspring, -> { where(relationship_type: 'parent').order('relation_order') }, :class_name => "Relationship", :foreign_key => "person_id", :dependent => :destroy
   # either check the relationship_type parent for the relation_id, OR check for relationship_type child for person_id
 #  has_many :parents, :class_name => "Relationship", :foreign_key => "relation_id", :conditions => { :relationship_type => 'parent' }
-  has_many :parents, :class_name => "Relationship", :foreign_key => "person_id", :conditions => { :relationship_type => 'child'}, :dependent => :destroy
+  has_many :parents, -> { where(relationship_type: 'child').order('relation_order') }, :class_name => "Relationship", :foreign_key => "person_id", :dependent => :destroy
 #  has_many :parents, :class_name => "Relationship", :foreign_key => "relation_id", :conditions => { :relationship_type => 'parent'}, :include => :person, :order => "people.gender desc"
-  has_many :spouses, :class_name => "Relationship", :foreign_key => "person_id", :conditions => ["relationship_type = ? and name not like ?", "undirected", "%twin%"], :dependent => :destroy
-  has_many :twins, :class_name => "Relationship", :foreign_key => "person_id", :conditions => ["name like ?","%twin%"], :dependent => :destroy
+  has_many :spouses, -> { where("relationship_type = ? and name not like ?", "undirected", "%twin%") }, :class_name => "Relationship", :foreign_key => "person_id", :dependent => :destroy
+  has_many :twins, -> { where("name like ?","%twin%") }, :class_name => "Relationship", :foreign_key => "person_id", :dependent => :destroy
   has_many :person_aliases, :class_name => "PersonAlias", :dependent => :destroy
   has_many :traits, :dependent => :destroy
   has_many :phenotypes, :through => :traits
@@ -27,16 +27,16 @@ class Person < ActiveRecord::Base
   validates_uniqueness_of :collaborator_id, :scope => :pedigree_id
   validates_uniqueness_of :isb_person_id
   validates :collaborator_id,
-    :presence => { 
+    :presence => {
 	:message => "You may not use anything other than strings in the collaborator_id.  Add an alias if this person has multiple collaborator ids"} ,
-	:format   => { :with => /^[a-zA-Z\d\s\-\_\.]*$/ }
+	:format   => { :with => /\A[a-zA-Z\d\s\-\_\.]*\z/ }
 
-  attr_accessible :collaborator_id, :gender, :dob, :dod, :deceased, :planning_on_sequencing, :complete, :root, :comments, :pedigree_id
+  #attr_accessor :collaborator_id, :gender, :dob, :dod, :deceased, :planning_on_sequencing, :complete, :root, :comments, :pedigree_id
 
-  def check_sequencing_status 
+  def check_sequencing_status
     if self.samples.empty? then
       self.planning_on_sequencing = false
-    else 
+    else
       self.planning_on_sequencing = true
     end
     self.save
@@ -52,7 +52,7 @@ class Person < ActiveRecord::Base
 
   def check_completeness
     # if any sample is complete then person is complete
-    return if self.complete 
+    return if self.complete
     self.samples.each do |sample|
       sample.assays.each do |assay|
         assay.assemblies.each do |assembly|

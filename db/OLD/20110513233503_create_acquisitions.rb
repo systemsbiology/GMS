@@ -1,4 +1,4 @@
-class CreateAcquisitions < ActiveRecord::Migration
+class CreateAcquisitions < ActiveRecord::Migration[4.2]
   def self.up
     create_table :acquisitions do |t|
       t.integer :id

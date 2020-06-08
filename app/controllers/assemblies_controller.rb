@@ -15,23 +15,23 @@ class AssembliesController < ApplicationController
     if params[:name] or params[:assembly_name] then
       @assemblies = Assembly.where(:name => [params[:name] , params[:assembly_name]] )
         .paginate :page => params[:page], :per_page => 100
-    elsif params[:id] 
+    elsif params[:id]
       idNum=params[:id].gsub(/isb_asm_/,"")
-      @assemblies = Assembly.where("assemblies.id = ?", 
+      @assemblies = Assembly.where("assemblies.id = ?",
                                    idNum)
         .paginate :page => params[:page], :per_page => 100
     else
       respond_to do |format|
         format.html {# show.html.erb
           @assemblies = Assembly.has_pedigree(params[:pedigree_filter])
-            .find(:all, :order => [ 'assemblies.name'])
+            .order('assemblies.name')
             .paginate :page => params[:page], :per_page => 100
         }
         format.any  {
           @assemblies = Assembly.has_pedigree(params[:pedigree_filter])
-            .find(:all, :order => [ 'assemblies.id'])
+            .order('assemblies.id')
         }
-      end     
+      end
     end
   end
 
@@ -147,8 +147,8 @@ class AssembliesController < ApplicationController
   #HELPER METHODS
 
   def find_all_by_pedigree_id(pedigree_id)
-    @assembly = Assembly.find(:all, :include => { :assay => { :sample => { :person => :pedigree } } },
-                                        :conditions => [ 'pedigrees.id = ?', pedigree_id ])
+    @assembly = Assembly.includes(assay: { sample: { person: :pedigree } })
+                        .where('pedigrees.id = ?', pedigree_id)
   end
 
   def ensure_files_up_to_date
@@ -166,7 +166,7 @@ class AssembliesController < ApplicationController
     expire_action(:controller => '/assembly_files', :action => :ped_info, :format => 'json')
 
     respond_to do |format|
-      format.html 
+      format.html
       format.xml  { head :ok }
     end
   end
@@ -188,7 +188,7 @@ class AssembliesController < ApplicationController
     end
   end
 
-  private 
+  private
   def assembly_params
     params.require(:assembly).permit(:genome_reference_id, :assay_id, :name, :description, :location, :file_type, :file_date, :status, :metadata, :disk_id, :software, :software_version, :record_date, :current, :comments, :coverage_data_date, :qa_data_date, :bed_file_date, :genotype_file_date, :COVERAGE_Alltypes_Fully_Called_Percent, :COVERAGE_Alltypes_Partially_Called_Percent, :COVERAGE_Alltypes_No_Called_Percent, :COVERAGE_Alltypes_Fully_Called_Count, :COVERAGE_Alltypes_Partially_Called_Count, :COVERAGE_Alltypes_No_Called_Count, :COVERAGE_Exon_Any_Called_Count, :COVERAGE_Unclassified_Any_Called_Count, :COVERAGE_Repeat_Simple_Low_Fully_Called_Count, :COVERAGE_Repeat_Int_Young_Fully_Called_Count, :COVERAGE_Repeat_Other_Fully_Called_Count, :COVERAGE_Cnv_Fully_Called_Count, :COVERAGE_Segdup_Fully_Called_Count, :COVERAGE_Exon_Partially_Called_Count, :COVERAGE_Unclassified_Partially_Called_Count, :COVERAGE_Repeat_Simple_Low_Partially_Called_Count, :COVERAGE_Repeat_Int_Young_Partially_Called_Count, :COVERAGE_Repeat_Other_Partially_Called_Count, :COVERAGE_Cnv_Partially_Called_Count, :COVERAGE_Segdup_Partially_Called_Count, :COVERAGE_Exon_No_Called_Count, :COVERAGE_Unclassified_No_Called_Count, :COVERAGE_Repeat_Simple_Low_No_Called_Count, :COVERAGE_Repeat_Int_Young_No_Called_Count, :COVERAGE_Repeat_Other_No_Called_Count, :COVERAGE_Cnv_No_Called_Count, :COVERAGE_Segdup_No_Called_Count)
   end

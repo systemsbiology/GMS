@@ -10,72 +10,73 @@ class SamplesController < ApplicationController
   # GET /samples
   # GET /samples.xml
   def index
-#    @samples = Sample.has_pedigree(params[:pedigree_filter]).find(:all, :include => [:assays, {:person => :pedigree }], :order => ['pedigrees.name'])
+    #@samples = Sample.has_pedigree(params[:pedigree_filter]).find(:all, :include => [:assays, {:person => :pedigree }], :order => ['pedigrees.name'])
     if params[:name] or params[:sample_vendor_id] then
       nameArg=params[:name] if params[:name]
       nameArg=params[:sample_vendor_id] if  params[:sample_vendor_id]
       if nameArg.match(/%/) then
         @samples = Sample.where("sample_vendor_id like ?", nameArg)
-          .find(:all, :include => {:person => {:pedigree => :study }}, 
-                :order => ['samples.sample_vendor_id']).paginate :page => params[:page], :per_page => 100
+          .includes(person: {pedigree: :study })
+          .order('samples.sample_vendor_id').paginate :page => params[:page], :per_page => 100
       else
         @samples = Sample.where("sample_vendor_id = ?", nameArg)
-          .find(:all, :include => {:person => { :pedigree => :study} }, 
-                :order => ['samples.sample_vendor_id']).paginate :page => params[:page], :per_page => 100
+          .includes(person: { pedigree: :study})
+          .order('samples.sample_vendor_id').paginate :page => params[:page], :per_page => 100
       end
     elsif params[:customer_sample_id] then
       nameArg=params[:customer_sample_id] if  params[:customer_sample_id]
       if nameArg.match(/%/) then
         @samples = Sample.where("customer_sample_id like ?", nameArg)
-          .find(:all, :include => {:person => {:pedigree => :study }}, 
+          .includes(person: { pedigree: :study },
                 :order => ['samples.customer_sample_id']).paginate :page => params[:page], :per_page => 100
       else
         @samples = Sample.where("customer_sample_id = ?", nameArg)
-          .find(:all, :include => {:person => { :pedigree => :study} }, 
-                :order => ['samples.customer_sample_id']).paginate :page => params[:page], :per_page => 100
+        .includes(person: { pedigree: :study})
+        .order('samples.customer_sample_id').paginate :page => params[:page], :per_page => 100
       end
     elsif params[:customer_subject_id] then
-        # aka person.collaborator_id 
+        # aka person.collaborator_id
         nameArg=params[:customer_subject_id] if  params[:customer_subject_id]
         if nameArg.match(/%/) then
-            @samples = Sample.find(:all, :include => {:person => {:pedigree => :study}}, 
-                        :conditions => {:people => {:collaborator_id => nameArg} },
-                        :order => ['samples.sample_vendor_id']).paginate :page => params[:page], :per_page => 100
+            @samples = Sample.includes(person: { pedigree: :study})
+                        .where('people.collaborator_id like ?', nameArg)
+                        .order('samples.sample_vendor_id').paginate :page => params[:page], :per_page => 100
         else
-            @samples = Sample.find(:all, :include => {:person => {:pedigree => :study}}, 
-                        :conditions => {:people => {:collaborator_id => nameArg} },
-                        :order => ['samples.sample_vendor_id']).paginate :page => params[:page], :per_page => 100
+            @samples = Sample.includes(person: { pedigree: :study})
+                        .where(people: {collaborator_id: nameArg})
+                        .order('samples.sample_vendor_id').paginate :page => params[:page], :per_page => 100
         end
     elsif params[:id] then
       if params[:id].match(/%/) then
         @samples = Sample.where("samples.id like ?", params[:id])
-          .find(:all, :include => {:person => {:pedigree => :study }}, 
-                :order => ['samples.id']).paginate :page => params[:page], :per_page => 100
+        .includes(person: { pedigree: :study})
+        .order('samples.id').paginate :page => params[:page], :per_page => 100
       else
         idNum=params[:id].gsub(/isb_sam.*_/,"")
         @samples = Sample.where("id = ?", idNum)
-          .find(:all, :include => {:person => { :pedigree => :study} }, 
-                :order => ['samples.id']).paginate :page => params[:page], :per_page => 100
+        .includes(person: { pedigree: :study})
+        .order('samples.id').paginate :page => params[:page], :per_page => 100
       end
     elsif params[:person] then
       @samples = Sample.has_person(params[:person])
         .order_by_pedigree.paginate :page => params[:page], :per_page => 100
     elsif params[:problems] then
-      @samples = Sample.where( Acquisition.where( Acquisition.arel_table[:sample_id].eq(Sample.arel_table[:id]) ).exists.not ).paginate(:page => params[:page], :per_page => 10)
+      #@samples = Sample.where( Acquisition.where( Acquisition.arel_table[:sample_id].eq(Sample.arel_table[:id]) ).exists.not ).paginate(:page => params[:page], :per_page => 10)
+      @samples = Sample.where.not(id: Acquisition.pluck(:sample_id))
     else
-      
+
       respond_to do |format|
         format.html {
           @samples = Sample.has_pedigree(params[:pedigree_filter])
-            .find(:all, :order => [ 'samples.id'])
+            .order('samples.id')
             .paginate :page => params[:page], :per_page => 100
         }
         format.any  {
           @samples = Sample.has_pedigree(params[:pedigree_filter])
-            .find(:all, :order => [ 'samples.id'])
+            .order('samples.id')
         }
       end
-    
+
     end
 
     respond_to do |format|
@@ -89,7 +90,7 @@ class SamplesController < ApplicationController
   # GET /samples/1
   # GET /samples/1.xml
   def show
-    @sample = Sample.find(params[:id], :include => [:assays, { :person => :pedigree}])
+    @sample = Sample.find(params[:id]).includes(assays: { person: :pedigree})
 
     respond_to do |format|
       format.html # show.html.erb
@@ -111,7 +112,7 @@ class SamplesController < ApplicationController
 
   # GET /samples/1/edit
   def edit
-    @sample = Sample.find(params[:id], :include => { :person => :pedigree} )
+    @sample = Sample.find(params[:id]).includes(person: :pedigree)
     @pedigrees = Pedigree.order("pedigrees.tag")
   end
 
@@ -135,7 +136,7 @@ class SamplesController < ApplicationController
     end
 
     # need to make usre thatperson[id] is not null
-    begin 
+    begin
       person = Person.find(params[:person][:id])
     rescue
       @sample.errors.add(:person, 'must be selected')
@@ -174,16 +175,16 @@ class SamplesController < ApplicationController
       if (@sample.person.nil? || params[:person][:id].to_i != @sample.person.id.to_i) then
         #logger.debug("updating the person associated with this sample from #{@sample.person.id} to #{params[:person][:id]}")
 	#check that there isn't an entry for this acquisition in the db already!
-	check_aq = Acquisition.find(:all, :conditions => {:person_id => params[:person][:id], :sample_id => @sample.id})
+	check_aq = Acquisition.where(person_id: params[:person][:id], sample_id: @sample.id)
 	if (check_aq.size > 0) then
 	  @sample.errors.add("Cannot create duplicate sample (#{@sample.id}) and person (#{@sample.person.id}) link.")
-	else 
+	else
 	  if (@sample.person) then
-    	    acquisition = Acquisition.find(:all, :conditions => {:person_id => @sample.person.id, :sample_id => @sample.id})
+    	    acquisition = Acquisition.where(person_id: @sample.person.id, sample_id: @sample.id)
 	    if (acquisition.size > 1) then
 	      #logger.debug("Found multiple samples for this sample (#{@sample.id}) and person(#{@sample.person.id}) combination!!!  This is an error in the database!!  Fix it manually!  #{acquisition.inspect}")
   	      @sample.errors.add("Found multiple samples for sample #{@sample.id} and person #{@sample.person.id}.  Fix manually.")
-	    else 
+	    else
 	      acquisition = acquisition.first
 	      acquisition.person_id = params[:person][:id]
 	      if (acquisition.save) then
@@ -195,7 +196,7 @@ class SamplesController < ApplicationController
 	    end
 	  else
 	    # create a new acquisition
-	    acquisition = Acquisition.new(:person_id => params[:person][:id], :sample_id => @sample.id)
+	    acquisition = Acquisition.new(person_id: params[:person][:id], sample_id: @sample.id)
 	    if (acquisition.save) then
 	      ac_notice << "Created new association between sample and person."
 	    else

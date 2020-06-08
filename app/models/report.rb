@@ -1,3 +1,3 @@
 class Report < ActiveRecord::Base
-  attr_accessible :name, :description, :report_type_id
+  validates_presence_of :name, :description, :type
 end

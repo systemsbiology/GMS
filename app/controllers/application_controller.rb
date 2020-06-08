@@ -1,6 +1,7 @@
 require 'will_paginate/array'
 
 class ApplicationController < ActionController::Base
+  include ActionController::MimeResponds
   #rescue_from DeviseLdapAuthenticatable::LdapException do |exception|
   #  render :text => exception, :status => 500
   #end

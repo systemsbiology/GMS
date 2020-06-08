@@ -31,11 +31,11 @@ set :bundle_flags, "--deployment"
 
 before 'bundle:install', "bundle:list"
 set :default_environment, {
-  'PATH' => "/u5/tools/rvm/wrappers/ruby-2.3.1@rails3:/u5/tools/rvm/rubies/ruby-2.3.1/bin/:/u5/tools/rvm/gems/ruby-2.3.1@rails3/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts:/bin/:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",
-  'RUBY_VERSION' => 'ruby-2.3.1@rails3',
-  'GEM_HOME' => '/u5/tools/rvm/gems/ruby-2.3.1@rails3',
-  'GEM_PATH' => '/u5/tools/rvm/gems/ruby-2.3.1@rails3',
-  'BUNDLE_PATH' => '/u5/tools/rvm/gems/ruby-2.3.1@rails3'
+  'PATH' => "/u5/tools/rvm/wrappers/ruby-2.7.0@rails6:/u5/tools/rvm/rubies/ruby-2.7.0/bin/:/u5/tools/rvm/gems/ruby-2.7.0@rails6/bin:/u5/tools/rvm/bin:/u5/tools/rvm:/u5/tools/rvm/scripts:/bin/:/local/bin:/usr/local/bin:/sbin:/usr/sbin:/usr/bin",
+  'RUBY_VERSION' => 'ruby-2.7.0@rails6',
+  'GEM_HOME' => '/u5/tools/rvm/gems/ruby-2.7.0@rails6',
+  'GEM_PATH' => '/u5/tools/rvm/gems/ruby-2.7.0@rails6',
+  'BUNDLE_PATH' => '/u5/tools/rvm/gems/ruby-2.7.0@rails6'
 }
 #capistrano pem ec2 info
 #default_run_options[:pty] = true
@@ -58,14 +58,14 @@ set :repository, "/proj/famgen/git/gms"
 set :branch, "master"
 set :use_sudo, false
 
-server "bobama.systemsbiology.net", :app, :web, :db, :primary => true
+server "mendel.systemsbiology.net", :app, :web, :db, :primary => true
 
 # if you're still using the script/reaper helper you will need
 # these http://github.com/rails/irs_process_scripts
 
 namespace :bundle do
   desc "list gems"
-  task :list do 
+  task :list do
     run "cd #{release_path} && cat Gemfile"
   end
 end
@@ -82,7 +82,7 @@ end
    task :restart, :roles => :app, :except => { :no_release => true } do
      run "touch #{File.join(current_path,'tmp','restart.txt')}"
    end
-  
+
    desc "Symlinks the database.yml"
    task :symlink_db, :roles => :app do
      run "ln -nfs #{deploy_to}/shared/config/database.yml #{release_path}/config/database.yml"

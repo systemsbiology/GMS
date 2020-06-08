@@ -3,5 +3,4 @@ class PersonAlias < ActiveRecord::Base
 
   auto_strip_attributes :value
   validates_presence_of :person_id, :value, :alias_type
-  attr_accessible :person_id, :value, :alias_type
 end

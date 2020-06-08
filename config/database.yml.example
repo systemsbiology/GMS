@@ -7,10 +7,9 @@ development:
   wait_timeout: 2147483
   pool: 5
   timeout: 5000
-  username: pedigree
-  password: p3d4b0
+  username: gms
+  password: WCcNTgf6a)g$
   host: localhost
-  socket: /u5/mysql/mysql.sock
 
 # Warning: The database defined as "test" will be erased and
 # re-generated from your development database when you run "rake".
@@ -22,10 +21,9 @@ test:
   database: gms_test
   pool: 5
   timeout: 5000
-  username: pedigree
-  password: p3d4b0
+  username: gms
+  password: WCcNTgf6a)g$
   host: localhost
-  socket: /u5/mysql/mysql.sock
 
 production:
   adapter: mysql2
@@ -34,7 +32,6 @@ production:
   database: gms_production
   pool: 5
   timeout: 5000
-  username: pedigree
-  password: p3d4b0
+  username: gns
+  password: WCcNTgf6a)g$
   host: localhost
-  socket: /u5/mysql/mysql.sock
