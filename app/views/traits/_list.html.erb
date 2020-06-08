@@ -1,4 +1,4 @@
-<% if traits.size > 0 %>
+<% if @traits.size > 0 %>
 <table class="tablesorter">
   <thead>
   <tr>
@@ -11,9 +11,9 @@
   </tr>
   </thead>
   <tbody>
-<% traits.each do |trait| %>
+<% @traits.each do |trait| %>
   <tr>
-    <td><%= trait.person.pedigree.name %></td>
+    <td><% if trait.person.pedigree %><%= trait.person.pedigree.name %><% else %>No Pedigree<% end %></td>
     <td><%= trait.person.identifier %></td>
     <td><%= trait.phenotype.name if trait.phenotype %></td>
     <td><%= trait.trait_information %></td>
@@ -27,6 +27,8 @@
 <% end %>
 </tbody>
 </table>
+<%= will_paginate @traits %>
+
 <% else %>
   <table class="tablesorter">
   <% if params[:person] %>

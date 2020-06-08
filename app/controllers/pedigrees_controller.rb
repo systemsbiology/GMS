@@ -247,8 +247,9 @@ class PedigreesController < ApplicationController
       labels = Array.new
       labels.push("IndividualID")
       labels << pedigree.conditions.map{|d| d.name.gsub!(/ /, '_')}
-      labels << pedigree.phenotypes.map{|p| p.name.gsub!(/ /,'_')}
-
+      #labels << pedigree.phenotypes.map{|p| p.name.gsub!(/ /,'_')}
+      labels << pedigree.people.map { |p| p.phenotypes.where(:madeline_display => 1)}.flatten.uniq.map{|l| l.name.gsub!(/ /,'_')} 
+	logger.debug("madeline_image labels are #{labels.inspect}")
       madeline_info = Array.new
       madeline_array.each do |line|
         line = line.join("\t")

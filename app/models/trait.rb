@@ -29,5 +29,10 @@ class Trait < ActiveRecord::Base
     end
   }
 
+  def get_people_by_phenotype_and_trait_value(phenotype, trait_value)
+        people = Array.new
+        return people
+  end
+
 
 end

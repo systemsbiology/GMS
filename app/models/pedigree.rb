@@ -81,28 +81,54 @@ class Pedigree < ActiveRecord::Base
     end
   end
 
-  # take a pedigree id in and give back an array of hashes of all of the quartets in the pedigree
+  def children
+	children = Array.new
+	self.people.each do |person|
+		person.relationships.each do |rel|
+			if rel.name == "child" then
+				children.push(person)
+			end
+		end
+	end
+	children.uniq!
+  end
+
+  def trios
+	Rails.cache.fetch("trios/#{id}", :expires_in => 7.days) do
+		trios = self.nTuple(3)
+	end
+  end
+  
   def quartets
-    quartets = Array.new
+	Rails.cache.fetch("quartets/#{id}", :expires_in => 7.days) do
+		quartets = self.nTuple(4)
+	end
+  end
+
+  # returns COMPLETE families - therefore skips anything that doesn't have a mother and a father
+  def nTuple(family_size)
+	raise "nTuple family_size must be at least 3" unless family_size >= 3
+	child_size = family_size -2
+    tuple = Array.new
     peopleByFamily = Hash.new
     self.people.each do |person|
       (father_rel, mother_rel) = person.parents
-       next if father_rel.nil? and mother_rel.nil?
+       next if father_rel.nil? or mother_rel.nil? 
        father = father_rel.relation # person is the child
        mother = mother_rel.relation
        peopleByFamily[father] = Hash.new if peopleByFamily[father].nil?
        peopleByFamily[father][mother] = Array.new if peopleByFamily[father][mother].nil?
        peopleByFamily[father][mother].push(person)
     end
-    family_size = 2
     peopleByFamily.each do |father, inner|
       inner.each do |mother, children|
-        childrenCombos = children.combination(family_size).to_a
-	quartets.push([father, mother, childrenCombos])
+        childrenCombos = children.combination(child_size).to_a
+		next if childrenCombos.empty?
+		tuple.push([father, mother, childrenCombos])
       end
     end
-    
-    return quartets
+   
+    return tuple
   end
 
   def genomic_count
@@ -130,6 +156,16 @@ class Pedigree < ActiveRecord::Base
     end
     return true if ((plan_count > 0) and (plan_count == complete_count))
     return false
+  end
+
+  def count_sequenced
+	Rails.cache.fetch("count_sequenced/#{id}", :expires_in => 7.days) do
+		numSequenced = 0
+		self.people.each do |person|
+			numSequenced+=1 if person.complete
+		end
+		numSequenced
+	end
   end
 
   def destroy_people

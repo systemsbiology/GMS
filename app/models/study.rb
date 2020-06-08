@@ -7,7 +7,7 @@ class Study < ActiveRecord::Base
   after_save :check_study_tag
   after_update :check_study_tag
   after_create :check_study_tag
-  
+
   attr_accessible :name, :tag, :lead, :collaborator, :collaborating_institution, :description, :contact
 
   def check_study_tag
@@ -26,4 +26,35 @@ class Study < ActiveRecord::Base
     end
     return total_count
   end
+
+  def count_trios
+    Rails.cache.fetch("numTrios/#{id}", :expires_in => 7.days) do
+      numTrios = 0
+      self.pedigrees.each do |ped|
+        numTrios += ped.trios[0][2].count unless ped.trios.empty?
+      end
+      numTrios
+    end
+    end
+
+  def count_individuals
+	Rails.cache.fetch("numPeople/#{id}",:expires_in => 7.days) do
+		numPeople = 0
+		self.pedigrees.each do |ped|
+			numPeople += ped.people.count
+		end
+		numPeople
+	end
+  end
+
+  def count_sequenced
+	Rails.cache.fetch("numSequenced/#{id}",:expires_in => 7.days) do
+		numPeople =0
+		self.pedigrees.each do |ped|
+			numPeople += ped.count_sequenced
+		end
+		numPeople
+	end
+  end
+
 end

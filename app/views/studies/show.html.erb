@@ -44,6 +44,10 @@
   <%= @study.description %>
 </td>
 </tr>
+<tr>
+  <td><b>Num Individuals:</b><%= @study.count_individuals %></td>
+  <td><b>Num Complete Trios:</b><%= @study.count_trios %></td>
+</tr>
 </table>
 
 <% if false %> <%= link_to "Delete study #{@study.name}, all pedigrees, all people, and all samples associated", @study, :confirm => "Are you sure you want to delete this study, all of its pedigrees, all of its people, and all of their associated information (including samples)?", :method => :delete %> <% end %>
@@ -53,11 +57,13 @@
   <%= @study.genomic_count %>
 </p>
 
+
 <p>
-  <b>Pedigrees:</b>
+  <b>Pedigrees</b>
 <% if @pedigrees.nil? or @pedigrees.empty? %>
   <p>No pedigrees for this study</p>
 <% else %>
+<b>(<%= @pedigrees.count %>)</b>:<br>
 <table class="tablesorter">
   <tr>
     <th>Pedigree Name</th>

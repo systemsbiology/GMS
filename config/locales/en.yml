@@ -3,3 +3,7 @@
 
 en:
   hello: "Hello world"
+  TrueClass: "Yes"
+  FalseClass: "No"
+  "1": "Yes"
+  "0": "No"

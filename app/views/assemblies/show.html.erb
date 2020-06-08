@@ -10,7 +10,7 @@
   <tr>
     <td colspan="1"> <b>Assay:</b> <%= link_to @assembly.assay.name , assay_path(@assembly.assay) %> </td>
     <td colspan="1"> <b>Sample:</b> <%= link_to @assembly.assay.sample.sample_vendor_id  , sample_path(@assembly.assay.sample) %> </td>
-    <td colspan="1"> 
+    <td colspan="1">
       <b>Person:</b>
       <% if @assembly.assay.sample.person.collaborator_id.nil? then %>
       <%= link_to @assembly.assay.sample.person.isb_person_id, @assembly.assay.sample.person  %>

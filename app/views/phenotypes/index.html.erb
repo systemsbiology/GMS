@@ -1,12 +1,17 @@
+<script>
+  $(document).ready(function() { setupTablesorter() });
+</script>
+
 <h1>Listing phenotypes</h1>
 
 <%= link_to 'New Phenotype', new_phenotype_path %>
-<table class="tablesorter" >
+<table class="tablesorter" width="500px;">
   <thead>
   <tr>
     <th>Condition</th>
     <th>Name</th>
     <th>Tag</th>
+	<th>Madeline Displayed?</th>
     <th>Description</th>
   </tr>
   </thead>
@@ -14,9 +19,10 @@
 <% @phenotypes.each do |phenotype| %>
   <tr>
     <td><%= link_to(phenotype.condition.name,phenotype.condition) if phenotype.condition %></td>
-    <td><%= link_to phenotype.name, phenotype %></td>
-    <td><%= phenotype.tag %></td>
-    <td><p style="white-space:pre"><%= word_wrap(phenotype.description,40) unless phenotype.description.nil? %></p></td>
+    <td class="wrap-long"><%= link_to(phenotype.name, phenotype, {:class => "wrap-long" }) %></td>
+    <td class="wrap-long"><div class="wrap-long"><%= phenotype.tag %></div></td>
+	<td><%= t phenotype.madeline_display %></td>
+    <td><div class="wrap-long"><%= phenotype.description unless phenotype.description.nil? %></div></td>
     <% if false %>
     <td><%= link_to 'Show', phenotype %></td>
     <td><%= link_to 'Edit', edit_phenotype_path(phenotype) %></td>
