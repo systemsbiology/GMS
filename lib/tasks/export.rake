@@ -99,7 +99,7 @@ namespace :export do
     end
   end
 
- 
+
   def individual_by_pedigree(ped_id)
     raise "No pedigree id provided to individual_by_pedigree" unless ped_id
     ped = Pedigree.find(ped_id)
@@ -121,7 +121,7 @@ namespace :export do
         next if sample.assays.nil?
         person_samples_id.push(sample.isb_sample_id)
         person_samples_vendor_id.push(sample.sample_vendor_id)
-        sample_type = sample.sample_type.nil? ? 'unknown' : sample.sample_type.name 
+        sample_type = sample.sample_type.nil? ? 'unknown' : sample.sample_type.name
         person_sample_types.push(sample_type)
         sample.assays.each do |assay|
           person_assays_id.push("isb_asy_#{assay.id}")
@@ -184,7 +184,7 @@ namespace :export do
     end
   end
 
- 
+
   def assembly_by_pedigree(ped_id)
     raise "No pedigree id provided to assembly_by_pedigree" unless ped_id
     ped = Pedigree.find(ped_id)
@@ -196,7 +196,7 @@ namespace :export do
 	  assay.assemblies.each do |assembly|
         mother = person.mother.empty? ? 'NULL' : person.mother.first.isb_person_id
         father = person.father.empty? ? 'NULL' : person.father.first.isb_person_id
-	    sample_type = sample.sample_type.nil? ? 'unknown' : sample.sample_type.name 
+	    sample_type = sample.sample_type.nil? ? 'unknown' : sample.sample_type.name
 	    output = [ped.study.tag, ped.isb_pedigree_id, ped.tag, person.isb_person_id, person.collaborator_id, person.gender, father, mother, sample.isb_sample_id, sample.sample_vendor_id, sample_type, "isb_asy_#{assay.id}", assay.name, assay.vendor, assay.technology, "isb_asm_#{assembly.id}", assembly.name, assembly.location, assembly.software_version, assembly.genome_reference.name]
 	    asm_output.push(output.join("\t"))
 	  end
@@ -245,7 +245,7 @@ namespace :export do
     end
   end
 
- 
+
   def assembly_files_by_pedigree(ped_id)
     raise "No pedigree id provided to assembly_files_by_pedigree" unless ped_id
     ped = Pedigree.find(ped_id)
@@ -256,7 +256,7 @@ namespace :export do
         sample.assays.each do |assay|
 	  assay.assemblies.each do |assembly|
 	    assembly.assembly_files.each do |file|
-	      sample_type = sample.sample_type.nil? ? 'unknown' : sample.sample_type.name 
+	      sample_type = sample.sample_type.nil? ? 'unknown' : sample.sample_type.name
 	      output = [ped.study.tag, ped.isb_pedigree_id, ped.tag, person.isb_person_id, person.collaborator_id, person.gender, sample.isb_sample_id, sample.sample_vendor_id, sample_type, "isb_asy_#{assay.id}", assay.name, "isb_asm_#{assembly.id}", assembly.name, "isb_asmfile_#{file.id}", file.file_type.type_name, file.location, file.file_date]
 	      af_output.push(output.join("\t"))
 	    end
@@ -303,7 +303,7 @@ namespace :export do
     end
   end
 
- 
+
   def assembly_files_by_status_pedigree(ped_id)
     raise "No pedigree id provided to assembly_files_by_status_pedigree" unless ped_id
     ped = Pedigree.find(ped_id)
@@ -316,7 +316,7 @@ namespace :export do
         sample.assays.each do |assay|
 	  assay.assemblies.each do |assembly|
 	    assembly.varfiles.each do |file|
-	      sample_type = sample.sample_type.nil? ? 'unknown' : sample.sample_type.name 
+	      sample_type = sample.sample_type.nil? ? 'unknown' : sample.sample_type.name
 	      output = [ped.study.tag, ped.isb_pedigree_id, ped.tag, person.isb_person_id, person.collaborator_id, person.gender, affected, sample.isb_sample_id, sample.sample_vendor_id, sample_type, "isb_asy_#{assay.id}", assay.name, "isb_asm_#{assembly.id}", assembly.name, "isb_asmfile_#{file.id}", file.file_type.type_name, file.location, file.file_date]
 	      af_output.push(output.join("\t"))
 	    end
@@ -332,7 +332,7 @@ namespace :export do
   ##########################################################################################################
   ### UTIL
   ##########################################################################################################
-  
+
 
   def exportdir_exists
     if !File.exists?(EXPORT_DIR) then
@@ -342,9 +342,8 @@ namespace :export do
 
   def create_file(output, filename)
     exportdir_exists
-    full_path =  EXPORT_DIR + '/' unless EXPORT_DIR.match('/$')
-    full_path = "#{full_path}#{filename}"
-    #puts "full path #{full_path}"
+    full_path = EXPORT_DIR + "#{filename}"
+    puts "full path #{full_path}"
     string = output.join("\n")
     File.open(full_path, 'w') do |f|
       f.puts string
