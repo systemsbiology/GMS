@@ -9,7 +9,7 @@ def pedindex(protocol,id_type)
   data_store = Hash.new
   if protocol.match('REST') then
     data_store["pedigree_databases_name"] = "ISB GMS Pedigrees"
-  else 
+  else
     data_store["pedigree_databases_name"] = "ISB Locally Stored Pedigrees"
   end
 
@@ -161,13 +161,13 @@ def pedfile(pedigree_id)
 	        asm_list["assembly_current"] = assembly.current
 		asm_list["assembly_status"] = assembly.status
 		asm_list["assembly_updated"] = assembly.updated_at
- 
+
                 af_list = assembly.assembly_files
                 file_list = Array.new
                 af_list.group_by {|t| t.file_type_id }.each do |file_type_id, assembly_file_array|
 #                  #logger.debug "file_type_id is #{file_type_id.inspect} assay_file_array is #{assembly_file_array.inspect}"
 		  assay_key = FileType.find(file_type_id).type_name
-                  next if assay_key == "ASSEMBLY" 
+                  next if assay_key == "ASSEMBLY"
                   assembly_file_array.each do |assembly_file|
                     file_info = Hash.new
 	            file_info["file_type"] = assay_key
@@ -178,11 +178,11 @@ def pedfile(pedigree_id)
                     file_info["assembly_desc"] = assembly_file.description
                     file_info["reference"] = assembly_file.genome_reference.name
                     file_info["file"] = assembly_file.location
- 
+
                     file_list.push(file_info)
                   end
                 end # end assay.assembly_files.all
-           
+
                 asm_list["files"] = file_list unless file_list.size == 0
                 assay_info["assemblies"].push(asm_list) unless asm_list.size == 0
             end  # end assay.assemblies.each
@@ -201,7 +201,7 @@ def pedfile(pedigree_id)
       samples_list.push(ind_sample)
     end # end ind.samples.each
 
-    person["samples"] = samples_list unless samples_list.size == 0 
+    person["samples"] = samples_list unless samples_list.size == 0
     individuals.push(person)
   end # end ped.people.each
 
@@ -226,13 +226,13 @@ def person_conditions(person)
 
   if conditions.size == 0 then
     return nil
-  else 
+  else
     return conditions
   end
 end
 
 def person_traits(person)
- 
+
   traits = Array.new
   person.traits.each do |trait|
     pheno = trait.phenotype
@@ -260,7 +260,7 @@ def pedigree_relationships(pedigree_id)
     person_rels = Hash.new
     person_rels["individual_id"] = person.isb_person_id
 
-    if mother.size > 1 then 
+    if mother.size > 1 then
       mothers = mother.map(&:isb_person_id).join(",")
     elsif mother.size == 1 then
       person_rels["mother"] = mother[0].isb_person_id
@@ -268,14 +268,14 @@ def pedigree_relationships(pedigree_id)
 
     if father.size > 1 then
       fathers = father.map(&:isb_person_id).join(",")
-    elsif father.size == 1 then 
+    elsif father.size == 1 then
       person_rels["father"] = father[0].isb_person_id
     end
 
     rel_info.push(person_rels)
   end
- 
-  return rel_info 
+
+  return rel_info
 end
 
 
@@ -303,14 +303,14 @@ def ordered_pedigree(pedigree_id)
   end
 
   # if this is an unrelateds pedigree then breadth_traverse should return fewer people than
-  # there are total, so we need to catch that and find the rest of the people - not all 
+  # there are total, so we need to catch that and find the rest of the people - not all
   # pedigrees are named 'unrelateds' so we need this check here
   unrelated_check = Pedigree.find(pedigree_id).people.order("isb_person_id")
   if unrelated_check.size > madeline_people.size then
     # add people that are only in unrelated_check to madeline_people at the end of the array
     madeline_people.concat(unrelated_check.delete_if { |per| madeline_people.include?(per) })
   end
-  
+
 
   return madeline_people
 end
@@ -339,7 +339,7 @@ end
 #   ####   ####   ###   #####  #   #    #    #####       #    ####   #####  #   #  ####   ####    ##   ###
 #   #   #  #  #   #     #   #  #   #    #    #   #       #    #  #   #   #   # #   #      #  #      #  #
 #   ####   #   #  ####  #   #  ####     #    #   #       #    #   #  #   #    #    #####  #   #  ###   ####
-#   
+#
 ############################################################################################################
 ############################################################################################################
 
@@ -395,7 +395,7 @@ def down_breadth_branch(people, current_gen)
       end
     end
   end
-  #logger.debug("exiting down_breadth_branch") 
+  #logger.debug("exiting down_breadth_branch")
   return people, new_gen
 end
 
@@ -452,7 +452,7 @@ def up_branch(person, previous)
       previous.push(parent)
       previous = side_branch(parent, previous)
       previous = up_branch(parent, previous)
-    end 
+    end
   end
 
   return previous
@@ -486,17 +486,17 @@ def find_root(pedigree_id)
    if Pedigree.find(pedigree_id).tag.downcase.match("diversity") then
      # diversity shoudl be split into multiple pedigrees, but for now just return the first
      first = Pedigree.find(pedigree_id).people.first
-     #logger.debug "Returned one root for diversity pedigree #{pedigree_id}"
+    #logger.debug "Returned one root for diversity pedigree #{pedigree_id}"
      return first
    end
+  child_rels = Relationship.has_pedigree(pedigree_id).where(:relationship_type => "child").map(&:person_id)
+  root_candidates = Person.has_pedigree(pedigree_id).joins(:offspring).where("relationships.person_id not in (?)", child_rels)
 
-   root_candidates = Person.has_pedigree(pedigree_id).joins(:offspring).where("relationships.person_id not in (?)", Relationship.has_pedigree(pedigree_id).where(:relationship_type => "child").map(&:person_id))
-
-   #logger.debug "root candidates #{root_candidates.inspect}"
+  #logger.debug "root candidates #{root_candidates.inspect}"
    if root_candidates.empty?
      # this means that this pedigree has a single person (probably)
      root_candidates = Person.has_pedigree(pedigree_id)
-     #logger.debug "new root cands is #{root_candidates.inspect}"
+    #logger.debug "new root cands is #{root_candidates.inspect}"
    end
 
    roots = winnow_candidates(root_candidates)
@@ -634,7 +634,7 @@ end
 def breadth_unrooted_traverse(person)
   people = Array.new
   people.push(person)
-#  people = side_branch(person, people)  # call side_branch so this person gets added 
+#  people = side_branch(person, people)  # call side_branch so this person gets added
   madeline_people = Array.new
   madeline_people = people.dup
   current_gen = side_unrooted_branch(person, [])
@@ -689,7 +689,7 @@ def down_breadth_unrooted_branch(people, current_gen)
       end
     end
   end
-  #logger.debug("exiting down_breadth_unrooted_branch with people #{people.inspect} and new_gen #{new_gen.inspect}") 
+  #logger.debug("exiting down_breadth_unrooted_branch with people #{people.inspect} and new_gen #{new_gen.inspect}")
   return people, new_gen
 end
 

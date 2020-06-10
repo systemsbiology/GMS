@@ -6,8 +6,8 @@ class Pedigree < ActiveRecord::Base
   after_update :check_pedigree_tag, :check_isb_pedigree_id
   before_destroy :destroy_people
 
-  has_many :people, :through => :memberships, :dependent => :destroy
   has_many :memberships, :dependent => :destroy
+  has_many :people, :through => :memberships, :dependent => :destroy
   belongs_to :study
 
   auto_strip_attributes :name, :tag, :description

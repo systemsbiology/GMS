@@ -20,7 +20,7 @@
   <tbody>
 <% assemblies.each do |assembly| %>
   <tr>
-    <td><%= image_tag('file_location.png', :size => "20x20", :onmouseover => "$('#assembly_loc_#{assembly.id}').poshytip('show')", :onmouseout => "$('#assembly_loc_#{assembly.id}').poshytip('hide')", :id => "assembly_loc_#{assembly.id}") %> <%= link_to assembly.name, assembly %></td>
+    <td><%= image_tag('/images/file_location.png', :size => "20x20", :onmouseover => "$('#assembly_loc_#{assembly.id}').poshytip('show')", :onmouseout => "$('#assembly_loc_#{assembly.id}').poshytip('hide')", :id => "assembly_loc_#{assembly.id}") %> <%= link_to assembly.name, assembly %></td>
     <td><%= link_to 'isb_asm_'+assembly.id.to_s,assembly %></td>
     <% if assembly.assay.sample.nil? then %>
     <td colspan="1">'No sample found'</td>

@@ -60,10 +60,10 @@
 
 <p>
   <b>Pedigrees</b>
-<% if @pedigrees.nil? or @pedigrees.empty? %>
+<% if not @study.pedigrees %>
   <p>No pedigrees for this study</p>
 <% else %>
-<b>(<%= @pedigrees.count %>)</b>:<br>
+<b>(<%= @study.pedigrees.count %>)</b>:<br>
 <table class="tablesorter">
   <tr>
     <th>Pedigree Name</th>
@@ -71,7 +71,7 @@
     <th>Pedigree Description</th>
     <th style="colspan: 3;">Controls</th>
   </tr>
-<% @pedigrees.each do |pedigree| %>
+<% @study.pedigrees.each do |pedigree| %>
   <tr>
     <td><%= link_to pedigree.name, pedigree %></td>
     <td><%= pedigree.tag %></td>

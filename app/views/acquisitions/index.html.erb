@@ -20,8 +20,8 @@
   <% person = acquisition.person %>
   <% sample = acquisition.sample %>
   <tr>
-    <td><%= link_to person.pedigree.name, person.pedigree %></td>
-    <td><%= link_to person.full_identifier, person %></td>
+    <td><% if person.nil? then %>No Person<% else %><%= link_to person.pedigree.name, person.pedigree %><% end %></td>
+    <td><% if person.nil? then %>No Person for <%= acquisition.person_id =%><% else %><%= link_to person.full_identifier, person %><% end %></td>
     <td><%= sample.nil? ? "SAMPLE ID DOESN'T EXIST IN DB: #{acquisition.sample_id}" : link_to(sample.sample_vendor_id, sample) %></td>
     <td><%= link_to 'show', acquisition_path(acquisition) %></td>
     <td><%= link_to 'Edit', edit_acquisition_path(acquisition) %></td>

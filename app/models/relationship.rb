@@ -19,20 +19,20 @@ class Relationship < ActiveRecord::Base
     unless pedigree.blank?
       if pedigree.kind_of?(Array) then
         pedigree_id = pedigree[0]
-      elsif pedigree.kind_of?(Hash) then
-      pedigree_id = pedigree[:id]
+      elsif pedigree.kind_of?(ActionController::Parameters) or pedigree.kind_of?(Hash) then
+        pedigree_id = pedigree[:id]
       else
-      pedigree_id = pedigree.to_i
+        pedigree_id = pedigree.to_i
       end
       unless pedigree_id.blank?
-        joins(:person => {:membership => :pedigree} ).
-        where('pedigrees.id = ?', pedigree_id)
+        joins(:person => {:membership => :pedigree} )
+          .where(pedigrees: {id: pedigree_id})
       end
     end
   }
 
   scope :display_filter, lambda {
-    {:conditions => ["relationship_type = 'parent' or relationship_type = 'undirected'"]}
+    where("relationship_type = 'parent' or relationship_type = 'undirected'")
   }
 
   scope :order_by_pedigree, lambda {

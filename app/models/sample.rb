@@ -1,8 +1,8 @@
 class Sample < ActiveRecord::Base
   before_destroy :trigger_person_sample_check
-  # assays has to come before sample_assays in order for the dependent destroy to work
-  has_many :assays, :through => :sample_assays, :dependent => :destroy
+
   has_many :sample_assays, :dependent => :destroy
+  has_many :assays, :through => :sample_assays, :dependent => :destroy
   belongs_to :sample_type
   has_one :acquisition, :dependent => :destroy
   has_one :person, :through => :acquisition
@@ -19,14 +19,15 @@ class Sample < ActiveRecord::Base
     unless pedigree.blank?
       if pedigree.kind_of?(Array) then
         pedigree_id = pedigree[0]
-      elsif pedigree.kind_of?(Hash) then
+      elsif pedigree.kind_of?(ActionController::Parameters) or pedigree.kind_of?(Hash) then
         pedigree_id = pedigree[:id]
       else
         pedigree_id = pedigree.to_i
       end
       logger.debug("pedigree_id #{pedigree_id}")
       unless pedigree_id.blank?
-        -> { includes(person: :pedigree).where('pedigrees.id = ?', pedigree_id) }
+        joins(person: :pedigree)
+          .where(pedigrees: {id: pedigree_id})
       end
     end
   }

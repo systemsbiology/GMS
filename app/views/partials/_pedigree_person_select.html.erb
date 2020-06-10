@@ -4,11 +4,13 @@
   <% pedigree_id = person.nil? ? nil : person.pedigree_id %>
   <div class="field">
     <%= f.label :pedigree %><br />
-    <%= collection_select(:pedigree, :id, @pedigrees, :id, :name, options = { :selected => pedigree_id, :include_blank => "-Select the pedigree this sample belongs to" }) %>
+    <%= collection_select(:pedigree, :id, @pedigrees, :id, :name, options = {
+      :selected => pedigree_id, :include_blank => "-Select the pedigree this sample belongs to" }) %>
   </div>
   <script>
 
     $("#pedigree_id").change(function() {
+      console.log("CHANGE FUNCTION")
       var url = '/people/get_drop_down_people_by_pedigree';
       var request = $.ajax({
         data: { 'pedigree_id' : $(this).val() },

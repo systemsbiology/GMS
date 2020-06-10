@@ -62,7 +62,7 @@ class SamplesController < ApplicationController
         .order_by_pedigree.paginate :page => params[:page], :per_page => 100
     elsif params[:problems] then
       #@samples = Sample.where( Acquisition.where( Acquisition.arel_table[:sample_id].eq(Sample.arel_table[:id]) ).exists.not ).paginate(:page => params[:page], :per_page => 10)
-      @samples = Sample.where.not(id: Acquisition.pluck(:sample_id))
+      @samples = Sample.where.not(id: Acquisition.pluck(:sample_id)).paginate(:page => params[:page], :per_page => 10)
     else
 
       respond_to do |format|
@@ -90,7 +90,7 @@ class SamplesController < ApplicationController
   # GET /samples/1
   # GET /samples/1.xml
   def show
-    @sample = Sample.find(params[:id]).includes(assays: { person: :pedigree})
+    @sample = Sample.includes(:assays, { person: :pedigree}).find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -103,7 +103,7 @@ class SamplesController < ApplicationController
   # GET /samples/new.xml
   def new
     @sample = Sample.new
-    @pedigrees = Pedigree.order("pedigrees.tag")
+    @pedigrees = Pedigree.order(:tag)
     respond_to do |format|
       format.html # new.html.erb
       format.xml  { render :xml => @sample }
@@ -112,8 +112,8 @@ class SamplesController < ApplicationController
 
   # GET /samples/1/edit
   def edit
-    @sample = Sample.find(params[:id]).includes(person: :pedigree)
-    @pedigrees = Pedigree.order("pedigrees.tag")
+    @sample = Sample.includes(:assays, {person: :pedigree}).find(params[:id])
+    @pedigrees = Pedigree.order(:tag)
   end
 
   # POST /samples

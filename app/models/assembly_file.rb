@@ -13,15 +13,15 @@ class AssemblyFile < ActiveRecord::Base
     unless pedigree.blank?
       if pedigree.kind_of?(Array) then
         pedigree_id = pedigree[0]
-      elsif pedigree.kind_of?(Hash) then
-      pedigree_id = pedigree[:id]
+      elsif pedigree.kind_of?(ActionController::Parameters) or pedigree.kind_of?(Hash) then
+        pedigree_id = pedigree[:id]
       else
-      pedigree_id = pedigree.to_i
+        pedigree_id = pedigree.to_i
       end
 
       unless pedigree_id.blank?
-        joins(:assembly => {:assay => { :sample => { :person => :pedigree } } } ).
-	where('pedigrees.id = ?', pedigree_id)
+        joins(assembly: { assay: { sample:{ person: :pedigree } } } )
+          .where(pedigrees: {id: pedigree_id})
       end
     end
   }

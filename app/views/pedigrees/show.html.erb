@@ -40,7 +40,7 @@
 </tr>
 <tr><td colspan="4"><b>Pedigree Status:</b> <% if @pedigree.complete then %><span style="background-color:green;">&nbsp;&nbsp;</span>Complete<% else %><span style="background-color:red;">&nbsp;&nbsp;</span>Incomplete<% end %></td></tr>
 </table>
-<%= link_to 'Back', pedigrees_path %> | 
+<%= link_to 'Back', pedigrees_path %> |
 <%= link_to 'Edit', edit_pedigree_path(@pedigree) %> |
 <% par = Hash.new;  par[:pedigree_filter] = Hash.new;  par[:pedigree_filter][:id] = @pedigree.id %>
 <%= link_to "Receiving Log for Pedigree #{@pedigree.name}", receiving_report_people_path(par) %> |
@@ -88,7 +88,7 @@
 	      <td><%= person.samples.first.customer_sample_id %></td>
 	    <% end %>
 	  <% else %>
-	    <td><%= image_tag('file_location.png', :size => "20x20", :onmouseover => "$('#person_#{person.id}').poshytip('show')", :onmouseout => "$('#person_#{person.id}').poshytip('hide')", :id => "person_#{person.id}") %><%= link_to 'Multiple Samples', samples_path(:person => {:id => person}), {:onmouseover => "$('#person_#{person.id}').poshytip('show')", :onmouseout => "$('#person_#{person.id}').poshytip('hide')" } %></td>
+	    <td><%= image_tag('/images/file_location.png', :size => "20x20", :onmouseover => "$('#person_#{person.id}').poshytip('show')", :onmouseout => "$('#person_#{person.id}').poshytip('hide')", :id => "person_#{person.id}") %><%= link_to 'Multiple Samples', samples_path(:person => {:id => person}), {:onmouseover => "$('#person_#{person.id}').poshytip('show')", :onmouseout => "$('#person_#{person.id}').poshytip('hide')" } %></td>
             <script>
 	      $("#person_<%= person.id %>").poshytip({
 	        content: '<%= person.samples.map(&:sample_vendor_id).join(", ") %>',
@@ -98,7 +98,7 @@
 		alignX: 'inner-left'
 	      });
 	     </script>
-             <td><%= image_tag('file_location.png', :size => "20x20", :onmouseover => "$('#person_customer_#{person.id}').poshytip('show')", :onmouseout => "$('#person_customer_#{person.id}').poshytip('hide')", :id => "person_customer_#{person.id}") %><%= link_to 'Multiple Samples', samples_path(:person => {:id => person}), {:onmouseover => "$('#person_customer_#{person.id}').poshytip('show')", :onmouseout => "$('#person_customer_#{person.id}').poshytip('hide')" } %></td>
+             <td><%= image_tag('/images/file_location.png', :size => "20x20", :onmouseover => "$('#person_customer_#{person.id}').poshytip('show')", :onmouseout => "$('#person_customer_#{person.id}').poshytip('hide')", :id => "person_customer_#{person.id}") %><%= link_to 'Multiple Samples', samples_path(:person => {:id => person}), {:onmouseover => "$('#person_customer_#{person.id}').poshytip('show')", :onmouseout => "$('#person_customer_#{person.id}').poshytip('hide')" } %></td>
             <script>
 	      $("#person_customer_<%= person.id %>").poshytip({
 	        content: '<%= person.samples.map(&:customer_sample_id).collect! {|obj| obj.nil? ? 'NA' : obj }.join(", ") %>',

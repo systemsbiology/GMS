@@ -14,7 +14,6 @@ class StudiesController < ApplicationController
   # GET /studies/1.xml
   def show
     @study = Study.find(params[:id])
-    @pedigrees = Pedigree.find_all_by_study_id(@study)
 
     respond_to do |format|
       format.html # show.html.erb

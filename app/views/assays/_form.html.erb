@@ -7,15 +7,15 @@
   </div>
   <div class="field">
     <%= f.label :assay_type %><br />
-    <%= f.collection_select(:assay_type, Assay.where("assay_type != ''").order('assay_type DESC').distinct.pluck(:assay_type), :assay_type, :assay_type) %>
+    <%= f.collection_select(:assay_type, Assay.where("assay_type != ''").order('assay_type DESC').distinct.pluck(:assay_type), :to_s, :to_s) %>
   </div>
   <div class="field">
     <%= f.label :vendor %><br />
-    <%= f.collection_select(:vendor, Assay.where("vendor != ''").order('vendor').distinct.pluck(:vendor), :vendor, :vendor) %>
+    <%= f.collection_select(:vendor, Assay.where("vendor != ''").order('vendor').distinct.pluck(:vendor), :to_s, :to_s) %>
   </div>
   <div class="field">
     <%= f.label :technology %><br />
-    <%= f.collection_select(:technology, Assay.where("technology != ''").order('technology').distinct.pluck(:technology), :technology, :technology) %>
+    <%= f.collection_select(:technology, Assay.where("technology != ''").order('technology').distinct.pluck(:technology), :to_s, :to_s) %>
   </div>
   <div class="field">
     <%= f.label :description %><br />

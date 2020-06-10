@@ -40,7 +40,10 @@ class PedigreesController < ApplicationController
   # GET /pedigrees/1.xml
   def show
     @pedigree = Pedigree.find(params[:id])
-    @person_relationships = Relationship.order(:person_id).order(:relation_order).display_filter.find_all_by_person_id(@pedigree.people.map(&:id))
+    people_ids = @pedigree.people.map(&:id)
+
+    @person_relationships = Relationship.display_filter.order(:person_id, :relation_order)
+      .where("person_id in (?)", @pedigree.people.map(&:id))
 
 #    @person_relationships = Relationship.order(:person_id).find_all_by_person_id(@pedigree.people.map(&:id))
 #    @relation_relationships = Relationship.find_all_by_relation_id(@pedigree.people.map(&:id))
@@ -247,7 +250,7 @@ class PedigreesController < ApplicationController
       labels << pedigree.conditions.map{|d| d.name.gsub!(/ /, '_')}
       #labels << pedigree.phenotypes.map{|p| p.name.gsub!(/ /,'_')}
       labels << pedigree.people.map { |p| p.phenotypes.where(:madeline_display => 1)}.flatten.uniq.map{|l| l.name.gsub!(/ /,'_')}
-	logger.debug("madeline_image labels are #{labels.inspect}")
+	    logger.debug("madeline_image labels are #{labels.inspect}")
       madeline_info = Array.new
       madeline_array.each do |line|
         line = line.join("\t")
@@ -269,10 +272,10 @@ class PedigreesController < ApplicationController
       begin
         tmpfile, warnings = Madeline::Interface.new(:embedded => true, :L => labels, "font-size"=> "10", "nolabeltruncation" => true, "sort" => "SortOrder").draw(File.open(infile,'r'))
       rescue Exception => e
-	msg = e.message.gsub(/\e\[(\d+)m/, '')
-	msg.gsub!(/\n/, '<br />')
-	msg.gsub!(/[^0-9A-Za-z \/<>-]/, '')
-	msg.gsub!(/131m/,'')
+        msg = e.message.gsub(/\e\[(\d+)m/, '')
+        msg.gsub!(/\n/, '<br />')
+        msg.gsub!(/[^0-9A-Za-z \/<>-]/, '')
+        msg.gsub!(/131m/,'')
         flash[:error] = "#{msg}"
       else
         FileUtils.copy(tmpfile,madeline_file)
