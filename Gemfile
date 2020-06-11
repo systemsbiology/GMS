@@ -4,8 +4,8 @@ gem 'rails'
 gem 'rake'
 gem 'builder'
 gem 'net-ssh'
-gem 'debugger2'
-gem 'sass-rails'
+#gem 'debugger2'
+#gem 'sass-rails'
 gem 'listen'
 gem 'activerecord-session_store'
 # caches_page
@@ -25,10 +25,11 @@ gem 'sprockets'
 # gem 'unicorn'
 
 # Deploy with Capistrano
-#gem 'rvm-capistrano'
-#gem 'capistrano-bundler'
-#gem 'capistrano-rails'
+gem 'capistrano-bundler'
+gem 'capistrano-passenger'
 gem 'capistrano'
+gem 'capistrano-rails'
+gem 'capistrano-rvm'
 #gem 'linecache19', :git => "git://github.com/mark-moseley/linecache"
 
 gem "chartkick"
