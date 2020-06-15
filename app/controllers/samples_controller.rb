@@ -241,7 +241,9 @@ class SamplesController < ApplicationController
   end
 
   def get_drop_down_samples_by_pedigree
-    options = Sample.where(pedigree_id: (params[:pedigree_id]).collect { |x| "\"#{x.id}\" : \"#{x.full_identifier}\""}
+    # returns sample id : person full_identifier
+    samples = Sample.where(pedigree_id: params[:pedigree_id])
+    options = samples.collect { |x| "\"#{x.id}\" : \"#{x.person.full_identifier}\""}
     render :text => "{#{options.join(",")}}"
   end
 
