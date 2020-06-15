@@ -47,7 +47,7 @@ class RelationshipsController < ApplicationController
   # POST /relationships.xml
   def create
     @relationship = Relationship.new(relationship_params)
-    #logger.debug("person_id #{@relationship.person_id} relation_id #{@relationship.relation_id} relation #{@relationship.inspect}")
+    logger.debug("person_id #{@relationship.person_id} relation_id #{@relationship.relation_id} relation #{@relationship.inspect}")
     if @relationship.person_id == @relationship.relation_id then
       @relationship.errors[:base] << "Cannot add a relationship between the same person"
     end
@@ -168,7 +168,7 @@ class RelationshipsController < ApplicationController
 	else
 	  recip.divorced = 0
 	end
-        begin 
+        begin
   	  recip.save
 	rescue ActiveRecord::RecordNotUnique
           format.html { redirect_to(@relationship, :notice => 'Relationship was successfully updated.') }

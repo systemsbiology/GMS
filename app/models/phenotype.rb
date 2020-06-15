@@ -1,7 +1,7 @@
 class Phenotype < ActiveRecord::Base
   has_many :traits, :dependent => :destroy
   has_many :people, :through => :traits
-  belongs_to :condition
+  belongs_to :condition, optional: true
   auto_strip_attributes :name, :tag, :description
   validates_presence_of :name, :tag
   validates_uniqueness_of :name, :tag

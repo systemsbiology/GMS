@@ -386,7 +386,7 @@ class PeopleController < ApplicationController
     end
 
     # process the rest of the objects
-    temp_objects = TempObject.find(:all, :conditions => {:trans_id => trans_id}, :order => "object_order")
+    temp_objects = TempObject.where(trans_id: trans_id).order("object_order")
     #logger.debug("temp objects are #{temp_objects.inspect}")
     temp_objects.each do |temp_obj|
       # need the begin rescue block because Person includes pedigree information and it needs to lazy load the pedigree class otherwise there is an error
@@ -415,13 +415,13 @@ class PeopleController < ApplicationController
         rel_order = obj[4]
 
         rel = Relationship.new
-        person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(person_collaborator_id)
+        person = Person.has_pedigree(pedigree_id).where(collaborator_id: person_collaborator_id).first
         if person.nil? then
           rel.errors.add(:person_id, "not found for #{person_collaborator_id} in pedigree #{pedigree_id}")
           @errors.push(["relationship", rel, rel.errors])
           next
         end
-        relation = Person.has_pedigree(pedigree_id).find_by_collaborator_id(relation_collaborator_id)
+        relation = Person.has_pedigree(pedigree_id).where(collaborator_id: relation_collaborator_id).first
         if relation.nil? then
           rel.errors.add(:person_id, "not found for #{relation_collaborator_id}")
           @errors.push(["relationship", rel, rel.errors])
@@ -493,7 +493,7 @@ class PeopleController < ApplicationController
         ped = Pedigree.find(obj[0])
         @pedigree_id = ped.id
         #logger.debug("processing membership information for pedigree #{ped.inspect}")
-        person = Person.find_by_collaborator_id_and_pedigree_id(obj[1], obj[0])
+        person = Person.where(collaborator_id: obj[1], pedigree_id: obj[0]).first
           m = Membership.new
         if person.nil? then
           m.errors.add(:person_id,"not found for #{obj[1]} in pedigree #{obj[0]}")
@@ -510,9 +510,9 @@ class PeopleController < ApplicationController
       elsif temp_obj.object_type == "Acquisition" then
         pedigree_id = obj[0]
         @pedigree_id = pedigree_id
-        person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(obj[1])
-        sample = Sample.find_by_sample_vendor_id_and_pedigree_id(obj[2], obj[0])
-        logger.debug("acquisition debug says pedigree #{pedigree_id.inspect} person #{person.inspect} sample #{sample.inspect}")
+        person = Person.has_pedigree(pedigree_id).where(collaborator_id: obj[1]).first
+        sample = Sample.where(sample_vendor_id: obj[2], pedigree_id: obj[0]).first
+        #logger.debug("acquisition debug says pedigree #{pedigree_id.inspect} person #{person.inspect} sample #{sample.inspect}")
         acq = Acquisition.new
         if person.nil? then
           acq.errors.add(:person_id,"not found for #{obj[0]}")
@@ -533,7 +533,7 @@ class PeopleController < ApplicationController
         condition = Condition.find(obj[0])
         pedigree_id = obj[1]
         @pedigree_id = pedigree_id
-        person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(obj[2])
+        person = Person.has_pedigree(pedigree_id).where(collaborator_id: obj[2]).first
             diagnosis = Diagnosis.new
         if person.nil? then
           diagnosis.errors.add(:person_id,"not found for condition #{obj[0]} pedigree #{pedigree_id} collaborator_id #{obj[2]}")
@@ -548,7 +548,7 @@ class PeopleController < ApplicationController
           end
         end
       elsif temp_obj.object_type == "Aliases" then
-        person = Person.has_pedigree(obj[0]).find_by_collaborator_id(obj[1])
+        person = Person.has_pedigree(obj[0]).where(collaborator_id:obj[1])
         if person.nil? then
             person = Person.new
             person.errors.add(:person_id,"not found for pedigree #{obj[0]} collaborator #{obj[1]}")
@@ -581,9 +581,9 @@ class PeopleController < ApplicationController
         end
       elsif temp_obj.object_type == "Phenotypes" then
         phenotype = Phenotype.find(obj[0])
-        person = Person.has_pedigree(obj[1]).find_by_collaborator_id(obj[2])
+        person = Person.has_pedigree(obj[1]).where(collaborator_id:obj[2]).first
         @pedigree_id = person.pedigree_id
-        trait = Trait.find_by_person_id_and_phenotype_id_and_trait_information(person.id, phenotype.id,obj[3])
+        trait = Trait.where(person_id: person.id, phenotype_id: phenotype.id, trait_information: obj[3]).first
         #logger.debug("phenotypes debug person #{person.inspect} trait #{trait.inspect}")
         if trait.nil? then
           trait = Trait.new
@@ -815,9 +815,9 @@ class PeopleController < ApplicationController
                 if pheno.match(/=/) then
                   (pheno, pheno_info) = pheno.split(/=/)
                 end
-                phenotype = Phenotype.find_by_name(pheno)
+                phenotype = Phenotype.where(name: pheno).first
                 if phenotype.nil? then
-                    phenotype = Phenotype.find_by_tag(pheno)
+                    phenotype = Phenotype.where(tag: pheno).first
                 end
                 if phenotype.nil? or phenotype.to_s.match('NA') then
                     phen = Phenotype.new
@@ -894,11 +894,11 @@ class PeopleController < ApplicationController
         vendor_id = row[headers["Sequencing Sample ID"]]
         if !vendor_id.nil? then
             # create the sample information
-            s = Sample.find(:first, :conditions => {:sample_vendor_id => vendor_id, :pedigree_id =>pedigree.id}) || Sample.new
+            s = Sample.find_or_initialize_by(sample_vendor_id: vendor_id, pedigree_id: pedigree.id)
             source = row[headers["Sample Source"]]
             s.customer_sample_id = customer_sample_id # don't check for duplicates, just add it and they can change it later
 
-            sample_type = SampleType.find_by_name(source)
+            sample_type = SampleType.where(name: source).first
             if sample_type.nil? then
                 s.errors.add(:sample_type_id, "Cannot find sample_type for #{source} for sample for person #{p.collaborator_id}.  Add this as a sample type before importing this spreadsheet")
                 errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?

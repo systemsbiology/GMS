@@ -3,24 +3,24 @@
 #########################################################
 
 The Genome Management System (GMS) is a website that allows researchers to
-store data about the location of Whole Genome Sequencing (WGS) files.  It 
+store data about the location of Whole Genome Sequencing (WGS) files.  It
 is designed for use with Complete Genomics Inc (CGI) files, but can also be
-used to store other types of files.  
+used to store other types of files.
 
 
 ## REQUIREMENTS
 
-The Genome Management System (GMS) is a Ruby on Rails website that runs on 
+The Genome Management System (GMS) is a Ruby on Rails website that runs on
 Ruby 1.9.2, Rails 3, MySQL, Apache, and Passenger.  It is available from
 a Git repository.
 
 ## INSTALLATION
 
-In general, download the appropriate latest version from the website listed. 
+In general, download the appropriate latest version from the website listed.
 Unzip and untar the file, go into the directory, type ./configure and then
 make.  If you do not have root access, then you need to supply a prefix for
 where the software should be installed to configure.  All software should be
-installed to the same location, although MySQL is typically installed to a 
+installed to the same location, although MySQL is typically installed to a
 separate hard disk than the web server is installed on.
 
 1. Install Ruby
@@ -31,7 +31,7 @@ separate hard disk than the web server is installed on.
 
    http://rubygems.org/pages/download
 
-3. Install Rails 
+3. Install Rails
 
    > gem install rails
 
@@ -80,7 +80,7 @@ separate hard disk than the web server is installed on.
 
 8.  Install GMS
 
-    Untar the GMS tar into the proper place.  
+    Untar the GMS tar into the proper place.
     Open gms/config/environment.rb in an editor
     Change the path for PEDIGREE_ROOT.
 
@@ -94,7 +94,7 @@ URL where you installed GMS and it should show you an index page.
 
 ----------------------------------------
 
-Capistrano set up requires that you have a shared directory in your deployment area.  
+Capistrano set up requires that you have a shared directory in your deployment area.
 The shared directory should have config, logs, pids, system.  Capistrano will create
 the bundle directory in there with the current deploy file.  The config needs to have
 the database.yml file that's appropriate for connecting to your database.  The other
@@ -105,3 +105,8 @@ config/user.rb
 set :user, "username"
 
 
+-----
+
+If installing mysql gem fails, then may need to specify the srcdir
+
+`gem install mysql2 -v '0.5.3' -- --srcdir=/usr/include/mysql`

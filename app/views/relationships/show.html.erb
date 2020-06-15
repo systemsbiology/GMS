@@ -49,7 +49,7 @@
 <br />
 
 <h1>Other Relationships involving <%= person_type %>: <%= @relationship.person.identifier %></h1>
-<% person_rels = Relationship.order(:relation_order).find_all_by_person_id(@relationship.person.id) %>
+<% person_rels = Relationship.order(:relation_order).where(person_id: @relationship.person.id) %>
 <% if person_rels.nil? or person_rels.size == 1 then %>
   <p>No other relationships for <%= @relationship.person.identifier %></p>
 <% else %>
@@ -83,7 +83,7 @@
 <br />
 <br />
 <h1>Other Relationships involving <%= relation_type %>: <%= @relationship.relation.identifier %></h1>
-<% relation_rels = Relationship.order(:relation_order).find_all_by_relation_id(@relationship.relation.id) %>
+<% relation_rels = Relationship.order(:relation_order).where(relation_id: @relationship.relation.id) %>
 <% if relation_rels.nil? or relation_rels.size == 1 then %>
   <p>No other relationships for <%= link_to @relationship.relation.identifier, @relationship.relation %></p>
 <% else %>

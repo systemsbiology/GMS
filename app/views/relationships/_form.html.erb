@@ -4,7 +4,7 @@
   <% sel_person = params[:person_id] || nil %>
   <% if sel_person.nil? and @relationship.person then sel_person = @relationship.person.id end %>
   <% person = sel_person.nil? ? nil : Person.find(sel_person)  %>
-  <% pedigree_id = person.nil? ? nil : person.pedigree_id %>
+  <% pedigree_id = person.nil? ? nil : person.pedigree.id %>
   <% if params[:pedigree_filter] then pedigree_id = params[:pedigree_filter][:id] end %>
   <% sel_relation = params[:relationship_relation_id] || nil %>
   <% if sel_relation.nil? and @relationship.relation then sel_relation = @relationship.relation.id end %>

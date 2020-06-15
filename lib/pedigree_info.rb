@@ -296,7 +296,7 @@ def ordered_pedigree(pedigree_id)
     #logger.debug("root person in ordered_pedigree is #{root_person.inspect}")
     logger.error("ERROR: no root person!") if root_person.nil?
     if (root_person.nil?) then
-      madeline_people = Pedigree.find(pedigree_id).people.order("isb_person_id")
+      madeline_people = Pedigree.where(id:pedigree_id).first.people.order("isb_person_id")
     else
       madeline_people = breadth_unrooted_traverse(root_person)
     end
@@ -305,9 +305,10 @@ def ordered_pedigree(pedigree_id)
   # if this is an unrelateds pedigree then breadth_traverse should return fewer people than
   # there are total, so we need to catch that and find the rest of the people - not all
   # pedigrees are named 'unrelateds' so we need this check here
-  unrelated_check = Pedigree.find(pedigree_id).people.order("isb_person_id")
+  unrelated_check = Pedigree.where(id: pedigree_id).first.people.order("isb_person_id").to_a
   if unrelated_check.size > madeline_people.size then
     # add people that are only in unrelated_check to madeline_people at the end of the array
+    logger.debug("unrelated check #{unrelated_check.inspect}")
     madeline_people.concat(unrelated_check.delete_if { |per| madeline_people.include?(per) })
   end
 
@@ -317,7 +318,7 @@ end
 
 # aka find founders, simply
 def parentless_people(pedigree_id)
-  ped = Pedigree.find(pedigree_id)
+  ped = Pedigree.where(id: pedigree_id)
   founders = Array.new
   ped.people.each do |person|
     parents = person.parents

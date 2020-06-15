@@ -36,7 +36,7 @@ class Sample < ActiveRecord::Base
     unless person.blank? or person[:id].nil?
       person_id = person[:id]
       unless person_id.blank?
-        -> { includes(:person).where('people.id = ?', person_id) }
+        joins(:person).where('people.id = ?', person_id)
       end
     end
   }

@@ -59,7 +59,7 @@ class SamplesController < ApplicationController
       end
     elsif params[:person] then
       @samples = Sample.has_person(params[:person])
-        .order_by_pedigree.paginate :page => params[:page], :per_page => 100
+        .order(:pedigree).paginate :page => params[:page], :per_page => 100
     elsif params[:problems] then
       #@samples = Sample.where( Acquisition.where( Acquisition.arel_table[:sample_id].eq(Sample.arel_table[:id]) ).exists.not ).paginate(:page => params[:page], :per_page => 10)
       @samples = Sample.where.not(id: Acquisition.pluck(:sample_id)).paginate(:page => params[:page], :per_page => 10)
@@ -241,7 +241,7 @@ class SamplesController < ApplicationController
   end
 
   def get_drop_down_samples_by_pedigree
-    options = Sample.find_all_by_pedigree_id(params[:pedigree_id]).collect { |x| "\"#{x.id}\" : \"#{x.full_identifier}\""}
+    options = Sample.where(pedigree_id: (params[:pedigree_id]).collect { |x| "\"#{x.id}\" : \"#{x.full_identifier}\""}
     render :text => "{#{options.join(",")}}"
   end
 

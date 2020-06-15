@@ -5,7 +5,7 @@ namespace :relationships do
     missing_marriages = get_missing_marriages
     if missing_marriages.empty? then
       puts "no missing marriages"
-    else 
+    else
       missing_marriages.each do |person, missings|
         missings.each do |missing, value|
           puts "missing relationship between #{Person.find(person).collaborator_id} and #{Person.find(missing).collaborator_id}"
@@ -22,7 +22,7 @@ namespace :relationships do
     if missing_marriages.empty? then
       puts "no missing marriages"
       exit
-    else 
+    else
       missing_marriages.each do |person, missing_spouses|
         missing_spouses.each do |missing_spouse, name|
           rel = Relationship.new
@@ -32,7 +32,7 @@ namespace :relationships do
 	  rel.name = name
 	  if rel.save
 	    puts "created relationship between #{Person.find(person).collaborator_id} (#{Person.find(person).isb_person_id}) and #{Person.find(missing_spouse).collaborator_id} (#{Person.find(missing_spouse).isb_person_id})"
-	  else 
+	  else
 	    raise "Error creating relationship"
 	  end
         end
@@ -70,7 +70,7 @@ namespace :relationships do
       # person is the wife of relation
       # person is the husband of relation
       if rel.relationship_type == 'undirected' then
- 
+
         if rel_types[rel.relationship_type] then
   	  if rel_types[rel.relationship_type][person_gender] then
             new_rel_name = rel_types[rel.relationship_type][person_gender]
@@ -82,14 +82,14 @@ namespace :relationships do
 	    else
 	      puts "failed to update relationship"
 	    end
-          else 
+          else
             puts "person gender was nil #{rel_types[rel.relationship_type]}"
   	  end
         else
           puts "ERROR: rel.relationship_type #{rel.relationship_type} not found in hash"
         end
-       
-           
+
+
       elsif rel.relationship_type == 'directed' then
 
         if rel_types[rel.relationship_type] then
@@ -104,10 +104,10 @@ namespace :relationships do
 	      else
 	        puts "failed to update relationship"
 	      end
-            else 
+            else
               puts "person gender was nil #{rel_types[rel.relationship_type]["person"]}"
   	    end
-          else 
+          else
             puts "person was nil #{rel_types[rel.relationship_type]}"
           end
         else
@@ -126,8 +126,8 @@ namespace :relationships do
   ###### METHODS #####
   ####################################################################################
 
-  def get_missing_marriages 
-    relationships = Relationship.find_all_by_relationship_type("undirected")
+  def get_missing_marriages
+    relationships = Relationship.where(relationship_type: "undirected")
     check_person = Hash.new
     relationships.each do |relationship|
       pid = relationship.person_id
@@ -150,7 +150,7 @@ namespace :relationships do
 #	  puts "making spouse entry #{spouse}"
 	  add[spouse] = Hash.new
 	  add[spouse][person] = name
-	else 
+	else
           if check_person[person][spouse] and check_person[spouse][person] then
 #	     puts "found reciprocal relationships for #{person} and #{spouse}"
   	  elsif check_person[person][spouse] and check_person[spouse][person].nil? then
@@ -184,7 +184,7 @@ namespace :relationships do
     missing_offspring = get_missing_offspring
     if missing_offspring.empty? then
       puts "no missing offspring"
-    else 
+    else
       missing_offspring.each do |person, missings|
         missings.each do |missing, value|
           puts "missing #{value} relationship between #{Person.find(person).collaborator_id} and #{Person.find(missing).collaborator_id}"
@@ -201,7 +201,7 @@ namespace :relationships do
     if missing_offspring.empty? then
       puts "no missing offspring"
       exit
-    else 
+    else
       missing_offspring.each do |person, missing_children|
         missing_children.each do |missing_child, rel_type|
           puts "processing person #{person.inspect} and child #{missing_child.inspect} with rel_type #{rel_type}"
@@ -232,14 +232,14 @@ namespace :relationships do
 
 	  puts "assigning relation_order #{rev_rel.relation_order} to relatino"
 	  rel.relation_order = rev_rel.relation_order
-  
+
           check = Relationship.where(:person_id => rel.person_id, :relation_id => rel.relation_id, :relationship_type => rel.relationship_type, :name => rel.name)
           #puts "check #{check.inspect}"
           raise "Found duplicate relationship.  debug the code or manually check the database!" unless check.empty?
 	  if rel.save
 	    puts "created relationship between #{Person.find(person).collaborator_id} (#{Person.find(person).isb_person_id}) and #{Person.find(missing_child).collaborator_id} (#{Person.find(missing_child).isb_person_id})"
             puts "rel #{rel.inspect}"
-	  else 
+	  else
 	    raise "Error creating relationship #{rel.inspect} #{rel.errors.inspect}"
 	  end
          puts "##############################"
@@ -258,11 +258,11 @@ namespace :relationships do
   # child relationships.  the first run gets the same sex parents and the
   # second run gets the opposite sex parents.  I could probably fix it, but why? ;)
   # this does not find cases where there are no relationships at all
-  def get_missing_offspring 
+  def get_missing_offspring
     puts "in missing_offspring"
     # get all of the parent relationships and add them to the hash
     # then get all of the child relationships and check that the ones in the parent exist there
-    parent_relationships = Relationship.find_all_by_relationship_type("parent")
+    parent_relationships = Relationship.where(relationship_type: "parent")
     check_parent = Hash.new
     parent_relationships.each do |relationship|
       pid = relationship.person_id
@@ -277,7 +277,7 @@ namespace :relationships do
     end
 
 
-    child_relationships = Relationship.find_all_by_relationship_type("child")
+    child_relationships = Relationship.where(relationship_type: "child")
     check_child = Hash.new
     child_relationships.each do |relationship|
       pid = relationship.person_id
@@ -301,7 +301,7 @@ namespace :relationships do
 	        puts "making child entry #{child}"
 	        add[child] = Hash.new
 	        add[child][person] = 'child'
-	     else 
+	     else
             if check_parent[person][child] and check_child[child][person] then
 	           puts "found reciprocal relationships for #{person} and #{child}"
   	        elsif check_parent[person][child] and check_child[child][person].nil? then

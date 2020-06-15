@@ -56,7 +56,7 @@ class Person < ActiveRecord::Base
     self.samples.each do |sample|
       sample.assays.each do |assay|
         assay.assemblies.each do |assembly|
-	  af = AssemblyFile.find_all_by_assembly_id_and_file_type_id(assembly.id, [1,8])
+	  af = AssemblyFile.where(assembly_id: assembly.id, file_type_id: [1,8])
 	  if af.count > 0
 	    self.complete = true
         self.save
