@@ -8,7 +8,7 @@ class PeopleController < ApplicationController
 #  load_and_authorize_resource
   respond_to :json
   caches_action :ped_info
-  cache_sweeper :people_sweeper
+  cache_sweeper :people_sweeper, only: [ :ped_info ]
   # GET /people
   # GET /people.xml
   def index
@@ -548,7 +548,7 @@ class PeopleController < ApplicationController
           end
         end
       elsif temp_obj.object_type == "Aliases" then
-        person = Person.has_pedigree(obj[0]).where(collaborator_id:obj[1])
+        person = Person.has_pedigree(obj[0]).where(collaborator_id:obj[1]).first
         if person.nil? then
             person = Person.new
             person.errors.add(:person_id,"not found for pedigree #{obj[0]} collaborator #{obj[1]}")

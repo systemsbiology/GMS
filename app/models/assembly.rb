@@ -175,8 +175,8 @@ class Assembly < ActiveRecord::Base
 
       if af.size == 0 then
         add[file_path] = Hash.new
-	add[file_path]["type"] = file_type
-	add[file_path]["vendor"] = file_vendor
+      	add[file_path]["type"] = file_type
+	      add[file_path]["vendor"] = file_vendor
       end
 
     end

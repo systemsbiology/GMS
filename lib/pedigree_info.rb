@@ -318,7 +318,7 @@ end
 
 # aka find founders, simply
 def parentless_people(pedigree_id)
-  ped = Pedigree.where(id: pedigree_id)
+  ped = Pedigree.find(pedigree_id)
   founders = Array.new
   ped.people.each do |person|
     parents = person.parents

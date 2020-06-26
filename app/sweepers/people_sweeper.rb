@@ -3,6 +3,7 @@ class PeopleSweeper < ActionController::Caching::Sweeper
 
     # expire people ped_info
     def after_save(person)
-        expire_action(:controller => 'people', :action => :ped_info, :format => 'json')
+        @controller ||= ActionController::Base.new
+        expire_action(:controller: 'people', :action: :ped_info, :format: 'json')
     end
 end
