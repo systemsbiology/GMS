@@ -988,13 +988,13 @@ class PeopleController < ApplicationController
   end # end process fgi manifest definition
 
   def get_drop_down_people_by_pedigree
-    options = Person.has_pedigree(params[:pedigree_id]).collect { |per| "\"#{per.id}\" : \"#{per.full_identifier}\"" }
-    render :text => "{#{options.join(",")}}"
+    options = Person.has_pedigree(params[:pedigree_id]).includes(:pedigree, :person_aliases).collect { |per| "\"#{per.id}\" : \"#{per.full_identifier}\"" }
+    render plain: "{#{options.join(",")}}"
   end
 
   def ped_info
     ped_info = Hash.new
-    Person.all.each do |p|
+    Person.includes(:pedigree, :person_aliases).all.each do |p|
       ped = p.pedigree
       logger.error("no pedigree for person #{p.inspect}") if ped.nil?
       next if ped.nil?

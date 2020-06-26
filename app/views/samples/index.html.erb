@@ -1,7 +1,7 @@
 <script>
-  $(document).ready(function() { 
-    $("table").tablesorter({
-      textExtraction: function(node) {
+  $(document).ready(function() { $(".tablesorter").tablesorter({
+    "theme": "blue",
+    textExtraction: function(node) {
         if (node.innerHTML.indexOf("isb_sample_") != -1){
 	  var id = node.childNodes[0].id;
 	  return id;

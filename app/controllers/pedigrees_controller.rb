@@ -13,19 +13,19 @@ class PedigreesController < ApplicationController
   # GET /pedigrees
   # GET /pedigrees.xml
   def index
-    @pedigrees = Pedigree.includes(:study).order('studies.name', 'pedigrees.name')
+    @pedigrees = Pedigree.includes(:study, :people).order('studies.name', 'pedigrees.name')
     if params[:name] or  params[:pedigree_name] then
-      @pedigrees = Pedigree.where(:name => [params[:name] , params[:pedigree_name]] ).paginate :page => params[:page], :per_page => 100
+      @pedigrees = Pedigree.includes(:study, :people).where(:name => [params[:name] , params[:pedigree_name]] ).paginate :page => params[:page], :per_page => 100
     elsif params[:id]
-      @pedigrees = Pedigree.where("pedigrees.id = ? or pedigrees.isb_pedigree_id = ?",
+      @pedigrees = Pedigree.includes(:study, :people).where("pedigrees.id = ? or pedigrees.isb_pedigree_id = ?",
                                   params[:id],params[:id]).paginate :page => params[:page], :per_page => 100
     else
       respond_to do |format|
         format.html {
-          @pedigrees = Pedigree.includes(:study).order('studies.name', 'pedigrees.name')
+          @pedigrees = Pedigree.includes(:study, :people).order('studies.name', 'pedigrees.name')
         }
         format.any{
-          @pedigrees = Pedigree.includes(:study).order('pedigrees.id')
+          @pedigrees = Pedigree.includes(:study, :people).order('pedigrees.id')
         }
       end
     end

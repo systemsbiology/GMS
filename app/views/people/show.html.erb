@@ -64,9 +64,6 @@
 <br />
 <h1>Samples</h1>
 <% if @person.samples.size > 0 %>
-<script>
-  $(document).ready(function() { setupTablesorter() });
-</script>
 <table class="tablesorter">
   <thead>
   <tr>
@@ -109,10 +106,6 @@
 <br />
 <h1>Assays</h1>
 <% if @person.samples.size > 0 %>
-
-<script>
-  $(document).ready(function() { setupTablesorter() });
-</script>
 <table class="tablesorter">
   <thead>
   <tr>
@@ -160,9 +153,6 @@
 <h1>Assemblies</h1>
 <% if @person.samples.size > 0 %>
 
-<script>
-  $(document).ready(function() { setupTablesorter() });
-</script>
 <table class="tablesorter">
   <thead>
   <tr>
@@ -238,3 +228,6 @@
 
 <%= link_to "Add Relationship for current person #{@person.identifier}", new_relationship_path(:person_id => @person, :pedigree_filter => {:id => @person.pedigree}) %>
 <br /><br />
+<script>
+  $(document).ready(function() { $(".tablesorter").tablesorter({"theme": "blue"}); });
+</script>

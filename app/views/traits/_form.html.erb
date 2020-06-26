@@ -3,7 +3,7 @@
 
   <div class="field">
     <%= f.label :person_id %><br />
-    <%= f.collection_select(:person_id, Person.all(:include => { :membership => :pedigree} , :order => ['pedigrees.name', 'collaborator_id']), :id, :full_identifier, { :prompt => "-Select Person", :selected => params[:person_id]}) %>
+    <%= f.collection_select(:person_id, Person.includes(:pedigree, :person_aliases).order('pedigrees.name', 'collaborator_id'), :id, :full_identifier, { :prompt => "-Select Person", :selected => params[:person_id]}) %>
   </div>
   <div class="field">
     <%= f.label :phenotype_id %><br />

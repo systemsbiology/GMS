@@ -7,8 +7,16 @@
     <%= collection_select(:pedigree, :id, @pedigrees, :id, :name, options = {
       :selected => pedigree_id, :include_blank => "-Select the pedigree this sample belongs to" }) %>
   </div>
-  <script>
 
+  <div class="field">
+    <%= f.label :person %><br />
+    <%= select("person", "id", ["-Select Pedigree"]) %>
+  </div>
+
+<script>
+console.log("loading")
+document.addEventListener("turbolinks:load", function(){
+    console.log("after page load")
     $("#pedigree_id").change(function() {
       console.log("CHANGE FUNCTION")
       var url = '/people/get_drop_down_people_by_pedigree';
@@ -18,8 +26,6 @@
             type: 'GET',
             url: url
       });
-      request.complete(
-      );
 
       request.done( function(responseData) {
           $("#person_id").children().remove();
@@ -43,9 +49,5 @@
       });
     }
     ).trigger('change');
-
+});
   </script>
-  <div class="field">
-    <%= f.label :person %><br />
-    <%= select("person", "id", ["-Select Pedigree"]) %>
-  </div>

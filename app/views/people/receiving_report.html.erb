@@ -1,5 +1,5 @@
 <script>
-  $(document).ready(function() { setupTablesorter() });
+  $(document).ready(function() { $(".tablesorter").tablesorter({"theme": "blue"}); });
 </script>
 <h1>Receiving Log for <%= @pedigree.kind_of?(Array) ? 'all pedigrees' : @pedigree.name %></h1>
 <%= render "partials/receiving_log_filter" %>
@@ -85,7 +85,7 @@
 		     elsif sample.status == 'pending' %>#CC6600"><span style="color: #CC6600;">P</span><%
 		     elsif sample.status == 'passed qc' %>#CC6600"><span style="color: #CC6600;">P</span><%
 		     elsif sample.status == 'failed qc' || sample.status == 'Failed QC' || sample.status == 'failed' %>red"> <span style="color: red;">F</span><%
-		     else %>white">ERROR WITH SAMPLE STATUS: <%= sample.status %><% 
+		     else %>white">ERROR WITH SAMPLE STATUS: <%= sample.status %><%
 		   end
 	         end %>&nbsp;</td>
             <td><%= sample.sample_vendor_id %></td>

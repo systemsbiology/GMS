@@ -85,9 +85,6 @@
 <% end %>
 <h1>Listing assays</h1>
 <% if @sample.assays.size > 0 %>
-<script>
-  $(document).ready(function() { setupTablesorter() });
-</script>
 <table class="tablesorter">
   <thead>
   <tr>
@@ -135,9 +132,6 @@
 
 <h1>Listing assemblies</h1>
 <% if @sample.assays.size > 0 %>
-<script>
-  $(document).ready(function() { setupTablesorter() });
-</script>
 <table class="tablesorter">
   <thead>
   <tr>
@@ -174,3 +168,6 @@
 <p>No assemblies for this sample</p>
 <% end %>
 <%= link_to 'Add new assembly', new_assembly_path(:sample_id => @sample) %>
+<script>
+  $(document).ready(function() { $(".tablesorter").tablesorter({"theme": "blue"}); });
+</script>

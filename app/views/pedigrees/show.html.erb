@@ -1,6 +1,6 @@
 <script>
   $(document).ready(function() {
-    $(".tablesorter").tablesorter({widgets: ['zebra']});
+    $(".tablesorter").tablesorter({widgets: ['zebra'], theme: "blue"});
   });
 </script>
 
@@ -88,26 +88,16 @@
 	      <td><%= person.samples.first.customer_sample_id %></td>
 	    <% end %>
 	  <% else %>
-	    <td><%= image_tag('/images/file_location.png', :size => "20x20", :onmouseover => "$('#person_#{person.id}').poshytip('show')", :onmouseout => "$('#person_#{person.id}').poshytip('hide')", :id => "person_#{person.id}") %><%= link_to 'Multiple Samples', samples_path(:person => {:id => person}), {:onmouseover => "$('#person_#{person.id}').poshytip('show')", :onmouseout => "$('#person_#{person.id}').poshytip('hide')" } %></td>
-            <script>
-	      $("#person_<%= person.id %>").poshytip({
-	        content: '<%= person.samples.map(&:sample_vendor_id).join(", ") %>',
-		className: 'tip-yellow',
-		showOn: 'none',
-		alignTo: 'target',
-		alignX: 'inner-left'
-	      });
-	     </script>
-             <td><%= image_tag('/images/file_location.png', :size => "20x20", :onmouseover => "$('#person_customer_#{person.id}').poshytip('show')", :onmouseout => "$('#person_customer_#{person.id}').poshytip('hide')", :id => "person_customer_#{person.id}") %><%= link_to 'Multiple Samples', samples_path(:person => {:id => person}), {:onmouseover => "$('#person_customer_#{person.id}').poshytip('show')", :onmouseout => "$('#person_customer_#{person.id}').poshytip('hide')" } %></td>
-            <script>
-	      $("#person_customer_<%= person.id %>").poshytip({
-	        content: '<%= person.samples.map(&:customer_sample_id).collect! {|obj| obj.nil? ? 'NA' : obj }.join(", ") %>',
-	        className: 'tip-yellow',
-		showOn: 'none',
-		alignTo: 'target',
-		alignX: 'inner-left'
-	      });
-	     </script>
+      <td><%= image_tag('file_location.png', :size => "20x20", :title => person.samples.map(&:sample_vendor_id).join(", "),
+            data: { toggle: "tooltip", placement: "right", trigger: 'click hover focus'},
+            :id => "person_#{person.id}") %>
+            <%= link_to 'Multiple Samples', samples_path(:person => {:id => person}) %>
+      </td>
+      <td><%= image_tag('file_location.png', :size => "20x20",
+          :title => person.samples.map(&:customer_sample_id).collect! {|obj| obj.nil? ? 'NA' : obj }.join(", "),
+          data: { toggle: "tooltip", placement: "right", trigger: 'click hover focus'},
+          :id => "person_customer_#{person.id}") %>
+      <%= link_to 'Multiple Samples', samples_path(:person => {:id => person}) %></td>
 	  <% end %>
 	<% else %>
 	  <td>NA</td>

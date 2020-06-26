@@ -6,6 +6,7 @@ table.tablesorter {
 	font-size: 8pt;
 	width: 80%;
 	text-align: left;
+	border-collapse: separate;
 }
 table.tablesorter thead tr th, table.tablesorter tfoot tr th {
 	background-color: #e6EEEE;

@@ -6,7 +6,7 @@
   </div>
   <div class="field">
     <%= f.label :person_id %><br />
-    <%= f.collection_select(:person_id, Person.all, :id, :full_identifier, { :prompt => "-Select Person"}, :selected => @membership.person_id) %>
+    <%= f.collection_select(:person_id, Person.includes(:pedigree, :person_aliases), :id, :full_identifier, { :prompt => "-Select Person"}, :selected => @membership.person_id) %>
   </div>
   <div class="field">
     <%= f.label :draw_duplicate %><br />

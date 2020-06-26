@@ -1,5 +1,5 @@
 <script>
-  $(document).ready(function() { setupTablesorter() });
+  $(document).ready(function() { $(".tablesorter").tablesorter({"theme": "blue"}); });
 </script>
 <% if !@relationships.nil? and @relationships.size > 0 %>
 <table class="tablesorter">

@@ -10,7 +10,7 @@ class AssembliesController < ApplicationController
     #    @assembly = @assembly.find(:all, :include => { :assay => { :sample => { :person => :pedigree } } },
     #                                        :conditions => [ 'pedigrees.id = ?', params[:pedigree_filter][:id] ]) if (params[:pedigree_filter])
 
-    @assemblies = Assembly.has_pedigree(params[:pedigree_filter])
+    @assemblies = Assembly.includes(:pedigree, assay: :sample).has_pedigree(params[:pedigree_filter])
       .paginate :page => params[:page], :per_page => 100
     if params[:name] or params[:assembly_name] then
       @assemblies = Assembly.where(:name => [params[:name] , params[:assembly_name]] )
@@ -163,7 +163,7 @@ class AssembliesController < ApplicationController
       @errors = assembly.ensure_files_up_to_date
     end
 
-    expire_action(:controller => '/assembly_files', :action => :ped_info, :format => 'json')
+    expire_action(controller: '/assembly_files', action: :ped_info, format: 'json')
 
     respond_to do |format|
       format.html

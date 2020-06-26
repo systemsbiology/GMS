@@ -58,8 +58,9 @@ class SamplesController < ApplicationController
         .order('samples.id').paginate :page => params[:page], :per_page => 100
       end
     elsif params[:person] then
-      @samples = Sample.has_person(params[:person])
-        .order(:pedigree).paginate :page => params[:page], :per_page => 100
+      logger.debug("in samples by person #{params[:person]}")
+      @samples = Sample.includes(person: :pedigree).has_person(params[:person])
+        .order('pedigrees.name').paginate :page => params[:page], :per_page => 100
     elsif params[:problems] then
       #@samples = Sample.where( Acquisition.where( Acquisition.arel_table[:sample_id].eq(Sample.arel_table[:id]) ).exists.not ).paginate(:page => params[:page], :per_page => 10)
       @samples = Sample.where.not(id: Acquisition.pluck(:sample_id)).paginate(:page => params[:page], :per_page => 10)
@@ -78,7 +79,6 @@ class SamplesController < ApplicationController
       end
 
     end
-
     respond_to do |format|
       format.html # index.html.erb
       format.xml  { render :xml => @samples }
@@ -242,7 +242,7 @@ class SamplesController < ApplicationController
 
   def get_drop_down_samples_by_pedigree
     # returns sample id : person full_identifier
-    samples = Sample.where(pedigree_id: params[:pedigree_id])
+    samples = Sample.includes(:person, :pedigree, :person_aliases).where(pedigree_id: params[:pedigree_id])
     options = samples.collect { |x| "\"#{x.id}\" : \"#{x.person.full_identifier}\""}
     render :text => "{#{options.join(",")}}"
   end
