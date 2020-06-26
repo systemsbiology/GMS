@@ -1,5 +1,0 @@
-The Genome Management System (GMS) is a Ruby on Rails website with a MySQL backend running 
-on Apache using Passenger that helps to organize the metadata for whole genome sequencing.  
-It is currently designed and set up to support Complete Genomics files, but has some 
-support for generic VCF files.  An associated pipeline to load data into GMS and an 
-associated perl module to retrieve data from GMS will be available soon.

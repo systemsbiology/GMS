@@ -8,6 +8,7 @@ class PeopleController < ApplicationController
 #  load_and_authorize_resource
   respond_to :json
   caches_action :ped_info
+  cache_sweeper :people_sweeper, only: [ :ped_info ]
   # GET /people
   # GET /people.xml
   def index
@@ -21,7 +22,7 @@ class PeopleController < ApplicationController
           .find(:all, :order => [ 'people.id'])
       }
     end
-    
+
 
     respond_to do |format|
       format.html # index.html.erb
@@ -111,7 +112,6 @@ class PeopleController < ApplicationController
 #        membership.pedigree_id = params[:pedigree][:id]
 #            membership.person_id = @person.id
 #        membership.save
-        expire_action :action => :ped_info
         format.html { redirect_to(@person, :notice => 'Person was successfully created.') }
         format.xml  { render :xml => @person, :status => :created, :location => @person }
       else
@@ -176,10 +176,12 @@ class PeopleController < ApplicationController
   def receiving_report
     if params[:pedigree_filter] and params[:pedigree_filter][:id] != '' then
       @pedigree = Pedigree.find(params[:pedigree_filter][:id])
-      @people = Person.find(:all, :include => [ {:samples =>  :assays }, :pedigree], :conditions => { 'pedigrees.id' => @pedigree.id, 'planning_on_sequencing' => 1 })
+      @people = Person.where(pedigree_id: @pedigree.id, 'planning_on_sequencing': 1)
+        .includes({samples:  :assays}, :pedigree)
     else
       @pedigree = Pedigree.order(:name)
-      @people = Person.find(:all, :include => [ {:samples =>  :assays }, :pedigree], :conditions => { 'planning_on_sequencing' => 1 }, :order => [ 'pedigrees.name','people.collaborator_id','samples.status'])
+      @people = Person.includes({samples: :assays}, :pedigree).where('planning_on_sequencing': 1)
+        .order('pedigrees.name','people.collaborator_id','samples.status')
     end
 
     respond_to do |format|
@@ -225,7 +227,7 @@ class PeopleController < ApplicationController
 
     spreadsheet_type = ''
     begin
-      if params[:spreadsheet][:type] 
+      if params[:spreadsheet][:type]
         spreadsheet_type = params[:spreadsheet][:type]
       else
         flash[:error] = "Spreadsheet type must be selected"
@@ -258,7 +260,7 @@ class PeopleController < ApplicationController
       # render should already have been called in the process_XXXX method
       return
     end
-    
+
     # need to add people, samples, relationships - don't track errors
     rc = 0
     @trans_id = Time.now.to_i + Random.rand(1000000)
@@ -314,7 +316,7 @@ class PeopleController < ApplicationController
   def write_temp_object(trans_id, obj_type, object, order)
     to = TempObject.new
     to.object_type = obj_type.capitalize!
-    to.trans_id = trans_id 
+    to.trans_id = trans_id
     to.added = Time.now
     to.object = Marshal.dump(object)
     to.object_order = order
@@ -384,11 +386,11 @@ class PeopleController < ApplicationController
     end
 
     # process the rest of the objects
-    temp_objects = TempObject.find(:all, :conditions => {:trans_id => trans_id}, :order => "object_order")
+    temp_objects = TempObject.where(trans_id: trans_id).order("object_order")
     #logger.debug("temp objects are #{temp_objects.inspect}")
     temp_objects.each do |temp_obj|
       # need the begin rescue block because Person includes pedigree information and it needs to lazy load the pedigree class otherwise there is an error
-      begin 
+      begin
         obj_array = Marshal.load(temp_obj.object)
       rescue ArgumentError => error
         lazy_load ||= Hash.new {|hash, hash_key| hash[hash_key] = true; false}
@@ -413,14 +415,14 @@ class PeopleController < ApplicationController
         rel_order = obj[4]
 
         rel = Relationship.new
-        person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(person_collaborator_id)
+        person = Person.has_pedigree(pedigree_id).where(collaborator_id: person_collaborator_id).first
         if person.nil? then
           rel.errors.add(:person_id, "not found for #{person_collaborator_id} in pedigree #{pedigree_id}")
           @errors.push(["relationship", rel, rel.errors])
           next
         end
-        relation = Person.has_pedigree(pedigree_id).find_by_collaborator_id(relation_collaborator_id)
-        if relation.nil? then 
+        relation = Person.has_pedigree(pedigree_id).where(collaborator_id: relation_collaborator_id).first
+        if relation.nil? then
           rel.errors.add(:person_id, "not found for #{relation_collaborator_id}")
           @errors.push(["relationship", rel, rel.errors])
           next
@@ -486,12 +488,12 @@ class PeopleController < ApplicationController
             rel.errors.add(:relationship,e.message)
             @errors.push(["relationship",rel, rel.errors])
           end
-        end 
+        end
       elsif temp_obj.object_type == "Membership" then
         ped = Pedigree.find(obj[0])
         @pedigree_id = ped.id
         #logger.debug("processing membership information for pedigree #{ped.inspect}")
-        person = Person.find_by_collaborator_id_and_pedigree_id(obj[1], obj[0])
+        person = Person.where(collaborator_id: obj[1], pedigree_id: obj[0]).first
           m = Membership.new
         if person.nil? then
           m.errors.add(:person_id,"not found for #{obj[1]} in pedigree #{obj[0]}")
@@ -508,9 +510,9 @@ class PeopleController < ApplicationController
       elsif temp_obj.object_type == "Acquisition" then
         pedigree_id = obj[0]
         @pedigree_id = pedigree_id
-        person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(obj[1])
-        sample = Sample.find_by_sample_vendor_id_and_pedigree_id(obj[2], obj[0])
-        logger.debug("acquisition debug says pedigree #{pedigree_id.inspect} person #{person.inspect} sample #{sample.inspect}")
+        person = Person.has_pedigree(pedigree_id).where(collaborator_id: obj[1]).first
+        sample = Sample.where(sample_vendor_id: obj[2], pedigree_id: obj[0]).first
+        #logger.debug("acquisition debug says pedigree #{pedigree_id.inspect} person #{person.inspect} sample #{sample.inspect}")
         acq = Acquisition.new
         if person.nil? then
           acq.errors.add(:person_id,"not found for #{obj[0]}")
@@ -527,11 +529,11 @@ class PeopleController < ApplicationController
             @errors.push(["acquisition", acq, acq.errors])
           end
         end
-      elsif temp_obj.object_type == "Diagnosis" then 
+      elsif temp_obj.object_type == "Diagnosis" then
         condition = Condition.find(obj[0])
         pedigree_id = obj[1]
         @pedigree_id = pedigree_id
-        person = Person.has_pedigree(pedigree_id).find_by_collaborator_id(obj[2])
+        person = Person.has_pedigree(pedigree_id).where(collaborator_id: obj[2]).first
             diagnosis = Diagnosis.new
         if person.nil? then
           diagnosis.errors.add(:person_id,"not found for condition #{obj[0]} pedigree #{pedigree_id} collaborator_id #{obj[2]}")
@@ -546,7 +548,7 @@ class PeopleController < ApplicationController
           end
         end
       elsif temp_obj.object_type == "Aliases" then
-        person = Person.has_pedigree(obj[0]).find_by_collaborator_id(obj[1])
+        person = Person.has_pedigree(obj[0]).where(collaborator_id:obj[1]).first
         if person.nil? then
             person = Person.new
             person.errors.add(:person_id,"not found for pedigree #{obj[0]} collaborator #{obj[1]}")
@@ -579,9 +581,9 @@ class PeopleController < ApplicationController
         end
       elsif temp_obj.object_type == "Phenotypes" then
         phenotype = Phenotype.find(obj[0])
-        person = Person.has_pedigree(obj[1]).find_by_collaborator_id(obj[2])
+        person = Person.has_pedigree(obj[1]).where(collaborator_id:obj[2]).first
         @pedigree_id = person.pedigree_id
-        trait = Trait.find_by_person_id_and_phenotype_id_and_trait_information(person.id, phenotype.id,obj[3])
+        trait = Trait.where(person_id: person.id, phenotype_id: phenotype.id, trait_information: obj[3]).first
         #logger.debug("phenotypes debug person #{person.inspect} trait #{trait.inspect}")
         if trait.nil? then
           trait = Trait.new
@@ -692,7 +694,7 @@ class PeopleController < ApplicationController
             row.each do |cell|
                 if cell.class == Spreadsheet::Formula then
                     printable_row << cell.value
-                else 
+                else
                     printable_row << cell
                 end
             end
@@ -710,22 +712,25 @@ class PeopleController < ApplicationController
         end
         next if row[headers["Customer Subject ID"]] == "NA19240" # skip example row
 
-        # create the person information 
+        # create the person information
         # need to check both customer_subject_id and customer_sample_id in case they're
         # trying to switch which one is which in the database... /facepalm
         customer_subject_id = row[headers["Customer Subject ID"]]
-        if (customer_subject_id.is_a? Float) then 
-          customer_subject_id = customer_subject_id.to_i
+        if (customer_subject_id.is_a? Float) then
+          customer_subject_id = customer_subject_id.to_i.to_s
+        end
+        if (customer_subject_id.match(/ /)) then
+            customer_subject_id.tr(" ","_")
         end
 
         customer_sample_id = row[headers["Customer Sample ID"]]
         # use customer subject_id to find the person with the correct pedigree
-        p = Person.has_pedigree(pedigree.id).find_by_collaborator_id(customer_subject_id) 
+        p = Person.has_pedigree(pedigree.id).find_by_collaborator_id(customer_subject_id)
         # use the customer_sample_id to find the person with the correct pedigree
         if (p.nil?) then
             p = Person.has_pedigree(pedigree.id).find_by_collaborator_id(customer_sample_id)
         end
-        # use the customer_subject_id but don't trust that there's an entry in the 
+        # use the customer_subject_id but don't trust that there's an entry in the
         # memberships table since this sometimes errs out, but then test that
         # the pedigree id is the same
         if (p.nil?) then
@@ -759,8 +764,8 @@ class PeopleController < ApplicationController
             new_aliases = Array.new
             person_aliases.each do |pa|
               peral = PersonAlias.find_by_person_id_and_value_and_alias_type(p.id, pa, "collaborator_id")
-              if peral.nil? then 
-                new_aliases.push(pa)
+              if peral.nil? then
+                new_aliases.push(pa.to_s)
               end
             end
             logger.debug("new aliasses #{new_aliases.inspect}")
@@ -779,7 +784,7 @@ class PeopleController < ApplicationController
         p.pedigree_id = pedigree.id
 
         if !condition.nil? and !condition.blank? then
-            # add diagnosis for this person if affected 
+            # add diagnosis for this person if affected
             affected_status = row[headers["Affected Status"]]
             if affected_status.nil? then
                 diag = Diagnosis.new
@@ -810,9 +815,9 @@ class PeopleController < ApplicationController
                 if pheno.match(/=/) then
                   (pheno, pheno_info) = pheno.split(/=/)
                 end
-                phenotype = Phenotype.find_by_name(pheno)
+                phenotype = Phenotype.where(name: pheno).first
                 if phenotype.nil? then
-                    phenotype = Phenotype.find_by_tag(pheno)
+                    phenotype = Phenotype.where(tag: pheno).first
                 end
                 if phenotype.nil? or phenotype.to_s.match('NA') then
                     phen = Phenotype.new
@@ -830,7 +835,7 @@ class PeopleController < ApplicationController
         mother_id = mother_id.to_i if (mother_id.is_a? Float)
         father_id = row[headers["Father's Subject ID"]]
         father_id = father_id.to_i if (father_id.is_a? Float)
-    
+
         child_order = row[headers["Child Order"]] ? row[headers["Child Order"]].to_i : 1
         r = Relationship.new
         if mother_id == father_id then
@@ -843,7 +848,7 @@ class PeopleController < ApplicationController
                 relationships.push([pedigree.id, mother_id, customer_subject_id, 'mother', child_order])
             end
             unless father_id.nil? or father_id.to_s.match('NA') or father_id.to_s.empty? then
-                relationships.push([pedigree.id, father_id, customer_subject_id, 'father', child_order]) 
+                relationships.push([pedigree.id, father_id, customer_subject_id, 'father', child_order])
             end
         end
 
@@ -854,7 +859,7 @@ class PeopleController < ApplicationController
                 relationships.push([pedigree.id, customer_subject_id, mz_twin_id, 'monozygotic twin','1'])
             end
         elsif headers["Twin Subject ID"] and !row[headers["Twin Subject ID"]].nil? then
-            if !row[headers["Twin Subject ID"]].nil? and !row[headers["Twin Type"]].nil? then 
+            if !row[headers["Twin Subject ID"]].nil? and !row[headers["Twin Type"]].nil? then
                 if (row[headers["Twin Type"]] != 'mz' and row[headers["Twin Type"]] != 'dz' and row[headers["Twin Type"]] != 'monozygotic' and row[headers["Twin Type"]] != 'dizygotic' ) then
                     r.errors.add(:parent_id, "Twin Type must be 'mz', 'dz', 'monozygotic', or 'dizygotic'")
                 else
@@ -866,7 +871,7 @@ class PeopleController < ApplicationController
                         relationships.push([pedigree.id, customer_subject_id, twin_id, twin_type, '1'])
                     end
                 end
-            else 
+            else
                 r.errors.add(:parent_id, "Twin Subject ID requires a Twin Type")
             end
         end
@@ -880,20 +885,20 @@ class PeopleController < ApplicationController
             #this person has a spouse and they are the X spouse that they've had
             relationships.push([pedigree.id, customer_subject_id, spouse_id, 'undirected', spouse_order])
 
-            if r.errors.size > 0 then 
+            if r.errors.size > 0 then
                 errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
                 errors["#{counter}"]["relationships"] = r.errors
             end
         end
 
         vendor_id = row[headers["Sequencing Sample ID"]]
-        if !vendor_id.nil? then  
+        if !vendor_id.nil? then
             # create the sample information
-            s = Sample.find(:first, :conditions => {:sample_vendor_id => vendor_id, :pedigree_id =>pedigree.id}) || Sample.new
+            s = Sample.find_or_initialize_by(sample_vendor_id: vendor_id, pedigree_id: pedigree.id)
             source = row[headers["Sample Source"]]
             s.customer_sample_id = customer_sample_id # don't check for duplicates, just add it and they can change it later
 
-            sample_type = SampleType.find_by_name(source)
+            sample_type = SampleType.where(name: source).first
             if sample_type.nil? then
                 s.errors.add(:sample_type_id, "Cannot find sample_type for #{source} for sample for person #{p.collaborator_id}.  Add this as a sample type before importing this spreadsheet")
                 errors["#{counter}"] = Hash.new if errors["#{counter}"].nil?
@@ -912,7 +917,7 @@ class PeopleController < ApplicationController
             s.pedigree_id = pedigree.id
 
             acquisitions.push([pedigree.id, customer_subject_id, vendor_id])
- 
+
             # handle volume, concentration, quantity
             volume = row[headers["Volume"]]
             concentration = row[headers["Concentration"]]
@@ -925,7 +930,7 @@ class PeopleController < ApplicationController
             status = row[headers["Sample Status"]]
             if status.nil? or status.blank? then
                 s.status = 'submitted'
-            else 
+            else
                 s.status = status
             end
 
@@ -951,7 +956,7 @@ class PeopleController < ApplicationController
             row.each do |cell|
                 if cell.class == Spreadsheet::Formula then
                     printable_row << cell.value
-                else 
+                else
                     printable_row << cell
                 end
             end
@@ -983,19 +988,22 @@ class PeopleController < ApplicationController
   end # end process fgi manifest definition
 
   def get_drop_down_people_by_pedigree
-    options = Person.has_pedigree(params[:pedigree_id]).collect { |per| "\"#{per.id}\" : \"#{per.full_identifier}\"" }
-    render :text => "{#{options.join(",")}}"
+    options = Person.has_pedigree(params[:pedigree_id]).includes(:pedigree, :person_aliases).collect { |per| "\"#{per.id}\" : \"#{per.full_identifier}\"" }
+    render plain: "{#{options.join(",")}}"
   end
 
   def ped_info
     ped_info = Hash.new
-    Person.all.each do |p|
+    Person.includes(:pedigree, :person_aliases).all.each do |p|
       ped = p.pedigree
       logger.error("no pedigree for person #{p.inspect}") if ped.nil?
       next if ped.nil?
-      ped_info[p.collaborator_id] = ped.isb_pedigree_id
-      ped_info[p.isb_person_id] = ped.isb_pedigree_id
-      ped_info[p.full_identifier] = ped.isb_pedigree_id
+      ped_info[p.collaborator_id] = Array.new unless ped_info[p.collaborator_id]
+      ped_info[p.collaborator_id].push(ped.isb_pedigree_id)
+      ped_info[p.isb_person_id] = Array.new unless ped_info[p.isb_person_id]
+      ped_info[p.isb_person_id].push(ped.isb_pedigree_id)
+      ped_info[p.full_identifier] = Array.new unless ped_info[p.full_identifier]
+      ped_info[p.full_identifier].push(ped.isb_pedigree_id)
     end
 
     respond_to do |format|

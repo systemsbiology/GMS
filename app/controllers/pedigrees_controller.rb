@@ -8,25 +8,24 @@ class PedigreesController < ApplicationController
   unloadable
   respond_to :json
   caches_page :all_pedigrees
-  
+  cache_sweeper :pedigree_sweeper
+
   # GET /pedigrees
   # GET /pedigrees.xml
   def index
-    @pedigrees = Pedigree.find(:all, :include => :study, :order => ['studies.name', 'pedigrees.name'])
+    @pedigrees = Pedigree.includes(:study, :people).order('studies.name', 'pedigrees.name')
     if params[:name] or  params[:pedigree_name] then
-      @pedigrees = Pedigree.where(:name => [params[:name] , params[:pedigree_name]] ).paginate :page => params[:page], :per_page => 100
+      @pedigrees = Pedigree.includes(:study, :people).where(:name => [params[:name] , params[:pedigree_name]] ).paginate :page => params[:page], :per_page => 100
     elsif params[:id]
-      @pedigrees = Pedigree.where("pedigrees.id = ? or pedigrees.isb_pedigree_id = ?", 
+      @pedigrees = Pedigree.includes(:study, :people).where("pedigrees.id = ? or pedigrees.isb_pedigree_id = ?",
                                   params[:id],params[:id]).paginate :page => params[:page], :per_page => 100
     else
       respond_to do |format|
         format.html {
-          @pedigrees = Pedigree.find(:all, :include => :study, 
-                                     :order => ['studies.name', 'pedigrees.name'])
+          @pedigrees = Pedigree.includes(:study, :people).order('studies.name', 'pedigrees.name')
         }
         format.any{
-          @pedigrees = Pedigree.find(:all, :include => :study, 
-                                     :order => ['pedigrees.id'])
+          @pedigrees = Pedigree.includes(:study, :people).order('pedigrees.id')
         }
       end
     end
@@ -36,12 +35,15 @@ class PedigreesController < ApplicationController
       format.json { respond_with @pedigrees }
     end
   end
-  
+
   # GET /pedigrees/1
   # GET /pedigrees/1.xml
   def show
     @pedigree = Pedigree.find(params[:id])
-    @person_relationships = Relationship.order(:person_id).order(:relation_order).display_filter.find_all_by_person_id(@pedigree.people.map(&:id))
+    people_ids = @pedigree.people.map(&:id)
+
+    @person_relationships = Relationship.display_filter.order(:person_id, :relation_order)
+      .where("person_id in (?)", @pedigree.people.map(&:id))
 
 #    @person_relationships = Relationship.order(:person_id).find_all_by_person_id(@pedigree.people.map(&:id))
 #    @relation_relationships = Relationship.find_all_by_relation_id(@pedigree.people.map(&:id))
@@ -168,7 +170,7 @@ class PedigreesController < ApplicationController
     end
 
     respond_to do |format|
-      format.html { 
+      format.html {
         # add the data_store to the zip file
         data_store = pedindex('FILE','TAG')
         data_store_name = PEDIGREE_DATA_STORE # from config/environment.rb
@@ -179,19 +181,19 @@ class PedigreesController < ApplicationController
           f.puts json_index
         end
 
-        download_zip("pedigrees.zip",ped_file_list) 
+        download_zip("pedigrees.zip",ped_file_list)
       }
-      format.json { 
+      format.json {
         contents = Array.new
 	ped_file_list.each do |file, file_loc|
 	  contents.push(File.read(file_loc))
 	end
-	send_data(contents.join(","), :filename => "all_peds", :type => 'application/json') 
+	send_data(contents.join(","), :filename => "all_peds", :type => 'application/json')
       }
     end
 
   end
- 
+
   def all_pedigrees
     @ped_list = Hash.new
     Pedigree.all.each do |ped|
@@ -203,14 +205,14 @@ class PedigreesController < ApplicationController
     end
 
     respond_to do |format|
-    	format.html 
+    	format.html
 	format.json {
 		render :json => @ped_list
 	}
     end
   end
 
-  
+
 
   def pedigree_datastore
     peddir_exists
@@ -247,8 +249,8 @@ class PedigreesController < ApplicationController
       labels.push("IndividualID")
       labels << pedigree.conditions.map{|d| d.name.gsub!(/ /, '_')}
       #labels << pedigree.phenotypes.map{|p| p.name.gsub!(/ /,'_')}
-      labels << pedigree.people.map { |p| p.phenotypes.where(:madeline_display => 1)}.flatten.uniq.map{|l| l.name.gsub!(/ /,'_')} 
-	logger.debug("madeline_image labels are #{labels.inspect}")
+      labels << pedigree.people.map { |p| p.phenotypes.where(:madeline_display => 1)}.flatten.uniq.map{|l| l.name.gsub!(/ /,'_')}
+	    logger.debug("madeline_image labels are #{labels.inspect}")
       madeline_info = Array.new
       madeline_array.each do |line|
         line = line.join("\t")
@@ -270,11 +272,11 @@ class PedigreesController < ApplicationController
       begin
         tmpfile, warnings = Madeline::Interface.new(:embedded => true, :L => labels, "font-size"=> "10", "nolabeltruncation" => true, "sort" => "SortOrder").draw(File.open(infile,'r'))
       rescue Exception => e
-	msg = e.message.gsub(/\e\[(\d+)m/, '')
-	msg.gsub!(/\n/, '<br />')
-	msg.gsub!(/[^0-9A-Za-z \/<>-]/, '')
-	msg.gsub!(/131m/,'')
-        flash[:error] = "#{msg}" 
+        msg = e.message.gsub(/\e\[(\d+)m/, '')
+        msg.gsub!(/\n/, '<br />')
+        msg.gsub!(/[^0-9A-Za-z \/<>-]/, '')
+        msg.gsub!(/131m/,'')
+        flash[:error] = "#{msg}"
       else
         FileUtils.copy(tmpfile,madeline_file)
       end
@@ -296,7 +298,7 @@ class PedigreesController < ApplicationController
         csv << row
       end
     end
-    
+
     respond_to do |format|
       format.html { download_zip("#{@pedigree.tag}_madeline_table.zip",{ "#{@pedigree.tag}_madeline_table.csv" => csv_file_name}) }
     end
@@ -306,7 +308,7 @@ class PedigreesController < ApplicationController
     study = Study.find(params[:study])
     if (study.nil?) then
         @pedigrees = Pedigree.all
-    else 
+    else
         @pedigrees = study.pedigrees
     end
     filenames = Hash.new
@@ -345,11 +347,11 @@ class PedigreesController < ApplicationController
       madeline_name = madeline_file(pedigree)
       madeline_file = MADELINE_DIR + "#{madeline_name}"
       madeline_file = madeline_image(pedigree) unless File.exists?(madeline_file)
-       
+
     end
 
     respond_to do |format|
-      format.pdf do 
+      format.pdf do
         render :pdf => "#{pdf_name}", :stylesheets => ["application","prince"], :layout => "pdf"
       end
     end

@@ -1,4 +1,4 @@
-<%= form_for(@file_type) do |f| %>
+<%= form_with model: @file_type do |f| %>
   <% if @file_type.errors.any? %>
     <div id="error_explanation">
       <h2><%= pluralize(@file_type.errors.count, "error") %> prohibited this file_type from being saved:</h2>

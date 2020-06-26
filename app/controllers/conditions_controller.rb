@@ -2,7 +2,7 @@ class ConditionsController < ApplicationController
   # GET /conditions
   # GET /conditions.xml
   def index
-    @conditions = Condition.find(:all, :order => ['name']).paginate :page => params[:page], :per_page => 100
+    @conditions = Condition.order('name').paginate :page => params[:page], :per_page => 100
 
     respond_to do |format|
       format.html # index.html.erb

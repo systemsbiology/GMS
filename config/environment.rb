@@ -1,10 +1,11 @@
-# Load the rails application
-require File.expand_path('../application', __FILE__)
+# Load the Rails application.
+require_relative 'application'
 
 # Configuration directives for application locations
 PEDIGREES_DIR = Rails.root.join('public/pedigrees')
 MADELINE_DIR = Rails.root.join('public/pedigrees/madeline')
-EXPORT_DIR = Rails.root.join('public/pedigrees/export')
+EXPORT_DIR = Rails.root.join('public/pedigrees/export') if Rails.env.development?
+EXPORT_DIR = "/proj/famgen/gms" if Rails.env.production?
 PEDIGREE_ROOT = "/proj/famgen/studies"
 PEDFILES_DIR = Rails.root.join('public/pedigrees/pedFiles')
 KWANZAA_DIR = Rails.root.join('public/pedigrees/kwanzaa')
@@ -13,7 +14,7 @@ CSVDIR = Rails.root.join('tmp/csv')
 # filename of the pedigree data store
 PEDIGREE_DATA_STORE = "isb-pedigrees.dat"
 
-# CGI header keys 
+# CGI header keys
 CGI_ASSEMBLY_ID = "ASSEMBLY_ID"
 CGI_COSMIC_VERSION = "COSMIC" # not used
 CGI_DBSNP_BUILD = "DBSNP_BUILD" # not used
@@ -64,16 +65,16 @@ FILE_SKIPS = {
          'original' => { 'type' => 'patch', 'category' => 'middle'},
          'debug' => { 'type' => 'patch', 'category' => 'middle'},
          'masterVarBeta[-\d+\w+]+.tsv.gz' => {'type' => 'tabix', 'category' => 'frontback' },
-}  
+}
 
-Dir[File.dirname(__FILE__) + "/../vendor/*"].each do |path|
-  gem_name = File.basename(path.gsub(/-\d+.\d+.\d+$/, ''))
-  gem_path = path + "/lib/" + gem_name + ".rb"
-  require gem_path if File.exists? gem_path
-end
+# Dir[File.dirname(__FILE__) + "/../vendor/*"].each do |path|
+#   gem_name = File.basename(path.gsub(/-\d+.\d+.\d+$/, ''))
+#   gem_path = path + "/lib/" + gem_name + ".rb"
+#   require gem_path if File.exists? gem_path
+# end
 
 # don't include the root, override as_json if you do need the root
 ActiveRecord::Base.include_root_in_json = false
 
-# Initialize the rails application
-Gms::Application.initialize!
+# Initialize the Rails application.
+Rails.application.initialize!

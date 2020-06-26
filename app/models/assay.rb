@@ -10,22 +10,18 @@ class Assay < ActiveRecord::Base
   after_create :check_isb_assay_id
   after_update :check_isb_assay_id
 
-  attr_accessible :name, :assay_type, :technology, :vendor, :status, :description, :date_received, :date_transferred, :dated_backup, :qc_pass_date, :current
-  attr_encrypted :truecrypt_key, :key => "JFDIAFUIOEUR#*(@IJHFDAIFU#*(@" # stores in encrypted_truecrypt_key
-
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
       if pedigree.kind_of?(Array) then
         pedigree_id = pedigree[0]
-      elsif pedigree.kind_of?(Hash) then
-      pedigree_id = pedigree[:id]
+      elsif pedigree.kind_of?(ActionController::Parameters) or pedigree.kind_of?(Hash) then
+        pedigree_id = pedigree[:id]
       else
-      pedigree_id = pedigree.to_i
+        pedigree_id = pedigree.to_i
       end
       unless pedigree_id.blank?
-        { :include => { :sample => { :person => :pedigree } },
-          :conditions => [ 'pedigrees.id = ?', pedigree_id]
-        }
+        joins(sample: { person: :pedigree })
+        .where(pedigrees: {id: pedigree_id})
       end
     end
   }

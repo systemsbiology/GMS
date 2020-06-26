@@ -1,13 +1,13 @@
-<%= form_for(@diagnosis) do |f| %>
+<%= form_with model: @diagnosis do |f| %>
   <%= render "partials/error_messages", :target => @diagnosis %>
 
   <div class="field">
     <%= f.label :person_id %><br />
-    <%= f.collection_select(:person_id, Person.all, :id, :full_identifier, { :include_blank => "-Select Person", :selected => params[:person_id] || @diagnosis.person.id || '' }) %>
+    <%= f.collection_select(:person_id, Person.includes(:pedigree, :person_aliases), :id, :full_identifier, { :include_blank => "-Select Person", :selected => params[:person_id] || @diagnosis.person.id || '' }) %>
   </div>
   <div class="field">
     <%= f.label :condition_id %><br />
-    <%= f.collection_select(:condition_id, Condition.find(:all, :order => ['name']), :id, :name, { :include_blank => "-Select Condition or leave blank" }) %>
+    <%= f.collection_select(:condition_id, Condition.order('name'), :id, :name, { :include_blank => "-Select Condition or leave blank" }) %>
     <div>If condition is not in this list, then <%= link_to "create a new condition", new_condition_path %></div>
   </div>
   <div class="field">

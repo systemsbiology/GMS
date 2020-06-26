@@ -18,7 +18,7 @@
   <tbody>
 <% assembly_files.each do |assembly_file| %>
   <tr>
-    <td> <%= image_tag('file_location.png', :size => "20x20", :onmouseover => "$('#assembly_file_loc_#{assembly_file.id}').poshytip('show')", :onmouseout => "$('#assembly_file_loc_#{assembly_file.id}').poshytip('hide')", :id => "assembly_file_loc_#{assembly_file.id}") %> <%= link_to assembly_file.name, assembly_file %></td>
+    <td> <%= image_tag('file_location.png', :size => "20x20", :title => assembly_file.location, data: { toggle: "tooltip", placement: "right", trigger: 'click hover focus'}, :id => "assembly_file_loc_#{assembly_file.id}") %> <%= link_to assembly_file.name, assembly_file %></td>
     <td><%= assembly_file.file_type.type_name %></td>
     <td> <%= assembly_file.assembly.assay.sample.nil? ? 'No sample linked to this assembly file' : link_to(assembly_file.assembly.assay.sample.sample_vendor_id, sample_path(assembly_file.assembly.assay.sample)) %></td>
     <td><%= link_to assembly_file.assembly.name, assembly_path(assembly_file.assembly) %></td>
@@ -32,16 +32,6 @@
     <td><%= assembly_file.software %></td>
     <td><%= assembly_file.software_version %></td>
   </tr>
-  <script>
-  $("#assembly_file_loc_<%= assembly_file.id %>").poshytip({
-      content: '<%= assembly_file.location if assembly_file.location %>',
-      className: 'tip-yellow',
-      showOn: 'none',
-      alignTo: 'target',
-      alignX: 'inner-left'
-  });
-  </script>
-
 <% end %>
   </tbody>
 </table>

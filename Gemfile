@@ -1,88 +1,100 @@
-source 'http://rubygems.org'
+source 'https://rubygems.org'
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-gem 'rails'
-gem 'rake'
-gem 'builder'
-gem 'net-ssh', '~>2.7.0'
-#gem 'net-ssh', '~> 2.8.1', :git => "https://github.com/net-ssh/net-ssh"
-gem 'debugger'
+ruby '2.7.0'
 
-gem 'aws-sdk'
-# Bundle edge Rails instead:
-# gem 'rails', :git => 'git://github.com/rails/rails.git'
-gem 'mysql2'
-gem 'minitest'
+# Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
+gem 'rails', '~> 6.0.3', '>= 6.0.3.1'
+# Use Puma as the app server
+gem 'puma', '~> 4.1'
+# Use SCSS for stylesheets
+gem 'sass-rails', '>= 6'
+# Transpile app-like JavaScript. Read more: https://github.com/rails/webpacker
+gem 'webpacker', '~> 4.0'
+# Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
+gem 'turbolinks', '~> 5'
+# Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
+gem 'jbuilder', '~> 2.7'
+# Use Redis adapter to run Action Cable in production
+# gem 'redis', '~> 4.0'
+# Use Active Model has_secure_password
+# gem 'bcrypt', '~> 3.1.7'
 
-# Use unicorn as the web server
-# gem 'unicorn'
+# Use Active Storage variant
+# gem 'image_processing', '~> 1.2'
 
-# Deploy with Capistrano
-#gem 'rvm-capistrano'
-#gem 'capistrano-bundler'
-#gem 'capistrano-rails'
-gem 'capistrano', '~> 2.15.5'
-# To use debugger (ruby-debug for Ruby 1.8.7+, ruby-debug19 for Ruby 1.9.2+)
-# gem 'ruby-debug'
-#gem 'linecache19', :git => "git://github.com/mark-moseley/linecache"
-#gem 'ruby-debug-base19x', "~>0.11.30.pre10"
-#gem 'ruby-debug19', :require => 'ruby-debug'
+# Reduces boot times through caching; required in config/boot.rb
+gem 'bootsnap', '>= 1.4.2', require: false
 
-gem 'settingslogic'
-
-gem 'strong_parameters'
-
-gem 'will_paginate'
-gem 'jquery-rails'#, '~> 2.1'
-gem 'select2-rails'    # jquery select boxes
-gem 'formtastic'
-gem 'event-calendar', :require => 'event_calendar'
-gem 'simple_navigation'
-gem 'gollum' # wiki
-
-#gem 'devise'
-#gem 'devise_ldap_authenticatable'
-#gem 'cancan'
-gem 'attr_encrypted'
-
-gem 'paperclip'
-gem 'spreadsheet'
-#gem 'princely'
-
-gem 'ancestry'
-#gem 'awesome_nested_set'
-#gem 'acts_as_audited'
-#, "2.0.0.rc7"
-
-gem 'madeline', '~> 0.1.11'
-
-gem 'rubyzip', '<1.0.0'
-gem 'auto_strip_attributes'#, "~> 1.0"
-gem 'json_builder'
-
-# create cron jobs to clean the temporary objects from the database
-gem 'whenever'
-gem 'rspec-rails'
-
-# testing
-group :test do
-  gem 'factory_girl'
-  gem 'factory_girl_rails'
-  gem 'shoulda'
-  gem 'shoulda-matchers'
-  gem 'fakefs', :require => "fakefs/safe"
-  gem "database_cleaner"
-  gem "email_spec"
+group :development, :test do
+  # Call 'byebug' anywhere in the code to stop execution and get a debugger console
+  gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
 end
 
-# Bundle the extra gems:
-# gem 'bj'
-# gem 'nokogiri'
-# gem 'sqlite3-ruby', :require => 'sqlite3'
-# gem 'aws-s3', :require => 'aws/s3'
+group :development do
+  # Access an interactive console on exception pages or by calling 'console' anywhere in the code.
+  gem 'web-console', '>= 3.3.0'
+  gem 'listen', '~> 3.2'
+  # Spring speeds up development by keeping your application running in the background. Read more: https://github.com/rails/spring
+  gem 'spring'
+  gem 'spring-watcher-listen', '~> 2.0.0'
+end
 
-# Bundle gems for the local environment. Make sure to
-# put test-only gems in this group so their generators
-# and rake tasks are available in development mode:
-# group :development, :test do
-#   gem 'webrat'
-# end
+group :test do
+  # Adds support for Capybara system testing and selenium driver
+  gem 'capybara', '>= 2.15'
+  gem 'selenium-webdriver'
+  # Easy installation and use of web drivers to run system tests with browsers
+  gem 'webdrivers'
+end
+
+# Windows does not include zoneinfo files, so bundle the tzinfo-data gem
+gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+
+gem "list", "~> 0.2.0"
+
+gem "activerecord-session_store", "~> 1.1"
+
+gem "actionpack-action_caching", "~> 1.2"
+gem "actionpack-page_caching", "~> 1.2"
+gem "rails-observers", "~> 0.1.5"
+
+gem "aws-sdk", "~> 3.0"
+
+gem "mysql2", "~> 0.5.3"
+
+gem "responders", "~> 3.0"
+
+gem "capistrano-bundler", "~> 1.6"
+gem "capistrano-passenger", "~> 0.2.0"
+gem "capistrano", "~> 3.14"
+gem "capistrano-rails", "~> 1.5"
+gem "capistrano-rvm", "~> 0.1.2"
+
+gem "settingslogic", "~> 2.0"
+
+gem "will_paginate", "~> 3.3"
+
+gem "paperclip", "~> 6.1"
+
+gem "spreadsheet", "~> 1.2"
+
+gem "ancestry", "~> 3.0"
+
+gem "rubyzip", "~> 2.3"
+
+gem "auto_strip_attributes", "~> 2.6"
+
+gem "json_builder", "~> 3.1"
+
+gem "whenever", "~> 1.0"
+
+gem "rspec-rails", "~> 4.0"
+
+gem "builder", "~> 3.2"
+
+gem "madeline", "~> 0.1.11"
+
+gem "jquery-tablesorter", "~> 1.27"
+
+gem "jquery-turbolinks", "~> 2.1"

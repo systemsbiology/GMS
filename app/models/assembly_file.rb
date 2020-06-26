@@ -9,21 +9,19 @@ class AssemblyFile < ActiveRecord::Base
   validates_uniqueness_of :name, :location
   after_save :update_completeness
 
-  attr_accessible :genome_reference_id, :assembly_id, :file_type_id, :name, :description, :location, :file_date, :metadata, :disk_id, :software, :software_version, :record_date, :current, :comments
-
   scope :has_pedigree, lambda { |pedigree|
     unless pedigree.blank?
       if pedigree.kind_of?(Array) then
         pedigree_id = pedigree[0]
-      elsif pedigree.kind_of?(Hash) then
-      pedigree_id = pedigree[:id]
+      elsif pedigree.kind_of?(ActionController::Parameters) or pedigree.kind_of?(Hash) then
+        pedigree_id = pedigree[:id]
       else
-      pedigree_id = pedigree.to_i
+        pedigree_id = pedigree.to_i
       end
 
       unless pedigree_id.blank?
-        joins(:assembly => {:assay => { :sample => { :person => :pedigree } } } ).
-	where('pedigrees.id = ?', pedigree_id)
+        joins(assembly: { assay: { sample:{ person: :pedigree } } } )
+          .where(pedigrees: {id: pedigree_id})
       end
     end
   }
@@ -39,7 +37,7 @@ class AssemblyFile < ActiveRecord::Base
   }
 
   def pedigree_id
-    begin 
+    begin
       self.assembly.assay.sample.person.pedigree.id
     rescue
       logger.error("Error with pedigree_id call for file #{self.inspect}")

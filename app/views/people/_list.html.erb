@@ -1,6 +1,5 @@
-<% logger.debug("in @people LIST #{@people.inspect}") %>
-<% if @people.size == 0 %>
-  <p>No @people for this pedigree</p>
+<% if @people.nil? || @people.size == 0 %>
+  <p>No people for this pedigree</p>
 <% else %>
 <table class="tablesorter">
   <thead>
@@ -30,6 +29,6 @@
   </tr>
 </tbody>
 </table>
+<%= will_paginate @people %>
 <% end %>
 
-<%= will_paginate @people %>

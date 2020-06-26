@@ -7,8 +7,7 @@ class Study < ActiveRecord::Base
   after_save :check_study_tag
   after_update :check_study_tag
   after_create :check_study_tag
-  
-  attr_accessible :name, :tag, :lead, :collaborator, :collaborating_institution, :description, :contact
+
 
   def check_study_tag
     if !self.tag.nil? and self.tag.match(/ /) then
@@ -18,15 +17,24 @@ class Study < ActiveRecord::Base
     end
   end
 
-  def count_trios
-	Rails.cache.fetch("numTrios/#{id}", :expires_in => 7.days) do
-		numTrios = 0
-		self.pedigrees.each do |ped|
-			numTrios += ped.trios[0][2].count unless ped.trios.empty?
-		end
-		numTrios
-	end
+  def genomic_count
+    total_count = 0
+    self.pedigrees.each do |ped|
+        ped_count = ped.genomic_count
+        total_count = total_count + ped_count
+    end
+    return total_count
   end
+
+  def count_trios
+    Rails.cache.fetch("numTrios/#{id}", :expires_in => 7.days) do
+      numTrios = 0
+      self.pedigrees.each do |ped|
+        numTrios += ped.trios[0][2].count unless ped.trios.empty?
+      end
+      numTrios
+    end
+    end
 
   def count_individuals
 	Rails.cache.fetch("numPeople/#{id}",:expires_in => 7.days) do

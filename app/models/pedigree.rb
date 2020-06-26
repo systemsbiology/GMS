@@ -6,15 +6,14 @@ class Pedigree < ActiveRecord::Base
   after_update :check_pedigree_tag, :check_isb_pedigree_id
   before_destroy :destroy_people
 
-  has_many :people, :through => :memberships, :dependent => :destroy
   has_many :memberships, :dependent => :destroy
+  has_many :people, :through => :memberships, :dependent => :destroy
   belongs_to :study
 
   auto_strip_attributes :name, :tag, :description
   validates_presence_of :name, :tag, :study_id
   validates_uniqueness_of :name, :tag
 
-  attr_accessible :name, :tag, :study_id, :directory, :description, :version, :genotype_vector_date, :quartet_date, :autozygosity_date, :relation_pairing_date
 
   def phenotypes
     self.people.map(&:phenotypes).flatten.uniq
@@ -98,7 +97,7 @@ class Pedigree < ActiveRecord::Base
 		trios = self.nTuple(3)
 	end
   end
-  
+
   def quartets
 	Rails.cache.fetch("quartets/#{id}", :expires_in => 7.days) do
 		quartets = self.nTuple(4)
@@ -113,7 +112,7 @@ class Pedigree < ActiveRecord::Base
     peopleByFamily = Hash.new
     self.people.each do |person|
       (father_rel, mother_rel) = person.parents
-       next if father_rel.nil? or mother_rel.nil? 
+       next if father_rel.nil? or mother_rel.nil?
        father = father_rel.relation # person is the child
        mother = mother_rel.relation
        peopleByFamily[father] = Hash.new if peopleByFamily[father].nil?
@@ -127,8 +126,18 @@ class Pedigree < ActiveRecord::Base
 		tuple.push([father, mother, childrenCombos])
       end
     end
-   
+
     return tuple
+  end
+
+  def genomic_count
+    complete_count = 0
+    self.people.each do |person|
+        if person.complete then
+            complete_count = complete_count+1
+        end
+    end
+    return complete_count
   end
 
   # return 1 if there are no 'planning_on_sequencing' members that don't have assembly files
@@ -138,10 +147,10 @@ class Pedigree < ActiveRecord::Base
     self.people.each do |person|
       if person.planning_on_sequencing then
         # check to see if they have a sample. return true if one sample is complete
-	plan_count = plan_count+1
-        if person.complete then 
-	  complete_count = complete_count+1
-	end
+	    plan_count = plan_count+1
+        if person.complete then
+	        complete_count = complete_count+1
+	    end
       end
     end
     return true if ((plan_count > 0) and (plan_count == complete_count))

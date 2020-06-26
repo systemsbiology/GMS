@@ -1,9 +1,9 @@
-<%= form_for(@person_alias) do |f| %>
+<%= form_with model: @person_alias do |f| %>
   <%= render "partials/error_messages", :target => @person_alias %>
 
   <div class="field">
     <%= f.label :person_id %><br />
-    <%= f.collection_select(:person_id, Person.all, :id, :full_identifier, { :include_blank => "-Select Person", :selected => params[:person_id]}) %>
+    <%= f.collection_select(:person_id, Person.includes(:pedigree, :person_aliases), :id, :full_identifier, { :include_blank => "-Select Person", :selected => params[:person_id]}) %>
   </div>
   <div class="field">
     <%= f.label :alias_type %><br />

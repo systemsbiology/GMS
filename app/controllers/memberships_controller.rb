@@ -3,7 +3,7 @@ class MembershipsController < ApplicationController
   # GET /memberships.xml
   def index
     if params[:pedigree_filter] then
-      @memberships = Membership.find_all_by_pedigree_id(params[:pedigree_filter][:id])
+      @memberships = Membership.find_by(pedigree_id: params[:pedigree_filter][:id])
     else
       @memberships = Membership.all
     end

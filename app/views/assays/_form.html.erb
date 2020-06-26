@@ -1,4 +1,4 @@
-<%= form_for(@assay) do |f| %>
+<%= form_with model: @assay do |f| %>
   <%= render "partials/error_messages", :target => @assay %>
 
   <div class="field">
@@ -7,15 +7,15 @@
   </div>
   <div class="field">
     <%= f.label :assay_type %><br />
-    <%= f.collection_select(:assay_type, Assay.find(:all, :conditions =>[ "assay_type != ''"], :select => 'DISTINCT assay_type',:order => 'assay_type DESC'), :assay_type, :assay_type) %>
+    <%= f.collection_select(:assay_type, Assay.where("assay_type != ''").order('assay_type DESC').distinct.pluck(:assay_type), :to_s, :to_s) %>
   </div>
   <div class="field">
     <%= f.label :vendor %><br />
-    <%= f.collection_select(:vendor, Assay.find(:all, :conditions =>[ "vendor != ''"], :select => "DISTINCT vendor ",:order => 'vendor'), :vendor, :vendor) %>
+    <%= f.collection_select(:vendor, Assay.where("vendor != ''").order('vendor').distinct.pluck(:vendor), :to_s, :to_s) %>
   </div>
   <div class="field">
     <%= f.label :technology %><br />
-    <%= f.collection_select(:technology, Assay.find(:all, :conditions =>[ "technology != ''"], :select => 'DISTINCT technology',:order => 'technology'), :technology, :technology) %>
+    <%= f.collection_select(:technology, Assay.where("technology != ''").order('technology').distinct.pluck(:technology), :to_s, :to_s) %>
   </div>
   <div class="field">
     <%= f.label :description %><br />
@@ -28,7 +28,7 @@
   <% if params[:action] == 'new' then %>
     <div class="field">
       <%= label(Sample, :sample) %><br />
-      <%= collection_select(:sample, :sample_id, Sample.all, :id, :identifier, { :selected => params[:sample_id] || ''} ) %>
+      <%= collection_select(:sample, :sample_id, Sample.includes(person: :person_aliases), :id, :identifier, { :selected => params[:sample_id] || ''} ) %>
     </div>
   <% end %>
   <div class="actions">

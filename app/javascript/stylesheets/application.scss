@@ -1,0 +1,12 @@
+// example of how to use bootstrap in rails
+
+$link-color: #000;
+$link-hover-color: #fff;
+
+@import "~bootstrap/scss/bootstrap";
+
+
+
+a {
+  text-decoration: underline;
+}

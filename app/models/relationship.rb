@@ -3,8 +3,7 @@ class Relationship < ActiveRecord::Base
   belongs_to :relation, :class_name => "Person"
   validates_presence_of :person_id, :relation_id, :relationship_type, :name, :relation_order
   before_save :validate_relationship_ids_differ
-  attr_accessible :name, :person_id, :relation_id, :relationship_type, :relation_order, :divorced
- 
+
   def validate_relationship_ids_differ
     return false if self.person_id == self.relation_id
     return true
@@ -20,20 +19,20 @@ class Relationship < ActiveRecord::Base
     unless pedigree.blank?
       if pedigree.kind_of?(Array) then
         pedigree_id = pedigree[0]
-      elsif pedigree.kind_of?(Hash) then
-      pedigree_id = pedigree[:id]
+      elsif pedigree.kind_of?(ActionController::Parameters) or pedigree.kind_of?(Hash) then
+        pedigree_id = pedigree[:id]
       else
-      pedigree_id = pedigree.to_i
+        pedigree_id = pedigree.to_i
       end
       unless pedigree_id.blank?
-        joins(:person => {:membership => :pedigree} ).
-        where('pedigrees.id = ?', pedigree_id)
+        joins(:person => {:membership => :pedigree} )
+          .where(pedigrees: {id: pedigree_id})
       end
     end
   }
 
-  scope :display_filter, lambda { 
-    {:conditions => ["relationship_type = 'parent' or relationship_type = 'undirected'"]}
+  scope :display_filter, lambda {
+    where("relationship_type = 'parent' or relationship_type = 'undirected'")
   }
 
   scope :order_by_pedigree, lambda {
@@ -139,7 +138,7 @@ class Relationship < ActiveRecord::Base
       # dizygotic twins can be any sex combination
       return true
     end
-    
+
     if relationship_gender[self.name].nil? then
       logger.error("Error: relationship_gender does not contain #{self.name}.  Please add to config/application.yml before adding this relationship.")
       return false
